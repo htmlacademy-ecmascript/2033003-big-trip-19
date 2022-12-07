@@ -12,5 +12,9 @@
   },
   "engines": {
     "node": "18"
+  },
+  "dependencies": {
+    "webpack": "5.75.0",
+    "webpack-cli": "5.0.0"
   }
 }
