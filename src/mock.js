@@ -1,4 +1,4 @@
-import { getRandomArrayElement } from "./util";
+import { getRandomArrayElement } from './util';
 
 const WAYPOINTS = [
   {
