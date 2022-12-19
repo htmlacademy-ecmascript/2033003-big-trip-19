@@ -24,7 +24,7 @@ const createOffersTemplate = (offers) => (offers.map((offer) => `<li class="even
     </li>`).join(''));
 
 function createWaypointTemplate(waypoint, allOffers, allDestinations) {
-  const {type,destination,dateFrom,dateTo,basePrice, isFavorite} = waypoint;
+  const {type,destination,dateFrom,dateTo,basePrice} = waypoint;
   const destinationdById = allDestinations.find((destinationElement) => destinationElement.id === destination);
   const{name} = destinationdById;
   const offers = getOffersByType(waypoint, allOffers);
