@@ -1,4 +1,3 @@
-import { OFFERS, POINT_TYPES } from '../const.js';
 import { render } from '../render.js';
 import AddPointView from '../view/add-point-view.js';
 import ContentView from '../view/content-view.js';
@@ -13,8 +12,6 @@ export default class ContentPresenter {
   }
 
   init() {
-    this.mockPointTypes = POINT_TYPES;
-    this.mockOffers = OFFERS;
     this.allDestinations = this.destinationModel.getDestinations();
     this.boardWaypoints = this.waypoinModel.sortWaypoints([...this.waypoinModel.getWaypoints()]);
     this.randomeDestination = this.destinationModel.getRandomeDestination();
