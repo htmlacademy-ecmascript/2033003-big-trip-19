@@ -1,43 +1,54 @@
+import { OFFERS } from '../const.js';
 import { createElement } from '../render.js';
-import { getDateDifference, getTimeFromDate, humanizeWaypointDate} from '../util.js';
+import { getDateDifference, getTimeFromDate, humanizeWaypointDate,getHumanizeTime, upperCaseFirst} from '../util.js';
 
-const createOffers = (offers) =>{
-  let offersMarkup = '';
-  for(let i = 0; i < offers.length; i++) {
-    const offer = offers[i];
-    const offerTitle = offer.offerTitle;
-    const offerPrice = offer.offerPrice;
-    offersMarkup += `<li class="event__offer">
-            <span class="event__offer-title">${offerTitle}</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offerPrice}</span>
-            </li>`;
+const getOffersByType = (waypoint,allOffers) =>{
+  const allOffersByType = allOffers.find((offer) => offer.type === waypoint.type);
+  const offersByType = [];
+  for(let i = 0; i < allOffersByType.offers.length; i++) {
+    const offerFromOfferByType = allOffersByType.offers[i];
+    for(let j = 0; j < waypoint.offers.length; j++){
+      const waypointOfferId = waypoint.offers[j];
+      if(waypointOfferId === offerFromOfferByType.id)
+      {
+        offersByType.push(offerFromOfferByType);
+      }
+    }
   }
-  return offersMarkup;
+  return offersByType;
 };
-function createWaypointTemplate(waypoint) {
-  const {date,icon,title,startTime,endTime,eventPrice,offers} = waypoint;
+const createOffersTemplate = (offers) => (offers.map((offer) => `<li class="event__offer">
+    <span class="event__offer-title">${offer.title}</span>
+    &plus;&euro;&nbsp;
+    <span class="event__offer-price">${offer.price}</span>
+    </li>`).join(''));
+
+function createWaypointTemplate(waypoint, allOffers, allDestinations) {
+  const {type,destination,dateFrom,dateTo,basePrice} = waypoint;
+  const destinationdById = allDestinations.find((destinationElement) => destinationElement.id === destination);
+  const{name} = destinationdById;
+  const offers = getOffersByType(waypoint, allOffers);
   return (`<li class="trip-events__item">
   <div class="event">
-    <time class="event__date" datetime="${date}">${humanizeWaypointDate(date)}</time>
+    <time class="event__date" datetime="${dateFrom}">${humanizeWaypointDate(dateFrom)}</time>
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}.png" alt="Event type icon">
+      <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${title}</h3>
+    <h3 class="event__title">${upperCaseFirst(type)} ${name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${startTime}">${getTimeFromDate(startTime)}</time>
+        <time class="event__start-time" datetime="${dateFrom.toISOString()}">${getTimeFromDate(dateFrom.toISOString())}</time>
         &mdash;
-        <time class="event__end-time" datetime="${endTime}">${getTimeFromDate(endTime)}</time>
+        <time class="event__end-time" datetime="${dateTo}">${getTimeFromDate(dateTo)}</time>
       </p>
-      <p class="event__duration">${getDateDifference(startTime,endTime)}M</p>
+      <p class="event__duration">${getHumanizeTime(getDateDifference(dateFrom,dateTo))}</p>
     </div>
     <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${eventPrice}</span>
+      &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${createOffers(offers)}
+    ${createOffersTemplate(offers)}
     </ul>
     <button class="event__favorite-btn event__favorite-btn--active" type="button">
       <span class="visually-hidden">Add to favorite</span>
@@ -53,12 +64,13 @@ function createWaypointTemplate(waypoint) {
 }
 
 export default class WaypointView {
-  constructor({ waypoint }) {
+  constructor({ waypoint, allDestinations }) {
     this.waypoint = waypoint;
+    this.allDestinations = allDestinations;
   }
 
   getTemplate() {
-    return createWaypointTemplate(this.waypoint);
+    return createWaypointTemplate(this.waypoint,OFFERS,this.allDestinations);
   }
 
   getElement() {

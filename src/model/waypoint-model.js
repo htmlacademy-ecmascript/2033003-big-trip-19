@@ -1,9 +1,12 @@
-import { getRandomWaypoint} from '../mock.js';
-
-const WAYPOINT_COUNT = 3;
+import { createDataPoints} from '../mock-waypoint.js';
 export default class WaypointModel{
-  waypoints = Array.from({length: WAYPOINT_COUNT},getRandomWaypoint);
+  #waypoints = Array.from(createDataPoints());
+
+  sortWaypoints(){
+    return this.#waypoints.sort((a, b) => a.dateFrom > b.dateFrom ? 1 : -1);
+  }
+
   getWaypoints(){
-    return this.waypoints;
+    return this.#waypoints;
   }
 }
