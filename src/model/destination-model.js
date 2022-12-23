@@ -8,7 +8,7 @@ export default class DestinationModel{
     return getRandomArrayElement(this.#destinations);
   }
 
-  getDestinations(){
+  get destinations(){
     return this.#destinations;
   }
 }

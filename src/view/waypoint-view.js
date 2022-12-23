@@ -64,23 +64,27 @@ function createWaypointTemplate(waypoint, allOffers, allDestinations) {
 }
 
 export default class WaypointView {
+  #element = null;
+  #waypoint = null;
+  #allDestinations = null;
+  #allOffers = OFFERS;
   constructor({ waypoint, allDestinations }) {
-    this.waypoint = waypoint;
-    this.allDestinations = allDestinations;
+    this.#waypoint = waypoint;
+    this.#allDestinations = allDestinations;
   }
 
-  getTemplate() {
-    return createWaypointTemplate(this.waypoint,OFFERS,this.allDestinations);
+  get template() {
+    return createWaypointTemplate(this.#waypoint,this.#allOffers,this.#allDestinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

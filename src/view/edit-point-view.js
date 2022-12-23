@@ -107,25 +107,28 @@ const createEditViewTemplate = (allPointTypes, allOffers, destination, offerType
 };
 
 export default class EditPointView {
+  #element = null;
+  #destination = null;
+
   constructor({destination = {} }) {
-    this.destination = destination;
+    this.#destination = destination;
     this.mockPointTypes = POINT_TYPES;
     this.mockOffers = OFFERS;
   }
 
-  getTemplate() {
-    return createEditViewTemplate(this.mockPointTypes, this.mockOffers, this.destination, getRandomArrayElement(this.mockPointTypes));
+  get template() {
+    return createEditViewTemplate(this.mockPointTypes, this.mockOffers, this.#destination, getRandomArrayElement(this.mockPointTypes));
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
 

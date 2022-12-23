@@ -6,7 +6,7 @@ export default class WaypointModel{
     return this.#waypoints.sort((a, b) => a.dateFrom > b.dateFrom ? 1 : -1);
   }
 
-  getWaypoints(){
+  get waypoints(){
     return this.#waypoints;
   }
 }
