@@ -12,7 +12,7 @@ export default class ContentPresenter {
   }
 
   #renderPoint(point, randomeDestination, allDestinations){
-    const pointComponent = new WaypointView({waypoint: point, destination: randomeDestination, allDestinations: allDestinations});
+    const pointComponent = new WaypointView({waypoint: point, allDestinations: allDestinations});
     const editPointComponent = new EditPointView({destination: randomeDestination});
 
     const replaceEditToPoint = () => {
@@ -43,6 +43,8 @@ export default class ContentPresenter {
     });
     editPointComponent.element.querySelector('form').addEventListener('submit', (evt) => {
       evt.preventDefault();
+      replaceEditToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
     });
     render(pointComponent,this.#boardComponent.element);
   }
