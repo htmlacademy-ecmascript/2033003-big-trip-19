@@ -1,4 +1,4 @@
-import { DESCRIPTIONS, DESTINATION_NAMES, MAX_COUNT_DESCRIPRIONS, MAX_COUNT_OBJECTS, MAX_RANDOM_IMAGE_INTEGER, MIN_COUNT_DESCRIPRIONS } from './const.js';
+import { DESCRIPTIONS, DESTINATION_NAMES, Integer } from './const.js';
 import { getRandomArrayElement, returnRandomInteger } from './util';
 
 const returnDescriptionWithoutDuplicate = (descriptions) => {
@@ -11,6 +11,7 @@ const returnDescriptionWithoutDuplicate = (descriptions) => {
 };
 
 const getDescriptionsForDestination = () =>{
+  const {MIN_COUNT_DESCRIPRIONS, MAX_COUNT_DESCRIPRIONS} = Integer;
   const countDescriptions = returnRandomInteger(MAX_COUNT_DESCRIPRIONS,MIN_COUNT_DESCRIPRIONS);
   const descriptions = [];
   for(let i = 0; i < countDescriptions; i++){
@@ -20,6 +21,7 @@ const getDescriptionsForDestination = () =>{
 };
 
 const createDataDestination = (integer) =>{
+  const {MAX_RANDOM_IMAGE_INTEGER} = Integer;
   const destinationName = getRandomArrayElement(DESTINATION_NAMES);
   const destinationDescription = returnDescriptionWithoutDuplicate(getDescriptionsForDestination());
   return {
@@ -34,7 +36,7 @@ const createDataDestination = (integer) =>{
     ]
   };
 };
-const createDataDestinations = ()=> Array.from({ length: MAX_COUNT_OBJECTS }, (_element,integer) =>
+const createDataDestinations = ()=> Array.from({ length: Integer.MAX_COUNT_OBJECTS }, (_element,integer) =>
   createDataDestination(integer + 1));
 
 export{createDataDestinations};

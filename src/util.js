@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DATE_FORMAT, MAX_INTEGER_DATE, MAX_RANDOME_TIME_INTEGER, MIN_RANDOME_TIME_INTEGER } from './const.js';
+import { DateFormat, Integer } from './const.js';
 const returnRandomBool = (() => {
   const a = new Uint8Array(1);
   return function() {
@@ -22,10 +22,11 @@ function returnRandomDate(minDate, maxDate) {
   return new Date(maxDate.getTime() + Math.random() * (minDate.getTime() - maxDate.getTime()));
 }
 function addDays(date) {
+  const {MIN_RANDOME_HOUR, MAX_RANDOME_HOUR, MAX_INTEGER_DATE_DURATION} = Integer;
   const result = new Date(date);
-  result.setDate(result.getDate() + returnRandomInteger(MAX_INTEGER_DATE));
-  result.setHours(result.getHours() + returnRandomInteger(MAX_RANDOME_TIME_INTEGER,MIN_RANDOME_TIME_INTEGER));
-  result.setMinutes(result.getMinutes() + returnRandomInteger(MAX_RANDOME_TIME_INTEGER,MIN_RANDOME_TIME_INTEGER));
+  result.setDate(result.getDate() + returnRandomInteger(MAX_INTEGER_DATE_DURATION));
+  result.setHours(result.getHours() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
+  result.setMinutes(result.getMinutes() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
   return result;
 }
 const upperCaseFirst = (str) => {
@@ -41,11 +42,11 @@ const lowwerCaseFirst = (str) => {
   return str[0].toLowerCase() + str.slice(1);
 };
 const getTimeFromDate = (date) => {
-  const withoutDate = dayjs(date).format('HH:mm');
+  const withoutDate = dayjs(date).format(DateFormat.HOURS_AND_MINUTES);
   return withoutDate;
 };
 const getFullFormatDate = (date) => {
-  const withoutDate = dayjs(date).format('DD/MM/YY HH:mm');
+  const withoutDate = dayjs(date).format(DateFormat.FULL_DATE_AND_TIME);
   return withoutDate;
 };
 const getHumanizeTime = (diff) => {
@@ -88,7 +89,7 @@ const isEmptyObject = (obj) => {
   }
   return false;
 };
-const humanizeWaypointDate = (date) => date ? dayjs(date).format(DATE_FORMAT) : date;
+const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
 
 export {upperCaseFirst, getTimeFromDate,
