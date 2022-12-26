@@ -5,15 +5,14 @@ import WaypointView from '../view/waypoint-view.js';
 export default class ContentPresenter {
   #boardComponent = new ContentView();
 
-  constructor({contentContainer,waypointModel,destinationModel}){
+  constructor({contentContainer,waypointModel}){
     this.contentContainer = contentContainer;
     this.waypoinModel = waypointModel;
-    this.destinationModel = destinationModel;
   }
 
-  #renderPoint(point, randomeDestination, allDestinations){
-    const pointComponent = new WaypointView({waypoint: point, allDestinations: allDestinations});
-    const editPointComponent = new EditPointView({destination: randomeDestination});
+  #renderPoint(point, allOffers){
+    const pointComponent = new WaypointView({waypoint: point});
+    const editPointComponent = new EditPointView({waypoint: point, allOffers: allOffers});
 
     const replaceEditToPoint = () => {
       this.#boardComponent.element.replaceChild(pointComponent.element, editPointComponent.element);
@@ -50,14 +49,12 @@ export default class ContentPresenter {
   }
 
   init() {
-    this.allDestinations = this.destinationModel.destinations;
-    this.boardWaypoints = this.waypoinModel.sortWaypoints([...this.waypoinModel.waypoints]);
-    this.randomeDestination = this.destinationModel.getRandomeDestination();
-
+    this.offers = [...this.waypoinModel.offers];
+    this.humanaseWaypoints = [...this.waypoinModel.humanazeWaypoints];
     render(this.#boardComponent,this.contentContainer);
 
-    for(let i = 0; i < this.boardWaypoints.length; i++){
-      this.#renderPoint(this.boardWaypoints[i],this.randomeDestination,this.allDestinations);
+    for(let i = 0; i < this.humanaseWaypoints.length; i++){
+      this.#renderPoint(this.humanaseWaypoints[i], this.offers);
     }
   }
 }

@@ -13,7 +13,7 @@ const MIN_COUNT_DESCRIPRIONS = 1;
 const MAX_COUNT_DESCRIPRIONS = 5;
 const MAX_RANDOM_IMAGE_INTEGER = 1000;
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburd', 'Rostov'];
+const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburg', 'Rostov', 'Ulan-Ude','Saratov', 'Samara','Izevsk','Krasnodar','Sochi','Adler'];
 const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',

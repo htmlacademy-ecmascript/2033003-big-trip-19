@@ -38,7 +38,7 @@ const lowwerCaseFirst = (str) => {
   if (!str){
     return str;
   }
-  return str[0].toUpperCase() + str.slice(1);
+  return str[0].toLowerCase() + str.slice(1);
 };
 const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format('HH:mm');

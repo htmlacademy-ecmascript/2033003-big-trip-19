@@ -1,5 +1,4 @@
-import { MAX_BASE_PRICE, MAX_COUNT_OBJECTS, MAX_DATE, MAX_INTEGER_DATE, MAX_LENGTH_ARRAY_ID_OFFERS, MIN_BASE_PRICE, MIN_DATE, MIN_LENGTH_ARRAY_ID_OFFERS, OFFERS, POINT_TYPES} from './const';
-import DestinationModel from './model/destination-model';
+import { MAX_BASE_PRICE, MAX_COUNT_OBJECTS, MAX_DATE, MAX_INTEGER_DATE, MIN_BASE_PRICE, MIN_DATE, MIN_LENGTH_ARRAY_ID_OFFERS, OFFERS, POINT_TYPES} from './const';
 import { addDays, getRandomArrayElement, returnRandomBool, returnRandomDate, returnRandomInteger } from './util.js';
 
 const lengthArrayPointType = (type) => {
@@ -14,12 +13,11 @@ const getUniqIdOffers = (offersIds) => {
   const newSet = new Set(offersIds);
   return Array.from(newSet);
 };
-const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, pointType) =>{
+const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, pointType, destinations) =>{
   const dateFrom = returnRandomDate(minRandomDate, maxRandomDate);
-  const destinationModel = new DestinationModel();
-  const destinationElement = destinationModel.getRandomeDestination();
+  const destinationElement = getRandomArrayElement(destinations);
   const arrayOffersByTypeLength = lengthArrayPointType(pointType);
-  const randomeOffersIds = getUniqIdOffers(generateArrayIdOffers(arrayOffersByTypeLength,MAX_LENGTH_ARRAY_ID_OFFERS,MIN_LENGTH_ARRAY_ID_OFFERS));
+  const randomeOffersIds = getUniqIdOffers(generateArrayIdOffers(arrayOffersByTypeLength,arrayOffersByTypeLength,MIN_LENGTH_ARRAY_ID_OFFERS));
   const dateTo = addDays(dateFrom,returnRandomInteger(maxIntegerDate)).toISOString();
   return{
     basePrice:returnRandomInteger(MIN_BASE_PRICE,MAX_BASE_PRICE),
@@ -32,7 +30,7 @@ const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, 
     type: pointType,
   };
 };
-const createDataPoints = ()=> Array.from({ length: MAX_COUNT_OBJECTS }, (_element,integer) =>
-  createDataPoint(integer + 1, MAX_DATE, MIN_DATE,MAX_INTEGER_DATE, getRandomArrayElement(POINT_TYPES)));
+const createDataPoints = (destinations)=> Array.from({ length: MAX_COUNT_OBJECTS }, (_element,integer) =>
+  createDataPoint(integer + 1, MAX_DATE, MIN_DATE,MAX_INTEGER_DATE, getRandomArrayElement(POINT_TYPES), destinations));
 
 export {createDataPoints};

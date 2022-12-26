@@ -1,6 +1,6 @@
-import { OFFERS, POINT_TYPES } from '../const.js';
+import { POINT_TYPES } from '../const.js';
 import {createElement} from '../render.js';
-import { getRandomArrayElement, isEmptyObject, lowwerCaseFirst, returnRandomBool, upperCaseFirst } from '../util.js';
+import {isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const {description} = destinationPoint;
@@ -22,15 +22,27 @@ const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
   </section>`;
 };
 
-const showDestinationTitle = (title) => `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${title}" list="destination-list-1">`;
+const showDestinationTitle = (title, id) => `<input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${title}" list="destination-list-${id}">`;
 
-const createOffersViewTemplate = (offers) =>
-  `<section class="event__section  event__section--offers">
+const getStatus = (offer, point) => {
+  let status = '';
+  for(let i = 0; i < point.offers.length; i++){
+    const pointOffers = point.offers[i];
+    if(pointOffers.id === offer.id){
+      status = 'checked';
+      break;
+    }
+  }
+  return status;
+};
+const createOffersViewTemplate = (point, allOffers) =>{
+  const availableOffers = allOffers.find((offer) => offer.type === point.type);
+  return `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${offers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0] - 1)}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0] - 1)}" ${returnRandomBool() ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0] - 1)}-1">
+      ${availableOffers.offers.map((offer) => `<div class="event__offer-selector">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${getStatus(offer, point)}>
+            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
@@ -38,38 +50,37 @@ const createOffersViewTemplate = (offers) =>
     </div>`).join('')}
     </div>
   </section>`;
+};
 
-const createEditViewTemplate = (allPointTypes, allOffers, destination, offerType) => {
-  const {name} = destination;
-  const availableOffers = allOffers.find((offer) => offer.type === offerType);
-  const {offers} = availableOffers;
+function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
+  const { type, destination, dateFrom, dateTo, basePrice, offers } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
-        <label class="event__type  event__type-btn" for="event-type-toggle-1">
+        <label class="event__type  event__type-btn" for="event-type-toggle-${waypoint.id}">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${offerType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${waypoint.id}" type="checkbox">
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${allPointTypes.map((type) =>`<div class="event__type-item">
-            <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-            <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${upperCaseFirst(type)}</label>
+            ${allPointTypes.map((pointType, index) => `<div class="event__type-item">
+            <input id="event-type-${pointType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
+            <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${index}">${upperCaseFirst(pointType)}</label>
             </div>`).join('')}
           </fieldset>
         </div>
       </div>
 
       <div class="event__field-group  event__field-group--destination">
-        <label class="event__label  event__type-output" for="event-destination-1">
-        ${upperCaseFirst(offerType)}
+        <label class="event__label  event__type-output" for="event-destination-${destination.id}">
+        ${upperCaseFirst(type)}
         </label>
-        ${!isEmptyObject(destination) ? showDestinationTitle(name) : ''}
-        <datalist id="destination-list-1">
+        ${!isEmptyObject(destination) ? showDestinationTitle(destination.name, destination.id) : ''}
+        <datalist id="destination-list-${destination.id}">
           <option value="Amsterdam"></option>
           <option value="Geneva"></option>
           <option value="Chamonix"></option>
@@ -77,19 +88,19 @@ const createEditViewTemplate = (allPointTypes, allOffers, destination, offerType
       </div>
 
       <div class="event__field-group  event__field-group--time">
-        <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+        <label class="visually-hidden" for="event-start-time-${waypoint.id}">From</label>
+        <input class="event__input  event__input--time" id="event-start-time-${waypoint.id}" type="text" name="event-start-time" value="18/03/19 12:25">
         &mdash;
-        <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+        <label class="visually-hidden" for="event-end-time-${waypoint.id}">To</label>
+        <input class="event__input  event__input--time" id="event-end-time-${waypoint.id}" type="text" name="event-end-time" value="18/03/19 13:35">
       </div>
 
       <div class="event__field-group  event__field-group--price">
-        <label class="event__label" for="event-price-1">
+        <label class="event__label" for="event-price-${waypoint.id}">
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+        <input class="event__input  event__input--price" id="event-price-${waypoint.id}" type="text" name="event-price" value="${basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -99,25 +110,25 @@ const createEditViewTemplate = (allPointTypes, allOffers, destination, offerType
       </button>
     </header>
     <section class="event__details">
-      ${offers.length > 0 ? createOffersViewTemplate(offers) : createDestinationWithoutOffersViewTemplate(destination)}
+      ${offers.length > 0 ? createOffersViewTemplate(waypoint, allOffers) : createDestinationWithoutOffersViewTemplate(destination)}
       ${!isEmptyObject(destination) && offers.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
     </section>
   </form>
 </li>`;
-};
+  }
 
 export default class EditPointView {
   #element = null;
-  #destination = null;
-
-  constructor({destination = {} }) {
-    this.#destination = destination;
-    this.mockPointTypes = POINT_TYPES;
-    this.mockOffers = OFFERS;
+  #waypoint = null;
+  #allOffers = null;
+  #allpointTypes = POINT_TYPES;
+  constructor({waypoint, allOffers}) {
+    this.#waypoint = waypoint;
+    this.#allOffers = allOffers;
   }
 
   get template() {
-    return createEditViewTemplate(this.mockPointTypes, this.mockOffers, this.#destination, getRandomArrayElement(this.mockPointTypes));
+    return createEditViewTemplate(this.#waypoint, this.#allpointTypes, this.#allOffers);
   }
 
   get element() {
