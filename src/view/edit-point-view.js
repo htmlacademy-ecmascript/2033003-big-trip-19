@@ -53,7 +53,7 @@ const createOffersViewTemplate = (point, allOffers) =>{
 };
 
 function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers } = waypoint;
+  const { type, destination, basePrice, offers } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -115,7 +115,7 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
     </section>
   </form>
 </li>`;
-  }
+}
 
 export default class EditPointView {
   #element = null;
