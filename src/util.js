@@ -44,6 +44,10 @@ const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format('HH:mm');
   return withoutDate;
 };
+const getFullFormatDate = (date) => {
+  const withoutDate = dayjs(date).format('DD/MM/YY HH:mm');
+  return withoutDate;
+};
 const getHumanizeTime = (diff) => {
   const humanaseTime = diff;
   return humanaseTime;
@@ -87,4 +91,9 @@ const isEmptyObject = (obj) => {
 const humanizeWaypointDate = (date) => date ? dayjs(date).format(DATE_FORMAT) : date;
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
 
-export {upperCaseFirst, getTimeFromDate, getDateDifference, humanizeWaypointDate, getRandomArrayElement,returnRandomInteger,getHumanizeTime,returnRandomDate,addDays,returnRandomBool,lowwerCaseFirst,isEmptyObject};
+export {upperCaseFirst, getTimeFromDate,
+  getDateDifference, humanizeWaypointDate,
+  getRandomArrayElement,returnRandomInteger,
+  getHumanizeTime,returnRandomDate,
+  addDays,returnRandomBool,lowwerCaseFirst,
+  isEmptyObject, getFullFormatDate};

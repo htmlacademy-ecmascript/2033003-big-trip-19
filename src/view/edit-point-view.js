@@ -1,6 +1,6 @@
 import { POINT_TYPES } from '../const.js';
 import {createElement} from '../render.js';
-import {isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
+import {getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const {description} = destinationPoint;
@@ -89,10 +89,10 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-${waypoint.id}">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-${waypoint.id}" type="text" name="event-start-time" value="18/03/19 12:25">
+        <input class="event__input  event__input--time" id="event-start-time-${waypoint.id}" type="text" name="event-start-time" value="${getFullFormatDate(waypoint.dateFrom)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-${waypoint.id}">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-${waypoint.id}" type="text" name="event-end-time" value="18/03/19 13:35">
+        <input class="event__input  event__input--time" id="event-end-time-${waypoint.id}" type="text" name="event-end-time" value="${getFullFormatDate(waypoint.dateTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
