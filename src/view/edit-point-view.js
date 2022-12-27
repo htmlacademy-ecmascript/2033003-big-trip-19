@@ -23,22 +23,22 @@ const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
 
 const showDestinationTitle = (title, id) => `<input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${title}" list="destination-list-${id}">`;
 
-const getStatus = (offer, point) => {
-  let status = '';
-  for (let i = 0; i < point.offers.length; i++) {
-    const pointOffers = point.offers[i];
-    if (pointOffers.id === offer.id) {
-      status = 'checked';
-      break;
+const isChecked = (offer, pointOffers) => {
+  let status = false;
+  for (let i = 0; i < pointOffers.length; i++) {
+    const pointOffer = pointOffers[i];
+    if(pointOffer.id === offer.id){
+      status = true;
     }
   }
   return status;
 };
+
 const createOffersViewTemplate = (point, allOffers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${getStatus(offer, point)}>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${isChecked(offer, point.offers) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
