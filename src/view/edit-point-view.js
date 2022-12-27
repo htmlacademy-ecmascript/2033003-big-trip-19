@@ -1,4 +1,3 @@
-import { POINT_TYPES } from '../const.js';
 import {createElement} from '../render.js';
 import {getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
 
@@ -53,16 +52,16 @@ const createOffersViewTemplate = (point, allOffers) =>{
 };
 
 function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
-  const { type, destination, basePrice, offers } = waypoint;
+  const { type, destination,dateFrom, dateTo, basePrice, offers, id } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
-        <label class="event__type  event__type-btn" for="event-type-toggle-${waypoint.id}">
+        <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${waypoint.id}" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -88,19 +87,19 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
       </div>
 
       <div class="event__field-group  event__field-group--time">
-        <label class="visually-hidden" for="event-start-time-${waypoint.id}">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-${waypoint.id}" type="text" name="event-start-time" value="${getFullFormatDate(waypoint.dateFrom)}">
+        <label class="visually-hidden" for="event-start-time-${id}">From</label>
+        <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFullFormatDate(dateFrom)}">
         &mdash;
-        <label class="visually-hidden" for="event-end-time-${waypoint.id}">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-${waypoint.id}" type="text" name="event-end-time" value="${getFullFormatDate(waypoint.dateTo)}">
+        <label class="visually-hidden" for="event-end-time-${id}">To</label>
+        <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${getFullFormatDate(dateTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
-        <label class="event__label" for="event-price-${waypoint.id}">
+        <label class="event__label" for="event-price-${id}">
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-${waypoint.id}" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -121,14 +120,15 @@ export default class EditPointView {
   #element = null;
   #waypoint = null;
   #allOffers = null;
-  #allpointTypes = POINT_TYPES;
-  constructor({waypoint, allOffers}) {
+  #allPointTypes = null;
+  constructor({waypoint, allOffers, allPointTypes}) {
     this.#waypoint = waypoint;
     this.#allOffers = allOffers;
+    this.#allPointTypes = allPointTypes;
   }
 
   get template() {
-    return createEditViewTemplate(this.#waypoint, this.#allpointTypes, this.#allOffers);
+    return createEditViewTemplate(this.#waypoint, this.#allPointTypes, this.#allOffers);
   }
 
   get element() {

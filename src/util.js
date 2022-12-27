@@ -50,8 +50,8 @@ const getFullFormatDate = (date) => {
   return withoutDate;
 };
 const getHumanizeTime = (diff) => {
-  const humanaseTime = diff;
-  return humanaseTime;
+  const humaniseTime = diff;
+  return humaniseTime;
 };
 const PrependZeros = (str, len, seperator) => {
   if (typeof str === 'number' || Number(str)) {
@@ -73,15 +73,15 @@ const getDateDifference = (startDate, endDate) =>{
   const days = Math.floor(diff / (1000 * 3600 * 24));
   const hours = Math.floor((diff / (1000 * 3600)) % 24);
   const minutes = Math.floor((diff / 1000 / 60) % 60);
-  let humanaseTime = '';
+  let humaniseTime = '';
   if(days > 0){
-    humanaseTime = `${PrependZeros(days,2)}D ${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${PrependZeros(days,2)}D ${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
   }else if(days < 1 && hours > 0){
-    humanaseTime = `${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
   }else{
-    humanaseTime = `${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${PrependZeros(minutes,2)}M`;
   }
-  return humanaseTime;
+  return humaniseTime;
 };
 const isEmptyObject = (obj) => {
   if (Object.keys(obj).length === 0) {

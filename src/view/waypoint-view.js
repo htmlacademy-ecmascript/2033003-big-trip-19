@@ -42,7 +42,6 @@ function createWaypointTemplate(waypoint) {
   </div>
 </li>`);
 }
-
 export default class WaypointView {
   #element = null;
   #waypoint = null;

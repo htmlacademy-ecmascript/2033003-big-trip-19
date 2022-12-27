@@ -1,7 +1,6 @@
 import { createDataDestinations } from '../mock-destination.js';
 import { createDataPoints} from '../mock-waypoint.js';
-import { OFFERS } from '../const.js';
-import { returnRandomBool } from '../util.js';
+import { OFFERS, POINT_TYPES } from '../const.js';
 
 const getUniqArrayElements = (array) => {
   const newSet = new Set(array);
@@ -13,7 +12,7 @@ const createPoint = (point, offers, destination) =>({
   dateTo: point.dateTo,
   destination: destination,
   id: point.id,
-  isFavorite: returnRandomBool(),
+  isFavorite: point.isFavorite,
   offers: offers,
   type: point.type,
 });
@@ -21,14 +20,18 @@ export default class WaypointModel{
   #offers = OFFERS;
   #destinations = createDataDestinations();
   #waypoints = Array.from(createDataPoints(this.#destinations));
+  #pointTypes = POINT_TYPES;
 
   sortWaypoints(){
     return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
   }
 
+  get pointTypes(){
+    return this.#pointTypes;
+  }
+
   get waypoints(){
     return this.#waypoints;
-
   }
 
   get destinations(){
@@ -39,9 +42,9 @@ export default class WaypointModel{
     return this.#offers;
   }
 
-  get humanazeWaypoints(){
-    const cloneWaypoints = Object.assign([], this.#waypoints);
-    const humanazeWaypoints = [];
+  get humanizedWaypoints(){
+    const cloneWaypoints = [...this.#waypoints];
+    const humanizedWaypoints = [];
 
     for(let i = 0; i < cloneWaypoints.length; i++) {
       const point = cloneWaypoints[i];
@@ -59,10 +62,10 @@ export default class WaypointModel{
         }
       }
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-      const humanazePoint = createPoint(point,getUniqArrayElements(availableOffers),destinationdById);
-      humanazeWaypoints.push(humanazePoint);
+      const humanizePoint = createPoint(point,getUniqArrayElements(availableOffers),destinationdById);
+      humanizedWaypoints.push(humanizePoint);
     }
-    return humanazeWaypoints;
+    return humanizedWaypoints;
   }
 
 }
