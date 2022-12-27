@@ -1,8 +1,8 @@
 import { createDataDestinations } from '../mock-destination.js';
-import { createDataPoints} from '../mock-waypoint.js';
+import { createDataPoints } from '../mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 
-const createPoint = (point, offers, destination, allAvailableOffers, pointTypes) =>({
+const createPoint = (point, offers, destination, allAvailableOffers, pointTypes) => ({
   basePrice: point.basePrice,
   dateFrom: point.dateFrom,
   dateTo: point.dateTo,
@@ -14,48 +14,47 @@ const createPoint = (point, offers, destination, allAvailableOffers, pointTypes)
   offersByType: allAvailableOffers,
   pointTypes: pointTypes
 });
-export default class WaypointModel{
+export default class WaypointModel {
   #offers = OFFERS;
   #destinations = createDataDestinations();
   #waypoints = Array.from(createDataPoints(this.#destinations));
   #pointTypes = POINT_TYPES;
 
-  sortWaypoints(){
+  sortWaypoints() {
     return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
   }
 
-  get waypoints(){
+  get waypoints() {
     return this.#waypoints;
   }
 
-  get destinations(){
+  get destinations() {
     return this.#destinations;
   }
 
-  get humanizedWaypoints(){
+  get humanizedWaypoints() {
     const cloneWaypoints = [...this.#waypoints];
     const humanizedWaypoints = [];
-
-    for(let i = 0; i < cloneWaypoints.length; i++) {
-      const point = cloneWaypoints[i];
+    for (const point of cloneWaypoints) {
       let allAvailableOffers = [];
       const availableOffers = [];
-      point.offers.sort((a, b) => a - b);
 
+      point.offers.sort((a, b) => a - b);
       allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
-      for(let k = 0; k < point.offers.length; k++){
-        for(let j = 0; j < allAvailableOffers.offers.length; j++){
-          if(point.offers[k] === allAvailableOffers.offers[j].id){
-            availableOffers.push(allAvailableOffers.offers[j]);
+
+      for (const pointOffer of point.offers) {
+        for (const availableOffer of allAvailableOffers.offers) {
+          if (pointOffer === availableOffer.id) {
+            availableOffers.push(availableOffer);
             break;
           }
         }
       }
+
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
       const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#pointTypes);
       humanizedWaypoints.push(humanizedPoint);
     }
     return humanizedWaypoints;
   }
-
 }

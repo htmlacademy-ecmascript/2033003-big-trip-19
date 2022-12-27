@@ -1,21 +1,21 @@
-import {createElement} from '../render.js';
-import {getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
+import { createElement } from '../render.js';
+import { getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
-  const {description} = destinationPoint;
-  return`<section class="event__section  event__section--destination">
+  const { description } = destinationPoint;
+  return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
   <p class="event__destination-description">${description}</p>
   </section>`;
 };
 const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
-  const {description, pictures} = destinationPoint;
-  return`<section class="event__section  event__section--destination">
+  const { description, pictures } = destinationPoint;
+  return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
   <p class="event__destination-description">${description}</p>
   <div class="event__photos-container">
                       <div class="event__photos-tape">
-                      ${pictures.map((picture) =>`<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
+                      ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
                       </div>
                     </div>
   </section>`;
@@ -25,16 +25,16 @@ const showDestinationTitle = (title, id) => `<input class="event__input  event__
 
 const getStatus = (offer, point) => {
   let status = '';
-  for(let i = 0; i < point.offers.length; i++){
+  for (let i = 0; i < point.offers.length; i++) {
     const pointOffers = point.offers[i];
-    if(pointOffers.id === offer.id){
+    if (pointOffers.id === offer.id) {
       status = 'checked';
       break;
     }
   }
   return status;
 };
-const createOffersViewTemplate = (point, allOffers) =>`<section class="event__section  event__section--offers">
+const createOffersViewTemplate = (point, allOffers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => `<div class="event__offer-selector">
@@ -49,7 +49,7 @@ const createOffersViewTemplate = (point, allOffers) =>`<section class="event__se
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination,dateFrom, dateTo, basePrice, offers, id, pointTypes, offersByType } = waypoint;
+  const { type, destination, dateFrom, dateTo, basePrice, offers, id, pointTypes, offersByType } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -116,7 +116,7 @@ function createEditViewTemplate(waypoint) {
 export default class EditPointView {
   #element = null;
   #waypoint = null;
-  constructor({waypoint}) {
+  constructor({ waypoint }) {
     this.#waypoint = waypoint;
   }
 
