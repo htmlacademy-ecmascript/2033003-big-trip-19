@@ -101,24 +101,27 @@ const createAddPointViewTemplate = (allPointTypes, allOffers, destination, offer
 };
 
 export default class AddPointView {
+  #element = null;
+  #destination = null;
+
   constructor({destination = {} }) {
-    this.destination = destination;
+    this.#destination = destination;
     this.mockPointTypes = POINT_TYPES;
     this.mockOffers = OFFERS;
   }
 
-  getTemplate() {
-    return createAddPointViewTemplate(this.mockPointTypes, this.mockOffers, this.destination, getRandomArrayElement(this.mockPointTypes));
+  get template() {
+    return createAddPointViewTemplate(this.mockPointTypes, this.mockOffers, this.#destination, getRandomArrayElement(this.mockPointTypes));
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

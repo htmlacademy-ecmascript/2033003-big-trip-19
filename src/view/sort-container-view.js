@@ -9,22 +9,24 @@ const createSortContainerTemplate = (sortings) => (`<form class="trip-events__tr
             <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`);
 export default class SortContainerView {
+  #element = null;
+  #sortings = null;
   constructor({sortings}) {
-    this.sortings = sortings;
+    this.#sortings = sortings;
   }
 
-  getTemplate() {
-    return createSortContainerTemplate(this.sortings);
+  get template() {
+    return createSortContainerTemplate(this.#sortings);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

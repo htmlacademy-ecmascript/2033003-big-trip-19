@@ -4,16 +4,14 @@ import ContentPresenter from './presenter/content-presenter.js';
 import {render} from './render.js';
 import SortContainerView from './view/sort-container-view.js';
 import WaypointModel from './model/waypoint-model.js';
-import DestinationModel from './model/destination-model.js';
 import { FILTERS, SORTINGS } from './const.js';
 
 const siteTripMain = document.querySelector('.trip-main');
 const siteFilterEventsElement = document.querySelector('.trip-controls__filters');
 const siteSortEventsElement = document.querySelector('.trip-events');
 
-const destinationModel = new DestinationModel();
 const waypointModel = new WaypointModel();
-const contentPresenter = new ContentPresenter({contentContainer: siteSortEventsElement, waypointModel, destinationModel});
+const contentPresenter = new ContentPresenter({contentContainer: siteSortEventsElement, waypointModel});
 
 render(new TripInfoView(), siteTripMain,'AFTERBEGIN');
 render(new FilterContainerView({filters: FILTERS}), siteFilterEventsElement);

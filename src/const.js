@@ -1,19 +1,25 @@
 const MIN_DATE = new Date(2018, 0, 1);
 const MAX_DATE = new Date(2018, 12, 31);
-const MAX_COUNT_OBJECTS = 3;
-const MAX_INTEGER_DATE = 3;
-const MIN_RANDOME_TIME_INTEGER = 1;
-const MAX_RANDOME_TIME_INTEGER = 12;
-const DATE_FORMAT = 'MMM DD';
-const MIN_LENGTH_ARRAY_ID_OFFERS = 1;
-const MAX_LENGTH_ARRAY_ID_OFFERS = 3;
-const MIN_BASE_PRICE = 30;
-const MAX_BASE_PRICE = 2000;
-const MIN_COUNT_DESCRIPRIONS = 1;
-const MAX_COUNT_DESCRIPRIONS = 5;
-const MAX_RANDOM_IMAGE_INTEGER = 1000;
+const Integer = {
+  MIN_RANDOME_HOUR: 1,
+  MAX_RANDOME_HOUR: 12,
+  MAX_INTEGER_DATE_DURATION : 3,
+  MIN_LENGTH_ARRAY_ID_OFFERS: 1,
+  MAX_COUNT_OBJECTS: 3,
+  MIN_BASE_PRICE: 30,
+  MAX_BASE_PRICE: 2000,
+  MIN_COUNT_DESCRIPRIONS: 1,
+  MAX_COUNT_DESCRIPRIONS: 5,
+  MAX_RANDOM_IMAGE_INTEGER: 1000
+};
+const DateFormat = {
+  MONTH_AND_DATE: 'MMM DD',
+  HOURS_AND_MINUTES: 'HH:mm',
+  FULL_DATE_AND_TIME: 'DD/MM/YY HH:mm'
+};
+
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburd', 'Rostov'];
+const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburg', 'Rostov', 'Ulan-Ude','Saratov', 'Samara','Izevsk','Krasnodar','Sochi','Adler'];
 const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -184,23 +190,13 @@ const FILTERS = {
   },
 };
 export {
+  Integer,
+  DateFormat,
   POINT_TYPES,
   MIN_DATE,
   MAX_DATE,
-  MAX_COUNT_OBJECTS,
-  MAX_INTEGER_DATE,
-  MIN_RANDOME_TIME_INTEGER,
-  MAX_RANDOME_TIME_INTEGER,
-  DATE_FORMAT,
-  MIN_LENGTH_ARRAY_ID_OFFERS,
-  MAX_LENGTH_ARRAY_ID_OFFERS,
-  MIN_BASE_PRICE,
-  MAX_BASE_PRICE,
   OFFERS,
   DESTINATION_NAMES,
   DESCRIPTIONS,
-  MIN_COUNT_DESCRIPRIONS,
-  MAX_COUNT_DESCRIPRIONS,
-  MAX_RANDOM_IMAGE_INTEGER,
   SORTINGS,
   FILTERS};
