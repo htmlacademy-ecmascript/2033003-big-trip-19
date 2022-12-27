@@ -10,9 +10,9 @@ export default class ContentPresenter {
     this.waypoinModel = waypointModel;
   }
 
-  #renderPoint(point, allOffers, pointTypes){
+  #renderPoint(point){
     const pointComponent = new WaypointView({waypoint: point});
-    const editPointComponent = new EditPointView({waypoint: point, allOffers: allOffers, allPointTypes: pointTypes});
+    const editPointComponent = new EditPointView({waypoint: point});
 
     const replaceEditToPoint = () => {
       this.#boardComponent.element.replaceChild(pointComponent.element, editPointComponent.element);
@@ -49,13 +49,11 @@ export default class ContentPresenter {
   }
 
   init() {
-    this.offers = [...this.waypoinModel.offers];
     this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
-    this.pointTypes = [...this.waypoinModel.pointTypes];
     render(this.#boardComponent,this.contentContainer);
 
     for(let i = 0; i < this.humanisedWaypoints.length; i++){
-      this.#renderPoint(this.humanisedWaypoints[i], this.offers, this.pointTypes);
+      this.#renderPoint(this.humanisedWaypoints[i]);
     }
   }
 }

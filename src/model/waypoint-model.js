@@ -6,7 +6,7 @@ const getUniqArrayElements = (array) => {
   const newSet = new Set(array);
   return Array.from(newSet);
 };
-const createPoint = (point, offers, destination) =>({
+const createPoint = (point, offers, destination, allAvailableOffers, pointTypes) =>({
   basePrice: point.basePrice,
   dateFrom: point.dateFrom,
   dateTo: point.dateTo,
@@ -15,6 +15,8 @@ const createPoint = (point, offers, destination) =>({
   isFavorite: point.isFavorite,
   offers: offers,
   type: point.type,
+  offersByType: allAvailableOffers,
+  pointTypes: pointTypes
 });
 export default class WaypointModel{
   #offers = OFFERS;
@@ -26,20 +28,12 @@ export default class WaypointModel{
     return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
   }
 
-  get pointTypes(){
-    return this.#pointTypes;
-  }
-
   get waypoints(){
     return this.#waypoints;
   }
 
   get destinations(){
     return this.#destinations;
-  }
-
-  get offers(){
-    return this.#offers;
   }
 
   get humanizedWaypoints(){
@@ -62,8 +56,8 @@ export default class WaypointModel{
         }
       }
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-      const humanizePoint = createPoint(point,getUniqArrayElements(availableOffers),destinationdById);
-      humanizedWaypoints.push(humanizePoint);
+      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#pointTypes);
+      humanizedWaypoints.push(humanizedPoint);
     }
     return humanizedWaypoints;
   }

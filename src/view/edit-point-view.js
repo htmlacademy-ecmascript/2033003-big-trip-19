@@ -34,12 +34,10 @@ const getStatus = (offer, point) => {
   }
   return status;
 };
-const createOffersViewTemplate = (point, allOffers) =>{
-  const availableOffers = allOffers.find((offer) => offer.type === point.type);
-  return `<section class="event__section  event__section--offers">
+const createOffersViewTemplate = (point, allOffers) =>`<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${availableOffers.offers.map((offer) => `<div class="event__offer-selector">
+      ${allOffers.map((offer) => `<div class="event__offer-selector">
             <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${getStatus(offer, point)}>
             <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
@@ -49,10 +47,9 @@ const createOffersViewTemplate = (point, allOffers) =>{
     </div>`).join('')}
     </div>
   </section>`;
-};
 
-function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
-  const { type, destination,dateFrom, dateTo, basePrice, offers, id } = waypoint;
+function createEditViewTemplate(waypoint) {
+  const { type, destination,dateFrom, dateTo, basePrice, offers, id, pointTypes, offersByType } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -66,7 +63,7 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${allPointTypes.map((pointType, index) => `<div class="event__type-item">
+            ${pointTypes.map((pointType, index) => `<div class="event__type-item">
             <input id="event-type-${pointType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
             <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${index}">${upperCaseFirst(pointType)}</label>
             </div>`).join('')}
@@ -109,7 +106,7 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
       </button>
     </header>
     <section class="event__details">
-      ${offers.length > 0 ? createOffersViewTemplate(waypoint, allOffers) : createDestinationWithoutOffersViewTemplate(destination)}
+      ${offers.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : createDestinationWithoutOffersViewTemplate(destination)}
       ${!isEmptyObject(destination) && offers.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
     </section>
   </form>
@@ -119,16 +116,12 @@ function createEditViewTemplate(waypoint, allPointTypes, allOffers) {
 export default class EditPointView {
   #element = null;
   #waypoint = null;
-  #allOffers = null;
-  #allPointTypes = null;
-  constructor({waypoint, allOffers, allPointTypes}) {
+  constructor({waypoint}) {
     this.#waypoint = waypoint;
-    this.#allOffers = allOffers;
-    this.#allPointTypes = allPointTypes;
   }
 
   get template() {
-    return createEditViewTemplate(this.#waypoint, this.#allPointTypes, this.#allOffers);
+    return createEditViewTemplate(this.#waypoint);
   }
 
   get element() {
