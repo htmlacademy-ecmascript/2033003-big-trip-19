@@ -2,10 +2,6 @@ import { createDataDestinations } from '../mock-destination.js';
 import { createDataPoints} from '../mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 
-const getUniqArrayElements = (array) => {
-  const newSet = new Set(array);
-  return Array.from(newSet);
-};
 const createPoint = (point, offers, destination, allAvailableOffers, pointTypes) =>({
   basePrice: point.basePrice,
   dateFrom: point.dateFrom,
