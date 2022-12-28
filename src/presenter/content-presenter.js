@@ -14,11 +14,6 @@ export default class ContentPresenter {
     this.filterModel = filterModel;
   }
 
-  #renderFilters(filters){
-    const filterComponent = new FilterContainerView({filters: filters});
-    render(filterComponent, this.filtersContainer);
-  }
-
   #renderPoint(point) {
     const pointComponent = new WaypointView({ waypoint: point });
     const editPointComponent = new EditPointView({ waypoint: point });
@@ -65,7 +60,11 @@ export default class ContentPresenter {
   #setupFilters(){
     this.filters = [...this.filterModel.filters];
     this.#filterComponent = new FilterContainerView({filters: this.filters});
-    this.#renderFilters(this.filters);
+    this.#renderFilters(this.#filterComponent);
+  }
+
+  #renderFilters(component){
+    render(component, this.filtersContainer);
   }
 
   init() {
