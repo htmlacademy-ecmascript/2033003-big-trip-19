@@ -3,12 +3,20 @@ import ContentView from '../view/content-view.js';
 import EditPointView from '../view/edit-point-view';
 import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
+import FilterContainerView from '../view/filter-container-view.js';
 export default class ContentPresenter {
   #boardComponent = new ContentView();
-
-  constructor({ contentContainer, waypointModel }) {
+  #filterComponent = null;
+  constructor({ contentContainer, filtersContainer, waypointModel, filterModel}) {
     this.contentContainer = contentContainer;
+    this.filtersContainer = filtersContainer;
     this.waypoinModel = waypointModel;
+    this.filterModel = filterModel;
+  }
+
+  #renderFilters(filters){
+    const filterComponent = new FilterContainerView({filters: filters});
+    render(filterComponent, this.filtersContainer);
   }
 
   #renderPoint(point) {
@@ -49,17 +57,23 @@ export default class ContentPresenter {
     render(pointComponent, this.#boardComponent.element);
   }
 
-  #renderMessage(){
-    const message = 'Click New Event to create your first point';
-    const messageComponent = new MessageView(message);
+  #renderMessage(filter){
+    const messageComponent = new MessageView({message: filter.message});
     render(messageComponent,this.contentContainer);
   }
 
   init() {
+    this.filters = [...this.filterModel.filters];
+    this.#filterComponent = new FilterContainerView({filters: this.filters});
+    this.#renderFilters(this.filters);
+
     this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
     render(this.#boardComponent, this.contentContainer);
+
     if(this.humanisedWaypoints.length < 1){
-      this.#renderMessage();
+      const checkedFilterElement = this.#filterComponent.element.querySelector('input[type="radio"]:checked');
+      const checkedFilter = this.filters.find((filter) => filter.name === checkedFilterElement.value);
+      this.#renderMessage(checkedFilter);
     }
     for (let i = 0; i < this.humanisedWaypoints.length; i++) {
       this.#renderPoint(this.humanisedWaypoints[i]);

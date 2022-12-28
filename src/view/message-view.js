@@ -1,6 +1,7 @@
 import {createElement} from '../render.js';
 
-function createMessageTemplate(message) {
+function createMessageTemplate(filterMessage) {
+  const { message} = filterMessage;
   return `<p class="trip-events__msg">${message}</p>`;
 }
 export default class MessageView {
