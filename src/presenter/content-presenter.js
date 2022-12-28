@@ -7,27 +7,31 @@ import FilterContainerView from '../view/filter-container-view.js';
 export default class ContentPresenter {
   #boardComponent = null;
   #filterComponent = null;
+  #contentContainer = null;
+  #filtersContainer = null;
+  #waypoinModel = null;
+  #filterModel = null;
 
   constructor({ contentContainer, filtersContainer, waypointModel, filterModel}) {
-    this.contentContainer = contentContainer;
-    this.filtersContainer = filtersContainer;
-    this.waypoinModel = waypointModel;
-    this.filterModel = filterModel;
+    this.#contentContainer = contentContainer;
+    this.#filtersContainer = filtersContainer;
+    this.#waypoinModel = waypointModel;
+    this.#filterModel = filterModel;
   }
 
   #setupFilters(){
-    this.filters = [...this.filterModel.filters];
+    this.filters = [...this.#filterModel.filters];
     this.#filterComponent = new FilterContainerView({filters: this.filters});
     this.#renderFilters(this.#filterComponent);
   }
 
   #renderFilters(component){
-    render(component, this.filtersContainer);
+    render(component, this.#filtersContainer);
   }
 
   #renderContentContainer(){
     this.#boardComponent = new ContentView();
-    render(this.#boardComponent, this.contentContainer);
+    render(this.#boardComponent, this.#contentContainer);
   }
 
   #renderPoint(point) {
@@ -70,14 +74,14 @@ export default class ContentPresenter {
 
   #renderMessage(filter){
     const messageComponent = new MessageView({message: filter.message});
-    render(messageComponent,this.contentContainer);
+    render(messageComponent,this.#contentContainer);
   }
 
   init() {
     this.#setupFilters();
     this.#renderContentContainer();
 
-    this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
+    this.humanisedWaypoints = [...this.#waypoinModel.humanizedWaypoints];
     if(this.humanisedWaypoints.length < 1){
       const checkedFilterElement = this.#filterComponent.element.querySelector('input[type="radio"]:checked');
       const checkedFilter = this.filters.find((filter) => filter.name === checkedFilterElement.value);
