@@ -1,6 +1,7 @@
 import { render } from '../render.js';
 import ContentView from '../view/content-view.js';
 import EditPointView from '../view/edit-point-view';
+import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -48,10 +49,18 @@ export default class ContentPresenter {
     render(pointComponent, this.#boardComponent.element);
   }
 
+  #renderMessage(){
+    const message = 'Click New Event to create your first point';
+    const messageComponent = new MessageView(message);
+    render(messageComponent,this.contentContainer);
+  }
+
   init() {
     this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
     render(this.#boardComponent, this.contentContainer);
-
+    if(this.humanisedWaypoints.length < 1){
+      this.#renderMessage();
+    }
     for (let i = 0; i < this.humanisedWaypoints.length; i++) {
       this.#renderPoint(this.humanisedWaypoints[i]);
     }
