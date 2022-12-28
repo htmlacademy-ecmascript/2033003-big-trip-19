@@ -175,7 +175,7 @@ const OFFERS = [
     offers: []
   }
 ];
-const FILTERS = [
+const filters = [
   {
     name: 'everything',
     isChecked: true,
@@ -207,4 +207,4 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   SORTINGS,
-  FILTERS};
+  filters};
