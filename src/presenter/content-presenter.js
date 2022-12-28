@@ -77,9 +77,10 @@ export default class ContentPresenter {
       const checkedFilterElement = this.#filterComponent.element.querySelector('input[type="radio"]:checked');
       const checkedFilter = this.filters.find((filter) => filter.name === checkedFilterElement.value);
       this.#renderMessage(checkedFilter);
-    }
-    for (let i = 0; i < this.humanisedWaypoints.length; i++) {
-      this.#renderPoint(this.humanisedWaypoints[i]);
+    }else{
+      for (let i = 0; i < this.humanisedWaypoints.length; i++) {
+        this.#renderPoint(this.humanisedWaypoints[i]);
+      }
     }
   }
 }
