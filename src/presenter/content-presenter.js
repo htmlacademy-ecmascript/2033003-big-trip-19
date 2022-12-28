@@ -14,6 +14,20 @@ export default class ContentPresenter {
     this.filterModel = filterModel;
   }
 
+  #setupFilters(){
+    this.filters = [...this.filterModel.filters];
+    this.#filterComponent = new FilterContainerView({filters: this.filters});
+    this.#renderFilters(this.#filterComponent);
+  }
+
+  #renderFilters(component){
+    render(component, this.filtersContainer);
+  }
+
+  #renderContentContainer(){
+    render(this.#boardComponent, this.contentContainer);
+  }
+
   #renderPoint(point) {
     const pointComponent = new WaypointView({ waypoint: point });
     const editPointComponent = new EditPointView({ waypoint: point });
@@ -57,22 +71,11 @@ export default class ContentPresenter {
     render(messageComponent,this.contentContainer);
   }
 
-  #setupFilters(){
-    this.filters = [...this.filterModel.filters];
-    this.#filterComponent = new FilterContainerView({filters: this.filters});
-    this.#renderFilters(this.#filterComponent);
-  }
-
-  #renderFilters(component){
-    render(component, this.filtersContainer);
-  }
-
   init() {
     this.#setupFilters();
+    this.#renderContentContainer();
 
     this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
-    render(this.#boardComponent, this.contentContainer);
-
     if(this.humanisedWaypoints.length < 1){
       const checkedFilterElement = this.#filterComponent.element.querySelector('input[type="radio"]:checked');
       const checkedFilter = this.filters.find((filter) => filter.name === checkedFilterElement.value);
