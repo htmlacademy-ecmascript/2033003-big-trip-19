@@ -5,9 +5,9 @@ function createMessageTemplate(message) {
 }
 export default class MessageView {
   #element = null;
-  #message = '';
-  constructor(){
-    this.#message = 'Click New Event to create your first point';
+  #message = null;
+  constructor(message){
+    this.#message = message;
   }
 
   get template() {
