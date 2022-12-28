@@ -5,8 +5,9 @@ import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
 import FilterContainerView from '../view/filter-container-view.js';
 export default class ContentPresenter {
-  #boardComponent = new ContentView();
+  #boardComponent = null;
   #filterComponent = null;
+
   constructor({ contentContainer, filtersContainer, waypointModel, filterModel}) {
     this.contentContainer = contentContainer;
     this.filtersContainer = filtersContainer;
@@ -25,6 +26,7 @@ export default class ContentPresenter {
   }
 
   #renderContentContainer(){
+    this.#boardComponent = new ContentView();
     render(this.#boardComponent, this.contentContainer);
   }
 
