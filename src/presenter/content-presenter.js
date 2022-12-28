@@ -62,10 +62,14 @@ export default class ContentPresenter {
     render(messageComponent,this.contentContainer);
   }
 
-  init() {
+  #setupFilters(){
     this.filters = [...this.filterModel.filters];
     this.#filterComponent = new FilterContainerView({filters: this.filters});
     this.#renderFilters(this.filters);
+  }
+
+  init() {
+    this.#setupFilters();
 
     this.humanisedWaypoints = [...this.waypoinModel.humanizedWaypoints];
     render(this.#boardComponent, this.contentContainer);
