@@ -56,6 +56,6 @@ export default class WaypointModel {
       const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
       humanizedWaypoints.push(humanizedPoint);
     }
-    return humanizedWaypoints;
+    return humanizedWaypoints.sort((a, b) => a.dateFrom - b.dateFrom);
   }
 }
