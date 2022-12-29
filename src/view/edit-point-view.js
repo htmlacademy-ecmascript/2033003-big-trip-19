@@ -8,6 +8,7 @@ const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   <p class="event__destination-description">${description}</p>
   </section>`;
 };
+
 const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
@@ -20,7 +21,6 @@ const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
                     </div>
   </section>`;
 };
-
 
 const isCheckedOffer = (offer, pointOffers) => {
   let status = false;

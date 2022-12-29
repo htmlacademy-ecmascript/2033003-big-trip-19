@@ -62,7 +62,10 @@ export default class ContentPresenter {
       replaceEditToPoint();
       document.removeEventListener('keydown', escKeyDownHandler);
     });
-    editPointComponent.element.querySelector('form').addEventListener('reset', () => {
+    editPointComponent.element.querySelector('form').addEventListener('reset', (evt) => {
+      evt.preventDefault();
+      replaceEditToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
     });
     editPointComponent.element.querySelector('form').addEventListener('submit', (evt) => {
       evt.preventDefault();
