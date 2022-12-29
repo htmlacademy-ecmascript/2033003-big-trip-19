@@ -21,9 +21,8 @@ const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
   </section>`;
 };
 
-const showDestinationTitle = (title, id) => `<input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${title}" list="destination-list-${id}">`;
 
-const isChecked = (offer, pointOffers) => {
+const isCheckedOffer = (offer, pointOffers) => {
   let status = false;
   for (let i = 0; i < pointOffers.length; i++) {
     const pointOffer = pointOffers[i];
@@ -34,11 +33,13 @@ const isChecked = (offer, pointOffers) => {
   return status;
 };
 
+const showDestinationTitle = (destination) => `<input class="event__input  event__input--destination" id="event-destination-${destination.id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${destination.id}">`;
+
 const createOffersViewTemplate = (point, allOffers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${isChecked(offer, point.offers) ? 'checked' : ''}>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${isCheckedOffer(offer, point.offers) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
@@ -49,7 +50,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers, id, pointTypes, offersByType } = waypoint;
+  const { type, destination, dateFrom, dateTo, basePrice, offers, id, offersByType, allTypes } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -58,13 +59,13 @@ function createEditViewTemplate(waypoint) {
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox"}>
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${pointTypes.map((pointType, index) => `<div class="event__type-item">
-            <input id="event-type-${pointType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
+            ${allTypes.map((pointType, index) => `<div class="event__type-item">
+            <input id="event-type-${pointType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${type === pointType ? 'checked' : ''}>
             <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${index}">${upperCaseFirst(pointType)}</label>
             </div>`).join('')}
           </fieldset>
@@ -75,7 +76,7 @@ function createEditViewTemplate(waypoint) {
         <label class="event__label  event__type-output" for="event-destination-${destination.id}">
         ${upperCaseFirst(type)}
         </label>
-        ${!isEmptyObject(destination) ? showDestinationTitle(destination.name, destination.id) : ''}
+        ${!isEmptyObject(destination) ? showDestinationTitle(destination) : ''}
         <datalist id="destination-list-${destination.id}">
           <option value="Amsterdam"></option>
           <option value="Geneva"></option>
