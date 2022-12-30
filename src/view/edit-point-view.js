@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
@@ -114,26 +114,15 @@ function createEditViewTemplate(waypoint) {
 </li>`;
 }
 
-export default class EditPointView {
-  #element = null;
+export default class EditPointView extends AbstractView {
   #waypoint = null;
   constructor({ waypoint }) {
+    super();
     this.#waypoint = waypoint;
   }
 
   get template() {
     return createEditViewTemplate(this.#waypoint);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
 

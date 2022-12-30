@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { getDateDifference, getTimeFromDate, humanizeWaypointDate, getHumanizeTime, upperCaseFirst} from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createWaypointTemplate(waypoint) {
   const {type,destination,dateFrom,dateTo,basePrice,offers} = waypoint;
@@ -42,26 +42,15 @@ function createWaypointTemplate(waypoint) {
   </div>
 </li>`);
 }
-export default class WaypointView {
-  #element = null;
+export default class WaypointView extends AbstractView {
   #waypoint = null;
 
   constructor({ waypoint}) {
+    super();
     this.#waypoint = waypoint;
   }
 
   get template() {
     return createWaypointTemplate(this.#waypoint);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { upperCaseFirst } from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createSortContainerTemplate = (sortings) => (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
             ${Object.entries(sortings).map(([name,state]) => `<div class="trip-sort__item  trip-sort__item--${name}">
@@ -8,25 +8,14 @@ const createSortContainerTemplate = (sortings) => (`<form class="trip-events__tr
             </div>`).join('')}
             <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`);
-export default class SortContainerView {
-  #element = null;
+export default class SortContainerView extends AbstractView {
   #sortings = null;
   constructor({sortings}) {
+    super();
     this.#sortings = sortings;
   }
 
   get template() {
     return createSortContainerTemplate(this.#sortings);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

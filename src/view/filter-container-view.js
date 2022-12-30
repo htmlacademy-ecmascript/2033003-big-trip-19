@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
 import { upperCaseFirst } from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createFilterContainerTemplate(filters) {
   return `<form class="trip-filters" action="#" method="get">
@@ -11,25 +11,14 @@ function createFilterContainerTemplate(filters) {
           </form>`;
 }
 
-export default class FilterContainerView {
-  #element = null;
+export default class FilterContainerView extends AbstractView {
   #filters = null;
   constructor({filters}) {
+    super();
     this.#filters = filters;
   }
 
   get template() {
     return createFilterContainerTemplate(this.#filters);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
