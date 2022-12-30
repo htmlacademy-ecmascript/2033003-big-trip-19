@@ -39,7 +39,6 @@ export default class ContentPresenter {
       waypoint: point,
       onShowEditClick: () => {
         replacePointToEdit.call(this);
-        document.addEventListener('keydown', escKeyDownHandler);
       }
     });
     const editPointComponent = new EditPointView({
@@ -57,6 +56,7 @@ export default class ContentPresenter {
 
     function replacePointToEdit () {
       replace(editPointComponent, pointComponent);
+      document.addEventListener('keydown', escKeyDownHandler);
     }
     function replaceEditToPoint() {
       replace(pointComponent, editPointComponent);
