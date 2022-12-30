@@ -175,20 +175,28 @@ const OFFERS = [
     offers: []
   }
 ];
-const FILTERS = {
-  everything:{
-    isChecked: false
+const filters = [
+  {
+    name: 'everything',
+    isChecked: true,
+    message: 'Click New Event to create your first point'
   },
-  future:{
-    isChecked: false
+  {
+    name: 'future',
+    isChecked: false,
+    message: 'There are no future events now'
   },
-  present:{
-    isChecked: false
+  {
+    name: 'present',
+    isChecked: false,
+    message: 'There are no present events now'
   },
-  past:{
-    isChecked: false
+  {
+    name :'past',
+    isChecked: false,
+    message: 'There are no past events now'
   },
-};
+];
 export {
   Integer,
   DateFormat,
@@ -199,4 +207,4 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   SORTINGS,
-  FILTERS};
+  filters};
