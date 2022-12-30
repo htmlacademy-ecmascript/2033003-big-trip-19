@@ -2,7 +2,7 @@ import { createDataDestinations } from '../mock-destination.js';
 import { createDataPoints } from '../mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 
-const createPoint = (point, offers, destination, allAvailableOffers, pointTypes) => ({
+const createPoint = (point, offers, destination, allAvailableOffers) => ({
   basePrice: point.basePrice,
   dateFrom: point.dateFrom,
   dateTo: point.dateTo,
@@ -12,13 +12,13 @@ const createPoint = (point, offers, destination, allAvailableOffers, pointTypes)
   offers: offers,
   type: point.type,
   offersByType: allAvailableOffers,
-  pointTypes: pointTypes
+  allTypes: POINT_TYPES
 });
+
 export default class WaypointModel {
   #offers = OFFERS;
   #destinations = createDataDestinations();
   #waypoints = Array.from(createDataPoints(this.#destinations));
-  #pointTypes = POINT_TYPES;
 
   sortWaypoints() {
     return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
@@ -52,9 +52,10 @@ export default class WaypointModel {
       }
 
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#pointTypes);
+
+      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
       humanizedWaypoints.push(humanizedPoint);
     }
-    return humanizedWaypoints;
+    return humanizedWaypoints.sort((a, b) => a.dateFrom - b.dateFrom);
   }
 }

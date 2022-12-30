@@ -1,13 +1,14 @@
 import {createElement} from '../render.js';
 
-function createMessageTemplate(message) {
+function createMessageTemplate(filterMessage) {
+  const { message} = filterMessage;
   return `<p class="trip-events__msg">${message}</p>`;
 }
 export default class MessageView {
   #element = null;
-  #message = '';
-  constructor(){
-    this.#message = 'Click New Event to create your first point';
+  #message = null;
+  constructor(message){
+    this.#message = message;
   }
 
   get template() {
