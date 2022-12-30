@@ -4,8 +4,9 @@ import EditPointView from '../view/edit-point-view';
 import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
 import FilterContainerView from '../view/filter-container-view.js';
+import { replace } from '../framework/render.js';
 export default class ContentPresenter {
-  #boardComponent = null;
+  #boardComponent = new ContentView();
   #filterComponent = null;
   #contentContainer = null;
   #filtersContainer = null;
@@ -30,54 +31,51 @@ export default class ContentPresenter {
   }
 
   #renderContentContainer(){
-    this.#boardComponent = new ContentView();
     render(this.#boardComponent, this.#contentContainer);
   }
 
   #renderPoint(point) {
-    const pointComponent = new WaypointView({ waypoint: point });
-    const editPointComponent = new EditPointView({ waypoint: point });
+    const pointComponent = new WaypointView({
+      waypoint: point,
+      onShowEditClick: () => {
+        replacePointToEdit.call(this);
+        document.addEventListener('keydown', escKeyDownHandler);
+      }
+    });
+    const editPointComponent = new EditPointView({
+      waypoint: point,
+      onCloseEditClick: () => {
+        replaceEditToPoint.call(this);
+      },
+      onDeleteClick: () => {
+        replaceEditToPoint.call(this);
+      },
+      onSaveClick: () => {
+        replaceEditToPoint.call(this);
+      }
+    });
 
-    const replaceEditToPoint = () => {
-      this.#boardComponent.element.replaceChild(pointComponent.element, editPointComponent.element);
-    };
-
-    const replacePointToEdit = () => {
-      this.#boardComponent.element.replaceChild(editPointComponent.element, pointComponent.element);
-    };
-
-    const escKeyDownHandler = (evt) => {
+    function replacePointToEdit () {
+      replace(editPointComponent, pointComponent);
+    }
+    function replaceEditToPoint() {
+      replace(pointComponent, editPointComponent);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+    function escKeyDownHandler(evt){
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        replaceEditToPoint(pointComponent.element, editPointComponent.element);
+        replaceEditToPoint.call(this);
         document.removeEventListener('keydown', escKeyDownHandler);
       }
-    };
+    }
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replacePointToEdit();
-      document.addEventListener('keydown', escKeyDownHandler);
-    });
-    editPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replaceEditToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    });
-    editPointComponent.element.querySelector('form').addEventListener('reset', (evt) => {
-      evt.preventDefault();
-      replaceEditToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    });
-    editPointComponent.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceEditToPoint();
-      document.removeEventListener('keydown', escKeyDownHandler);
-    });
     render(pointComponent, this.#boardComponent.element);
   }
 
   #renderMessage(filter){
     const messageComponent = new MessageView({message: filter.message});
-    render(messageComponent,this.#contentContainer);
+    render(messageComponent, this.#contentContainer);
   }
 
   init() {
