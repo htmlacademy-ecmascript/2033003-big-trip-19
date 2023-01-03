@@ -1,10 +1,11 @@
 import { render } from '../render.js';
+import { replace } from '../framework/render.js';
 import ContentView from '../view/content-view.js';
 import EditPointView from '../view/edit-point-view';
 import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
 import FilterContainerView from '../view/filter-container-view.js';
-import { replace } from '../framework/render.js';
+
 export default class ContentPresenter {
   #boardComponent = new ContentView();
   #filterComponent = null;
