@@ -5,6 +5,7 @@ import EditPointView from '../view/edit-point-view';
 import MessageView from '../view/message-view.js';
 import WaypointView from '../view/waypoint-view.js';
 import FilterContainerView from '../view/filter-container-view.js';
+import FilterModel from '../model/filter-model.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -13,17 +14,24 @@ export default class ContentPresenter {
   #filtersContainer = null;
   #waypoinModel = null;
   #filterModel = null;
+  #humanizedWaypoints = null;
+  #checkedFilter = null;
+  #waypointsByCheckedFilter = null;
 
-  constructor({ contentContainer, filtersContainer, waypointModel, filterModel}) {
+  constructor({ contentContainer, filtersContainer, waypointModel}) {
     this.#contentContainer = contentContainer;
     this.#filtersContainer = filtersContainer;
     this.#waypoinModel = waypointModel;
-    this.#filterModel = filterModel;
   }
 
+
+
   #setupFilters(){
-    this.filters = [...this.#filterModel.filters];
-    this.#filterComponent = new FilterContainerView({filters: this.filters});
+    this.#filterModel = new FilterModel({waypoints: this.#humanizedWaypoints});
+    this.filters = [...this.#filterModel.humanizedFilters];
+    this.#filterComponent = new FilterContainerView({
+      filters: this.filters
+    });
     this.#renderFilters(this.#filterComponent);
   }
 
@@ -33,6 +41,17 @@ export default class ContentPresenter {
 
   #renderContentContainer(){
     render(this.#boardComponent, this.#contentContainer);
+  }
+
+  #getCurrentFilterAndWaypoints(){
+    this.#checkedFilter = this.#filterComponent.selectedFilter;
+    this.#waypointsByCheckedFilter = this.#checkedFilter.waypoints;
+  }
+
+  #renderPoints(){
+    for (let i = 0; i < this.#waypointsByCheckedFilter.length; i++) {
+      this.#renderPoint(this.#waypointsByCheckedFilter[i]);
+    }
   }
 
   #renderPoint(point) {
@@ -80,18 +99,16 @@ export default class ContentPresenter {
   }
 
   init() {
+    this.#humanizedWaypoints = [...this.#waypoinModel.humanizedWaypoints];
+
     this.#setupFilters();
     this.#renderContentContainer();
+    this.#getCurrentFilterAndWaypoints();
 
-    this.humanisedWaypoints = [...this.#waypoinModel.humanizedWaypoints];
-    if(this.humanisedWaypoints.length < 1){
-      const checkedFilterElement = this.#filterComponent.element.querySelector('input[type="radio"]:checked');
-      const checkedFilter = this.filters.find((filter) => filter.name === checkedFilterElement.value);
-      this.#renderMessage(checkedFilter);
+    if(this.#waypointsByCheckedFilter.length < 1){
+      this.#renderMessage(this.checkedFilter);
     }else{
-      for (let i = 0; i < this.humanisedWaypoints.length; i++) {
-        this.#renderPoint(this.humanisedWaypoints[i]);
-      }
+      this.#renderPoints();
     }
   }
 }

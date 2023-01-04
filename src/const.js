@@ -1,11 +1,11 @@
 const MIN_DATE = new Date(2018, 0, 1);
-const MAX_DATE = new Date(2018, 12, 31);
+const MAX_DATE = new Date(2023, 11, 31);
 const Integer = {
   MIN_RANDOME_HOUR: 1,
-  MAX_RANDOME_HOUR: 12,
+  MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 3,
+  MAX_COUNT_OBJECTS: 300,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
@@ -175,28 +175,7 @@ const OFFERS = [
     offers: []
   }
 ];
-const filters = [
-  {
-    name: 'everything',
-    isChecked: true,
-    message: 'Click New Event to create your first point'
-  },
-  {
-    name: 'future',
-    isChecked: false,
-    message: 'There are no future events now'
-  },
-  {
-    name: 'present',
-    isChecked: false,
-    message: 'There are no present events now'
-  },
-  {
-    name :'past',
-    isChecked: false,
-    message: 'There are no past events now'
-  },
-];
+
 export {
   Integer,
   DateFormat,
@@ -206,5 +185,4 @@ export {
   OFFERS,
   DESTINATION_NAMES,
   DESCRIPTIONS,
-  SORTINGS,
-  filters};
+  SORTINGS};
