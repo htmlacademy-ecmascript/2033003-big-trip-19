@@ -19,7 +19,7 @@ const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, 
   const destinationElement = getRandomArrayElement(destinations);
   const arrayOffersByTypeLength = lengthArrayPointType(pointType);
   const randomeOffersIds = getUniqIdOffers(generateArrayIdOffers(arrayOffersByTypeLength,arrayOffersByTypeLength,MIN_LENGTH_ARRAY_ID_OFFERS));
-  const dateTo = addDays(dateFrom,returnRandomInteger(maxIntegerDate)).toISOString();
+  const dateTo = addDays(dateFrom,returnRandomInteger(maxIntegerDate));
   return{
     basePrice:returnRandomInteger(MIN_BASE_PRICE,MAX_BASE_PRICE),
     dateFrom: dateFrom,

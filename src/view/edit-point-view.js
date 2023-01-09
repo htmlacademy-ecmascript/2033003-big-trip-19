@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
@@ -111,29 +111,42 @@ function createEditViewTemplate(waypoint) {
       ${!isEmptyObject(destination) && offers.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
     </section>
   </form>
-</li>`;
+  </li>`;
 }
 
-export default class EditPointView {
-  #element = null;
+export default class EditPointView extends AbstractView {
   #waypoint = null;
-  constructor({ waypoint }) {
+  #handleCloseEditClick = null;
+  #handleDeleteClick = null;
+  #handleSaveClick = null;
+  constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
+    super();
     this.#waypoint = waypoint;
+    this.#handleCloseEditClick = onCloseEditClick;
+    this.#handleDeleteClick = onDeleteClick;
+    this.#handleSaveClick = onSaveClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
   }
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseEditClick();
+  };
+
+  #deleteClickHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handleDeleteClick();
+  };
+
+  #saveClickHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handleSaveClick();
+  };
 
   get template() {
     return createEditViewTemplate(this.#waypoint);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
 

@@ -1,7 +1,6 @@
 
-import { OFFERS, POINT_TYPES } from '../const.js';
-import { createElement } from '../render.js';
-import { getRandomArrayElement, returnRandomBool, upperCaseFirst, isEmptyObject, lowwerCaseFirst} from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {returnRandomBool, upperCaseFirst, isEmptyObject, lowwerCaseFirst} from '../util.js';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const {description, pictures} = destinationPoint;
@@ -100,28 +99,8 @@ const createAddPointViewTemplate = (allPointTypes, allOffers, destination, offer
 </li>`;
 };
 
-export default class AddPointView {
-  #element = null;
-  #destination = null;
-
-  constructor({destination = {} }) {
-    this.#destination = destination;
-    this.mockPointTypes = POINT_TYPES;
-    this.mockOffers = OFFERS;
-  }
-
+export default class AddPointView extends AbstractView{
   get template() {
-    return createAddPointViewTemplate(this.mockPointTypes, this.mockOffers, this.#destination, getRandomArrayElement(this.mockPointTypes));
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+    return createAddPointViewTemplate();
   }
 }
