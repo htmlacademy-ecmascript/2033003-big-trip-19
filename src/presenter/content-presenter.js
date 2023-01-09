@@ -24,8 +24,6 @@ export default class ContentPresenter {
     this.#waypoinModel = waypointModel;
   }
 
-
-
   #setupFilters(){
     this.#filterModel = new FilterModel({waypoints: this.#humanizedWaypoints});
     this.filters = [...this.#filterModel.humanizedFilters];

@@ -135,7 +135,7 @@ const OFFERS = [
     type: 'check-in',
     offers: [{
       id: 1,
-      title: 'sea ​​view',
+      title: 'sea view',
       price: 135
     },
     {
