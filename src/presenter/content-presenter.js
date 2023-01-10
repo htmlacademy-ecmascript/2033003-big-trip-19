@@ -62,10 +62,10 @@ export default class ContentPresenter {
     render(messageComponent, this.#contentContainer);
   }
 
-  #clearWaypointsList(){
+  #clearWaypointsList = () => {
     this.#waypointPresenters.forEach((presenter) => presenter.destroy());
     this.#waypointPresenters.clear();
-  }
+  };
 
   #handleModeChange = () => {
     this.#waypointPresenters.forEach((presenter) => presenter.resetView());
