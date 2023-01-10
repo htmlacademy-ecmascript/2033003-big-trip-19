@@ -1,19 +1,24 @@
 import { createDataDestinations } from '../mock-destination.js';
 import { createDataPoints } from '../mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
+import { nanoid } from 'nanoid';
 
-const createPoint = (point, offers, destination, allAvailableOffers) => ({
-  basePrice: point.basePrice,
-  dateFrom: point.dateFrom,
-  dateTo: point.dateTo,
-  destination: destination,
-  id: point.id,
-  isFavorite: point.isFavorite,
-  offers: offers,
-  type: point.type,
-  offersByType: allAvailableOffers,
-  allTypes: POINT_TYPES
-});
+function createPoint(point, offers, destination, allAvailableOffers){
+  return {
+    id: nanoid(),
+    ...{
+      basePrice: point.basePrice,
+      dateFrom: point.dateFrom,
+      dateTo: point.dateTo,
+      destination: destination,
+      isFavorite: point.isFavorite,
+      offers: offers,
+      type: point.type,
+      offersByType: allAvailableOffers,
+      allTypes: POINT_TYPES
+    }
+  };
+}
 
 export default class WaypointModel {
   #offers = OFFERS;
