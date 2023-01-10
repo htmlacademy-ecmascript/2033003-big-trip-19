@@ -31,4 +31,3 @@ export default class FilterContainerView extends AbstractView {
   }
 
 }
-s
