@@ -1,27 +1,26 @@
 import { render } from '../render.js';
-import { replace } from '../framework/render.js';
 import ContentView from '../view/content-view.js';
-import EditPointView from '../view/edit-point-view';
 import MessageView from '../view/message-view.js';
-import WaypointView from '../view/waypoint-view.js';
 import FilterContainerView from '../view/filter-container-view.js';
 import FilterModel from '../model/filter-model.js';
+import WaypointPresenter from './waypoint-presenter.js';
+import WaypointModel from '../model/waypoint-model.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
   #filterComponent = null;
   #contentContainer = null;
   #filtersContainer = null;
-  #waypoinModel = null;
   #filterModel = null;
   #humanizedWaypoints = null;
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
+  #waypointPresenters = new Map();
+  #waypointModel = new WaypointModel();
 
-  constructor({ contentContainer, filtersContainer, waypointModel}) {
+  constructor({ contentContainer, filtersContainer}) {
     this.#contentContainer = contentContainer;
     this.#filtersContainer = filtersContainer;
-    this.#waypoinModel = waypointModel;
   }
 
   #setupFilters(){
@@ -53,42 +52,9 @@ export default class ContentPresenter {
   }
 
   #renderPoint(point) {
-    const pointComponent = new WaypointView({
-      waypoint: point,
-      onShowEditClick: () => {
-        replacePointToEdit.call(this);
-      }
-    });
-    const editPointComponent = new EditPointView({
-      waypoint: point,
-      onCloseEditClick: () => {
-        replaceEditToPoint.call(this);
-      },
-      onDeleteClick: () => {
-        replaceEditToPoint.call(this);
-      },
-      onSaveClick: () => {
-        replaceEditToPoint.call(this);
-      }
-    });
-
-    function replacePointToEdit () {
-      replace(editPointComponent, pointComponent);
-      document.addEventListener('keydown', escKeyDownHandler);
-    }
-    function replaceEditToPoint() {
-      replace(pointComponent, editPointComponent);
-      document.removeEventListener('keydown', escKeyDownHandler);
-    }
-    function escKeyDownHandler(evt){
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceEditToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    }
-
-    render(pointComponent, this.#boardComponent.element);
+    const waypointPresenter = new WaypointPresenter({waypointContainer: this.#boardComponent.element, onModeChange: this.#handleModeChange});
+    waypointPresenter.init(point);
+    this.#waypointPresenters.set(point.id, waypointPresenter);
   }
 
   #renderMessage(filter){
@@ -96,8 +62,17 @@ export default class ContentPresenter {
     render(messageComponent, this.#contentContainer);
   }
 
+  #clearWaypointsList(){
+    this.#waypointPresenters.forEach((presenter) => presenter.destroy());
+    this.#waypointPresenters.clear();
+  }
+
+  #handleModeChange(){
+    this.#waypointPresenters.forEach((presenter) => presenter.resetView());
+  }
+
   init() {
-    this.#humanizedWaypoints = [...this.#waypoinModel.humanizedWaypoints];
+    this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
 
     this.#setupFilters();
     this.#renderContentContainer();
