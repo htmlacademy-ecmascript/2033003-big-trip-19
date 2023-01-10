@@ -67,9 +67,9 @@ export default class ContentPresenter {
     this.#waypointPresenters.clear();
   }
 
-  #handleModeChange(){
+  #handleModeChange = () => {
     this.#waypointPresenters.forEach((presenter) => presenter.resetView());
-  }
+  };
 
   init() {
     this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];

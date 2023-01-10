@@ -64,7 +64,7 @@ export default class WaypointPresenter{
   #replacePointToEdit () {
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    //this.#handleModeChange();
+    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
