@@ -5,6 +5,7 @@ import FilterContainerView from '../view/filter-container-view.js';
 import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
+import { updateItem } from '../utils/common.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -12,7 +13,7 @@ export default class ContentPresenter {
   #contentContainer = null;
   #filtersContainer = null;
   #filterModel = null;
-  #humanizedWaypoints = null;
+  #humanizedWaypoints = [];
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
@@ -52,7 +53,10 @@ export default class ContentPresenter {
   }
 
   #renderPoint(point) {
-    const waypointPresenter = new WaypointPresenter({waypointContainer: this.#boardComponent.element, onModeChange: this.#handleModeChange});
+    const waypointPresenter = new WaypointPresenter({
+      waypointContainer: this.#boardComponent.element,
+      onModeChange: this.#handleModeChange,
+      onDataChange: this.#handleWaypointChange});
     waypointPresenter.init(point);
     this.#waypointPresenters.set(point.id, waypointPresenter);
   }
@@ -69,6 +73,11 @@ export default class ContentPresenter {
 
   #handleModeChange = () => {
     this.#waypointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handleWaypointChange = (updatedWaypoint) => {
+    this.#humanizedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
+    this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
   init() {

@@ -1,4 +1,4 @@
-import { upperCaseFirst } from '../util.js';
+import { upperCaseFirst } from '../utils/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 const createSortContainerTemplate = (sortings) => (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">

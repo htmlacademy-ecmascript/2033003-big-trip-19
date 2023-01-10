@@ -1,5 +1,5 @@
-import { createDataDestinations } from '../mock-destination.js';
-import { createDataPoints } from '../mock-waypoint.js';
+import { createDataDestinations } from '../mocks/mock-destination.js';
+import { createDataPoints } from '../mocks/mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
 

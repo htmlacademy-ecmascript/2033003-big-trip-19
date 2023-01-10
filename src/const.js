@@ -1,5 +1,9 @@
-const MIN_DATE = new Date(2018, 0, 1);
-const MAX_DATE = new Date(2023, 11, 31);
+const Dates = {
+  CURRENTDATE: new Date(),
+  MIN_DATE: new Date(2018, 0, 1),
+  MAX_DATE: new Date(2023, 11, 31)
+};
+
 const Integer = {
   MIN_RANDOME_HOUR: 1,
   MAX_RANDOME_HOUR: 1200,
@@ -19,7 +23,9 @@ const DateFormat = {
 };
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburg', 'Rostov', 'Ulan-Ude','Saratov', 'Samara','Izevsk','Krasnodar','Sochi','Adler'];
+
 const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -52,6 +58,7 @@ const SORTINGS = {
     isChecked: false
   }
 };
+
 const OFFERS = [
   {
     type: 'taxi',
@@ -180,9 +187,8 @@ export {
   Integer,
   DateFormat,
   POINT_TYPES,
-  MIN_DATE,
-  MAX_DATE,
   OFFERS,
   DESTINATION_NAMES,
   DESCRIPTIONS,
-  SORTINGS};
+  SORTINGS,
+  Dates};

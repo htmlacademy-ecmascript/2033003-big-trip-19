@@ -13,10 +13,12 @@ export default class WaypointPresenter{
   #waypoint = null;
   #mode = Mode.DEFAULT;
   #handleModeChange = null;
+  #handleDataChange = null;
 
-  constructor({waypointContainer, onModeChange}){
+  constructor({waypointContainer, onModeChange, onDataChange}){
     this.#contentContainer = waypointContainer;
     this.#handleModeChange = onModeChange;
+    this.#handleDataChange = onDataChange;
   }
 
   init(waypoint){
@@ -90,12 +92,7 @@ export default class WaypointPresenter{
   };
 
   #handleFavoriteClick = () => {
-    if(this.#waypoint.isFavorite){
-      this.#waypoint.isFavorite = false;
-    }else{
-      this.#waypoint.isFavorite = true;
-    }
-    this.init(this.#waypoint);
+    this.#handleDataChange({...this.#waypoint, isFavorite: !this.#waypoint.isFavorite});
   };
 }
 

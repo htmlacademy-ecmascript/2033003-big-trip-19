@@ -1,5 +1,6 @@
+import { DateFormat, Integer } from '../const.js';
 import dayjs from 'dayjs';
-import { DateFormat, Integer } from './const.js';
+
 const returnRandomBool = (() => {
   const a = new Uint8Array(1);
   return function() {
@@ -7,6 +8,7 @@ const returnRandomBool = (() => {
     return a[0] > 127;
   };
 })();
+
 const returnRandomInteger = (max, min = 0) => {
   if (min < 0 || max < 0 || typeof min !== 'number' || typeof max !== 'number')
   {
@@ -18,9 +20,7 @@ const returnRandomInteger = (max, min = 0) => {
   }
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-function returnRandomDate(minDate, maxDate) {
-  return new Date(maxDate.getTime() + Math.random() * (minDate.getTime() - maxDate.getTime()));
-}
+
 function addDays(date) {
   const {MIN_RANDOME_HOUR, MAX_RANDOME_HOUR, MAX_INTEGER_DATE_DURATION} = Integer;
   const result = new Date(date);
@@ -29,18 +29,11 @@ function addDays(date) {
   result.setMinutes(result.getMinutes() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
   return result;
 }
-const upperCaseFirst = (str) => {
-  if (!str){
-    return str;
-  }
-  return str[0].toUpperCase() + str.slice(1);
-};
-const lowwerCaseFirst = (str) => {
-  if (!str){
-    return str;
-  }
-  return str[0].toLowerCase() + str.slice(1);
-};
+
+function returnRandomDate(minDate, maxDate) {
+  return new Date(maxDate.getTime() + Math.random() * (minDate.getTime() - maxDate.getTime()));
+}
+
 const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format(DateFormat.HOURS_AND_MINUTES);
   return withoutDate;
@@ -53,6 +46,7 @@ const getHumanizeTime = (diff) => {
   const humaniseTime = diff;
   return humaniseTime;
 };
+
 const PrependZeros = (str, len, seperator) => {
   if (typeof str === 'number' || Number(str)) {
     str = str.toString();
@@ -68,6 +62,7 @@ const PrependZeros = (str, len, seperator) => {
     return spl.join(seperator || ' ');
   }
 };
+
 const getDateDifference = (startDate, endDate) =>{
   const diff = Date.parse(endDate) - Date.parse(startDate);
   const days = Math.floor(diff / (1000 * 3600 * 24));
@@ -83,18 +78,27 @@ const getDateDifference = (startDate, endDate) =>{
   }
   return humaniseTime;
 };
+
 const isEmptyObject = (obj) => {
   if (Object.keys(obj).length === 0) {
     return true;
   }
   return false;
 };
-const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
-const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
 
-export {upperCaseFirst, getTimeFromDate,
-  getDateDifference, humanizeWaypointDate,
-  getRandomArrayElement,returnRandomInteger,
-  getHumanizeTime,returnRandomDate,
-  addDays,returnRandomBool,lowwerCaseFirst,
-  isEmptyObject, getFullFormatDate};
+const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
+
+const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
+export {
+  returnRandomBool,
+  returnRandomInteger,
+  addDays,
+  returnRandomDate,
+  getTimeFromDate,
+  getFullFormatDate,
+  getHumanizeTime,
+  getDateDifference,
+  isEmptyObject,
+  humanizeWaypointDate,
+  getRandomArrayElement
+};

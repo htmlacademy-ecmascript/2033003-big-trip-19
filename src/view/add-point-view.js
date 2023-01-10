@@ -1,6 +1,7 @@
 
 import AbstractView from '../framework/view/abstract-view.js';
-import {returnRandomBool, upperCaseFirst, isEmptyObject, lowwerCaseFirst} from '../util.js';
+import {returnRandomBool, isEmptyObject} from '../util.js';
+import { lowwerCaseFirst } from '../common.js';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const {description, pictures} = destinationPoint;

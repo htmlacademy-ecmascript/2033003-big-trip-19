@@ -1,5 +1,7 @@
-import { getDateDifference, getTimeFromDate, humanizeWaypointDate, getHumanizeTime, upperCaseFirst} from '../util.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import { getTimeFromDate, getHumanizeTime } from '../utils/util-waypoint.js';
+import { upperCaseFirst } from '../utils/common.js';
+import { getDateDifference, humanizeWaypointDate } from '../utils/util-waypoint.js';
 
 function createWaypointTemplate(waypoint) {
   const {type,destination,dateFrom,dateTo,basePrice,offers} = waypoint;

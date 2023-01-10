@@ -1,4 +1,4 @@
-import { filterTypes } from '../filter.js';
+import { filterTypes } from '../mocks/mock-filter.js';
 
 const createFilter = (filter, humanizedWaypoints, filters) =>{
   const waypointsByFilterType = filters.find((filterElement) => filterElement.name === filter.name).waypoints(humanizedWaypoints.waypoints);
