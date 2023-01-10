@@ -15,7 +15,6 @@ const createDestinationViewTemplate = (destinationPoint) => {
                     </div>
   </section>`;
 };
-
 const showDestinationTitle = (title) => `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${title}" list="destination-list-1">`;
 
 const createOffersViewTemplate = (offers) =>
