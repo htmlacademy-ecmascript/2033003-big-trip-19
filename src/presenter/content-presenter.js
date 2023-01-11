@@ -6,6 +6,8 @@ import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
 import { updateItem } from '../utils/common.js';
+import SortContainerView from '../view/sort-container-view.js';
+import { SortType } from '../const.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -18,10 +20,12 @@ export default class ContentPresenter {
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
   #waypointModel = new WaypointModel();
+  #sortingsContainer = null;
 
-  constructor({ contentContainer, filtersContainer}) {
+  constructor({ contentContainer, filtersContainer, sortingsContainer}) {
     this.#contentContainer = contentContainer;
     this.#filtersContainer = filtersContainer;
+    this.#sortingsContainer = sortingsContainer;
   }
 
   #setupFilters(){
@@ -31,6 +35,10 @@ export default class ContentPresenter {
       filters: this.filters
     });
     this.#renderFilters(this.#filterComponent);
+  }
+
+  #setupSortings(){
+    render(new SortContainerView({sortings: SortType}),this.#sortingsContainer);
   }
 
   #renderFilters(component){
@@ -84,8 +92,11 @@ export default class ContentPresenter {
     this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
 
     this.#setupFilters();
+    this.#setupSortings();
     this.#renderContentContainer();
     this.#getCurrentFilterAndWaypoints();
+
+
 
     if(this.#waypointsByCheckedFilter.length < 1){
       this.#renderMessage(this.checkedFilter);
