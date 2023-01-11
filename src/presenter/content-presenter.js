@@ -21,6 +21,7 @@ export default class ContentPresenter {
   #waypointPresenters = new Map();
   #waypointModel = new WaypointModel();
   #sortingsContainer = null;
+  #sortComponent = null;
 
   constructor({ contentContainer, filtersContainer, sortingsContainer}) {
     this.#contentContainer = contentContainer;
@@ -37,8 +38,13 @@ export default class ContentPresenter {
     this.#renderFilters(this.#filterComponent);
   }
 
+  #handleSortTypeChange = (sortType) => {
+
+  };
+
   #setupSortings(){
-    render(new SortContainerView({sortings: SortType}),this.#sortingsContainer);
+    this.#sortComponent = new SortContainerView({sortings: SortType, onSortTypeChange: this.#handleSortTypeChange});
+    render(this.#sortComponent, this.#sortingsContainer);
   }
 
   #renderFilters(component){
@@ -95,8 +101,6 @@ export default class ContentPresenter {
     this.#setupSortings();
     this.#renderContentContainer();
     this.#getCurrentFilterAndWaypoints();
-
-
 
     if(this.#waypointsByCheckedFilter.length < 1){
       this.#renderMessage(this.checkedFilter);

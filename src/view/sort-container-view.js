@@ -10,12 +10,24 @@ const createSortContainerTemplate = (sortings) => (`<form class="trip-events__tr
             </form>`);
 export default class SortContainerView extends AbstractView {
   #sortings = null;
-  constructor({sortings}) {
+  #handleSortTypeChange = null;
+
+  constructor({sortings, onSortTypeChange}) {
     super();
     this.#sortings = sortings;
+    this.#handleSortTypeChange = onSortTypeChange;
+    this.element.addEventListener('click', this.#sortTypeChangeHandler);
   }
 
   get template() {
     return createSortContainerTemplate(this.#sortings);
   }
+
+  #sortTypeChangeHandler = (evt) => {
+    if(evt.target.tagName !== 'INPUT'){
+      return;
+    }
+    evt.preventDefault();
+    this.#handleSortTypeChange(evt.target.dataset.sortType);
+  };
 }
