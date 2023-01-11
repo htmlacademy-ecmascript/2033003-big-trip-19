@@ -1,5 +1,5 @@
-import { DESCRIPTIONS, DESTINATION_NAMES, Integer } from './const.js';
-import { getRandomArrayElement, returnRandomInteger } from './util';
+import { DESCRIPTIONS, DESTINATION_NAMES, Integer } from '../const.js';
+import { returnRandomInteger, getRandomArrayElement } from '../utils/util-waypoint.js';
 
 const returnDescriptionWithoutDuplicate = (descriptions) => {
   const uniqueDescriptions = [...new Set(descriptions)];

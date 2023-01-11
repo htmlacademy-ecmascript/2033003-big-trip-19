@@ -1,6 +1,7 @@
 
 import AbstractView from '../framework/view/abstract-view.js';
-import {returnRandomBool, upperCaseFirst, isEmptyObject, lowwerCaseFirst} from '../util.js';
+import {returnRandomBool, isEmptyObject} from '../util.js';
+import { lowwerCaseFirst, upperCaseFirst } from '../common.js';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const {description, pictures} = destinationPoint;
@@ -14,7 +15,6 @@ const createDestinationViewTemplate = (destinationPoint) => {
                     </div>
   </section>`;
 };
-
 const showDestinationTitle = (title) => `<input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${title}" list="destination-list-1">`;
 
 const createOffersViewTemplate = (offers) =>

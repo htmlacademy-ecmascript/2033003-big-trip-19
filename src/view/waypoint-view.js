@@ -1,5 +1,7 @@
-import { getDateDifference, getTimeFromDate, humanizeWaypointDate, getHumanizeTime, upperCaseFirst} from '../util.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import { getTimeFromDate, getHumanizeTime } from '../utils/util-waypoint.js';
+import { upperCaseFirst } from '../utils/common.js';
+import { getDateDifference, humanizeWaypointDate } from '../utils/util-waypoint.js';
 
 function createWaypointTemplate(waypoint) {
   const {type,destination,dateFrom,dateTo,basePrice,offers} = waypoint;
@@ -30,7 +32,7 @@ function createWaypointTemplate(waypoint) {
     <span class="event__offer-price">${offer.price}</span>
     </li>`).join('')}
     </ul>
-    <button class="event__favorite-btn event__favorite-btn--active" type="button">
+    <button class="event__favorite-btn event__favorite-btn${waypoint.isFavorite ? '--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
         <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -45,16 +47,24 @@ function createWaypointTemplate(waypoint) {
 export default class WaypointView extends AbstractView {
   #waypoint = null;
   #handleShowEditClick = null;
-  constructor({ waypoint, onShowEditClick}) {
+  #handleFavoriteClick = null;
+  constructor({ waypoint, onShowEditClick, onFavoriteClick}) {
     super();
     this.#waypoint = waypoint;
     this.#handleShowEditClick = onShowEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
 
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleShowEditClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
   };
 
   get template() {

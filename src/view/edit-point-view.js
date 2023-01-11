@@ -1,5 +1,6 @@
-import { getFullFormatDate, isEmptyObject, lowwerCaseFirst, upperCaseFirst } from '../util.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
+import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
