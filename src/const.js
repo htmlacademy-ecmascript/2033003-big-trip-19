@@ -1,4 +1,4 @@
-const Dates = {
+const DateType = {
   CURRENTDATE: new Date(),
   MIN_DATE: new Date(2018, 0, 1),
   MAX_DATE: new Date(2023, 11, 31)
@@ -57,6 +57,14 @@ const SORTINGS = {
     isDisabled: true,
     isChecked: false
   }
+};
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
 };
 
 const OFFERS = [
@@ -191,4 +199,5 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   SORTINGS,
-  Dates};
+  DateType,
+  SortType};

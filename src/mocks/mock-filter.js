@@ -1,4 +1,4 @@
-import { Dates } from '../const.js';
+import { DateType } from '../const.js';
 
 const filterTypes = [
   {
@@ -11,19 +11,19 @@ const filterTypes = [
     name: 'future',
     isChecked: false,
     message: 'There are no future events now',
-    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateFrom.getTime() > Dates.CURRENTDATE.getTime()),
+    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateFrom.getTime() > DateType.CURRENTDATE.getTime()),
   },
   {
     name: 'present',
     isChecked: false,
     message: 'There are no present events now',
-    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateFrom.getTime() <= Dates.CURRENTDATE.getTime() && waypoint.dateTo.getTime() >= Dates.CURRENTDATE.getTime()),
+    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateFrom.getTime() <= DateType.CURRENTDATE.getTime() && waypoint.dateTo.getTime() >= DateType.CURRENTDATE.getTime()),
   },
   {
     name :'past',
     isChecked: false,
     message: 'There are no past events now',
-    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateTo.getTime() < Dates.CURRENTDATE.getTime()),
+    waypoints: (waypoints) => waypoints.filter((waypoint) => waypoint.dateTo.getTime() < DateType.CURRENTDATE.getTime()),
   },
 ];
 
