@@ -86,6 +86,36 @@ const isEmptyObject = (obj) => {
   return false;
 };
 
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
+  }
+
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+const sortWaypointByDate = (waypointA, waypointB) => {
+  const weight = getWeightForNullDate(waypointA.dateFrom, waypointB.dateFrom);
+
+  return weight ?? dayjs(waypointA.dateFrom).diff(dayjs(waypointB.dateFrom));
+};
+
+const sortWaypointByDuration = (waypointA, waypointB) => {
+  const durationA = waypointA.dateTo.getTime() - waypointA.dateFrom.getTime();
+  const durationB = waypointB.dateTo.getTime() - waypointB.dateFrom.getTime();
+  return durationB - durationA;
+};
+
+const sortWaypointByPrice = (waypointA, waypointB) => waypointB.basePrice - waypointA.basePrice;
+
 const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
 
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
@@ -100,5 +130,8 @@ export {
   getDateDifference,
   isEmptyObject,
   humanizeWaypointDate,
-  getRandomArrayElement
+  getRandomArrayElement,
+  sortWaypointByDate,
+  sortWaypointByDuration,
+  sortWaypointByPrice
 };
