@@ -2,6 +2,7 @@ import { createDataDestinations } from '../mocks/mock-destination.js';
 import { createDataPoints } from '../mocks/mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
+import { sortWaypointByDate } from '../utils/util-waypoint.js';
 
 function createPoint(point, offers, destination, allAvailableOffers){
   return {
@@ -61,6 +62,6 @@ export default class WaypointModel {
       const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
       humanizedWaypoints.push(humanizedPoint);
     }
-    return humanizedWaypoints.sort((a, b) => a.dateFrom - b.dateFrom);
+    return humanizedWaypoints.sort(sortWaypointByDate);
   }
 }

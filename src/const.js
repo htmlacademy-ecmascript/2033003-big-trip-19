@@ -1,7 +1,6 @@
-const Dates = {
-  CURRENTDATE: new Date(),
-  MIN_DATE: new Date(2018, 0, 1),
-  MAX_DATE: new Date(2023, 11, 31)
+const waypointDate = {
+  min: new Date(2018, 0, 1),
+  max: new Date(2023, 11, 31)
 };
 
 const Integer = {
@@ -9,7 +8,7 @@ const Integer = {
   MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 3,
+  MAX_COUNT_OBJECTS: 30,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
@@ -57,6 +56,14 @@ const SORTINGS = {
     isDisabled: true,
     isChecked: false
   }
+};
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
 };
 
 const OFFERS = [
@@ -191,4 +198,5 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   SORTINGS,
-  Dates};
+  waypointDate,
+  SortType};
