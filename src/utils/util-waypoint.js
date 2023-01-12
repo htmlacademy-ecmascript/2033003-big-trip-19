@@ -31,7 +31,7 @@ function addDays(date) {
 }
 
 function returnRandomDate(minDate, maxDate) {
-  return new Date(maxDate.getTime() + Math.random() * (minDate.getTime() - maxDate.getTime()));
+  return new Date(minDate.getTime() + Math.random() * (maxDate.getTime() - minDate.getTime()));
 }
 
 const getTimeFromDate = (date) => {

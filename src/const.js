@@ -1,7 +1,6 @@
-const DateType = {
-  CURRENTDATE: new Date(),
-  MIN_DATE: new Date(2018, 0, 1),
-  MAX_DATE: new Date(2023, 11, 31)
+const waypointDate = {
+  min: new Date(2018, 0, 1),
+  max: new Date(2023, 11, 31)
 };
 
 const Integer = {
@@ -199,5 +198,5 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   SORTINGS,
-  DateType,
+  waypointDate,
   SortType};
