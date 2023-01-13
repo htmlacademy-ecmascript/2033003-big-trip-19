@@ -14,6 +14,7 @@ function createTripInfoTemplate(trip) {
   </p>
 </section>`;
 }
+
 export default class TripInfoView extends AbstractView {
   #trip = null;
 
