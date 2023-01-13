@@ -1,6 +1,7 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js'
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
+import { OFFERS } from '../const.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
@@ -108,27 +109,28 @@ function createEditViewTemplate(waypoint) {
       </button>
     </header>
     <section class="event__details">
-      ${offers.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : createDestinationWithoutOffersViewTemplate(destination)}
-      ${!isEmptyObject(destination) && offers.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
+      ${offersByType.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : createDestinationWithoutOffersViewTemplate(destination)}
+      ${!isEmptyObject(destination) && offersByType.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
     </section>
   </form>
   </li>`;
 }
 
-export default class EditPointView extends AbstractView {
-  #waypoint = null;
+export default class EditPointView extends AbstractStatefulView {
   #handleCloseEditClick = null;
   #handleDeleteClick = null;
   #handleSaveClick = null;
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
-    this.#waypoint = waypoint;
+    this._setState(EditPointView.parseWaypointToState(waypoint));
     this.#handleCloseEditClick = onCloseEditClick;
     this.#handleDeleteClick = onDeleteClick;
     this.#handleSaveClick = onSaveClick;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+
     this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
+    
+    this._restoreHandlers();
   }
 
   #editClickHandler = (evt) => {
@@ -146,8 +148,29 @@ export default class EditPointView extends AbstractView {
     this.#handleSaveClick();
   };
 
+  #typeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const offers = OFFERS.find((_value, index, offer) => offer[index].type === evt.target.value);
+    this.updateElement({
+      type: evt.target.value,
+      offersByType: offers.offers
+    });
+  };
+
   get template() {
-    return createEditViewTemplate(this.#waypoint);
+    return createEditViewTemplate(this._state);
+  }
+
+  static parseWaypointToState(waypoint) {
+    return {...waypoint};
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    const types = this.element.querySelectorAll('.event__type-input');
+    for (let i = 0; i < types.length; i++){
+      types[i].addEventListener('click', this.#typeChangeHandler);
+    }
   }
 }
 

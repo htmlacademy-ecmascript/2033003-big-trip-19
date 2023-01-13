@@ -35,6 +35,10 @@ export default class WaypointModel {
     return this.#destinations;
   }
 
+  get offers(){
+    return this.#offers;
+  }
+
   get humanizedWaypoints() {
     const cloneWaypoints = [...this.#waypoints];
     this.#humanizedWaypoints = [];
