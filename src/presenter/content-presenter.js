@@ -11,6 +11,7 @@ import { SortType } from '../const.js';
 import SortModel from '../model/sort-model.js';
 import { replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info.js';
+import TripModel from '../model/trip-model.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -22,6 +23,7 @@ export default class ContentPresenter {
   #tripContainer = null;
   #filterModel = null;
   #sortingModel = new SortModel();
+  #tripModel = null;
   #humanizedWaypoints = [];
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
@@ -31,6 +33,7 @@ export default class ContentPresenter {
   #currentSortType = null;
   #filters = null;
   #sortings = null;
+  #trip = null;
 
   constructor({ contentContainer, filtersContainer, sortingsContainer, tripContainer}) {
     this.#contentContainer = contentContainer;
@@ -121,8 +124,8 @@ export default class ContentPresenter {
     this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
-  #renderTrip(){
-    this.#tripComponent = new TripInfoView({waypoints: this.#humanizedWaypoints});
+  #renderTrip(trip){
+    this.#tripComponent = new TripInfoView({trip: trip});
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
 
@@ -140,6 +143,8 @@ export default class ContentPresenter {
     }else{
       this.#renderPoints(this.#waypointsByCheckedFilter);
     }
-    this.#renderTrip();
+    this.#tripModel = new TripModel(this.#humanizedWaypoints);
+    this.#trip = this.#tripModel.trip;
+    this.#renderTrip(this.#trip);
   }
 }
