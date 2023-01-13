@@ -6,36 +6,80 @@ import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
 import { updateItem } from '../utils/common.js';
+import SortContainerView from '../view/sort-container-view.js';
+import { SortType } from '../const.js';
+import SortModel from '../model/sort-model.js';
+import { replace } from '../framework/render.js';
+import TripInfoView from '../view/trip-info-view.js';
+import TripModel from '../model/trip-model.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
+  #tripComponent = null;
   #filterComponent = null;
+  #sortingComponent = null;
   #contentContainer = null;
   #filtersContainer = null;
+  #tripContainer = null;
   #filterModel = null;
+  #sortingModel = new SortModel();
+  #tripModel = null;
   #humanizedWaypoints = [];
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
   #waypointModel = new WaypointModel();
+  #sortingsContainer = null;
+  #currentSortType = null;
+  #filters = null;
+  #sortings = null;
+  #trip = null;
 
-  constructor({ contentContainer, filtersContainer}) {
+  constructor({ contentContainer, filtersContainer, sortingsContainer, tripContainer}) {
     this.#contentContainer = contentContainer;
     this.#filtersContainer = filtersContainer;
+    this.#sortingsContainer = sortingsContainer;
+    this.#tripContainer = tripContainer;
   }
 
   #setupFilters(){
     this.#filterModel = new FilterModel({waypoints: this.#humanizedWaypoints});
-    this.filters = [...this.#filterModel.humanizedFilters];
+    this.#filters = [...this.#filterModel.humanizedFilters];
     this.#filterComponent = new FilterContainerView({
-      filters: this.filters
+      filters: this.#filters
     });
-    this.#renderFilters(this.#filterComponent);
+    render(this.#filterComponent, this.#filtersContainer);
   }
 
-  #renderFilters(component){
-    render(component, this.#filtersContainer);
+  #setupSortings(sortings, selectedSortType){
+    const prevSortComponent = this.#sortingComponent;
+    this.#currentSortType = selectedSortType;
+    this.#sortingComponent = new SortContainerView({
+      sortings: sortings,
+      selectedSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange});
+    if(prevSortComponent !== null){
+      replace(this.#sortingComponent, prevSortComponent);
+    }else{
+      render(this.#sortingComponent, this.#sortingsContainer);
+    }
   }
+
+  #handleSortTypeChange = (sortType, updatedSorting) => {
+    if(this.#currentSortType === sortType){
+      return;
+    }
+    this.#humanizedWaypoints = this.#waypointModel.sortWaypoints(this.#humanizedWaypoints, sortType);
+    this.#sortings = updateItem(this.#sortings, updatedSorting);
+    this.#sortings.forEach((sorting) => {
+      if(sorting.name !== sortType){
+        sorting.isChecked = false;
+      }
+    });
+    this.#setupSortings(this.#sortings, sortType);
+    this.#clearWaypointsList();
+    this.#renderPoints(this.#humanizedWaypoints);
+  };
 
   #renderContentContainer(){
     render(this.#boardComponent, this.#contentContainer);
@@ -46,9 +90,9 @@ export default class ContentPresenter {
     this.#waypointsByCheckedFilter = this.#checkedFilter.waypoints;
   }
 
-  #renderPoints(){
-    for (let i = 0; i < this.#waypointsByCheckedFilter.length; i++) {
-      this.#renderPoint(this.#waypointsByCheckedFilter[i]);
+  #renderPoints(waypoints){
+    for (let i = 0; i < waypoints.length; i++) {
+      this.#renderPoint(waypoints[i]);
     }
   }
 
@@ -80,17 +124,27 @@ export default class ContentPresenter {
     this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
-  init() {
-    this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
+  #renderTrip(trip){
+    this.#tripComponent = new TripInfoView({trip: trip});
+    render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
+  }
 
+  init() {
+    this.#currentSortType = SortType.DAY;
+    this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
+    this.#sortings = [...this.#sortingModel.humanizedSortings];
     this.#setupFilters();
+    this.#setupSortings(this.#sortings, this.#currentSortType);
     this.#renderContentContainer();
     this.#getCurrentFilterAndWaypoints();
 
     if(this.#waypointsByCheckedFilter.length < 1){
       this.#renderMessage(this.checkedFilter);
     }else{
-      this.#renderPoints();
+      this.#renderPoints(this.#waypointsByCheckedFilter);
     }
+    this.#tripModel = new TripModel(this.#humanizedWaypoints);
+    this.#trip = this.#tripModel.trip;
+    this.#renderTrip(this.#trip);
   }
 }
