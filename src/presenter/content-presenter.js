@@ -10,7 +10,7 @@ import SortContainerView from '../view/sort-container-view.js';
 import { SortType } from '../const.js';
 import SortModel from '../model/sort-model.js';
 import { replace } from '../framework/render.js';
-import TripInfoView from '../view/trip-info.js';
+import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 
 export default class ContentPresenter {
