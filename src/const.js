@@ -8,7 +8,7 @@ const Integer = {
   MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 30,
+  MAX_COUNT_OBJECTS: 3,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
@@ -35,28 +35,6 @@ const DESCRIPTIONS = [
   'Sed sed nisi sed augue convallis suscipit in sed felis.',
   'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
 ];
-const SORTINGS = {
-  day: {
-    isDisabled: false,
-    isChecked: false
-  },
-  event: {
-    isDisabled: true,
-    isChecked: false
-  },
-  time: {
-    isDisabled: false,
-    isChecked: false
-  },
-  price: {
-    isDisabled: false,
-    isChecked: true
-  },
-  offer: {
-    isDisabled: true,
-    isChecked: false
-  }
-};
 
 const SortType = {
   DAY: 'day',
@@ -197,6 +175,5 @@ export {
   OFFERS,
   DESTINATION_NAMES,
   DESCRIPTIONS,
-  SORTINGS,
   waypointDate,
   SortType};

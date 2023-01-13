@@ -8,23 +8,26 @@ import WaypointModel from '../model/waypoint-model.js';
 import { updateItem } from '../utils/common.js';
 import SortContainerView from '../view/sort-container-view.js';
 import { SortType } from '../const.js';
-import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
+import SortModel from '../model/sort-model.js';
+import { replace } from '../framework/render.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
   #filterComponent = null;
+  #sortingComponent = null;
   #contentContainer = null;
   #filtersContainer = null;
   #filterModel = null;
+  #sortingModel = new SortModel();
   #humanizedWaypoints = [];
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
   #waypointModel = new WaypointModel();
   #sortingsContainer = null;
-  #sortComponent = null;
-  #currentSortType = SortType.DAY;
-  #sourcedWaypoints = [];
+  #currentSortType = null;
+  #filters = null;
+  #sortings = null;
 
   constructor({ contentContainer, filtersContainer, sortingsContainer}) {
     this.#contentContainer = contentContainer;
@@ -34,47 +37,42 @@ export default class ContentPresenter {
 
   #setupFilters(){
     this.#filterModel = new FilterModel({waypoints: this.#humanizedWaypoints});
-    this.filters = [...this.#filterModel.humanizedFilters];
+    this.#filters = [...this.#filterModel.humanizedFilters];
     this.#filterComponent = new FilterContainerView({
-      filters: this.filters
+      filters: this.#filters
     });
-    this.#renderFilters(this.#filterComponent);
+    render(this.#filterComponent, this.#filtersContainer);
   }
 
-  #handleSortTypeChange = (sortType) => {
+  #setupSortings(sortings, selectedSortType){
+    const prevSortComponent = this.#sortingComponent;
+    this.#currentSortType = selectedSortType;
+    this.#sortingComponent = new SortContainerView({
+      sortings: sortings,
+      selectedSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange});
+    if(prevSortComponent !== null){
+      replace(this.#sortingComponent, prevSortComponent);
+    }else{
+      render(this.#sortingComponent, this.#sortingsContainer);
+    }
+  }
+
+  #handleSortTypeChange = (sortType, updatedSorting) => {
     if(this.#currentSortType === sortType){
       return;
     }
-    this.#sortWaypoints(sortType);
+    this.#humanizedWaypoints = this.#waypointModel.sortWaypoints(this.#humanizedWaypoints, sortType);
+    this.#sortings = updateItem(this.#sortings, updatedSorting);
+    this.#sortings.forEach((sorting) => {
+      if(sorting.name !== sortType){
+        sorting.isChecked = false;
+      }
+    });
+    this.#setupSortings(this.#sortings, sortType);
     this.#clearWaypointsList();
-    this.#renderPoints();
+    this.#renderPoints(this.#humanizedWaypoints);
   };
-
-  #sortWaypoints(sortType){
-    switch(sortType){
-      case SortType.DAY:
-        this.#humanizedWaypoints.sort(sortWaypointByDate);
-        break;
-      case SortType.TIME:
-        this.#humanizedWaypoints.sort(sortWaypointByDuration);
-        break;
-      case SortType.PRICE:
-        this.#humanizedWaypoints.sort(sortWaypointByPrice);
-        break;
-      default:
-        this.#humanizedWaypoints = [...this.#sourcedWaypoints];
-    }
-    this.#currentSortType = sortType;
-  }
-
-  #renderSortings(){
-    this.#sortComponent = new SortContainerView({sortings: SortType, onSortTypeChange: this.#handleSortTypeChange});
-    render(this.#sortComponent, this.#sortingsContainer);
-  }
-
-  #renderFilters(component){
-    render(component, this.#filtersContainer);
-  }
 
   #renderContentContainer(){
     render(this.#boardComponent, this.#contentContainer);
@@ -85,9 +83,9 @@ export default class ContentPresenter {
     this.#waypointsByCheckedFilter = this.#checkedFilter.waypoints;
   }
 
-  #renderPoints(){
-    for (let i = 0; i < this.#waypointsByCheckedFilter.length; i++) {
-      this.#renderPoint(this.#waypointsByCheckedFilter[i]);
+  #renderPoints(waypoints){
+    for (let i = 0; i < waypoints.length; i++) {
+      this.#renderPoint(waypoints[i]);
     }
   }
 
@@ -116,22 +114,22 @@ export default class ContentPresenter {
 
   #handleWaypointChange = (updatedWaypoint) => {
     this.#humanizedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
-    this.#sourcedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
     this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
   init() {
+    this.#currentSortType = SortType.DAY;
     this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
-    this.#sourcedWaypoints = [...this.#waypointModel.humanizedWaypoints];
+    this.#sortings = [...this.#sortingModel.humanizedSortings];
     this.#setupFilters();
-    this.#renderSortings();
+    this.#setupSortings(this.#sortings, this.#currentSortType);
     this.#renderContentContainer();
     this.#getCurrentFilterAndWaypoints();
 
     if(this.#waypointsByCheckedFilter.length < 1){
       this.#renderMessage(this.checkedFilter);
     }else{
-      this.#renderPoints();
+      this.#renderPoints(this.#waypointsByCheckedFilter);
     }
   }
 }

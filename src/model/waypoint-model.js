@@ -2,7 +2,7 @@ import { createDataDestinations } from '../mocks/mock-destination.js';
 import { createDataPoints } from '../mocks/mock-waypoint.js';
 import { OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
-import { sortWaypointByDate } from '../utils/util-waypoint.js';
+import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 
 function createPoint(point, offers, destination, allAvailableOffers){
   return {
@@ -25,10 +25,7 @@ export default class WaypointModel {
   #offers = OFFERS;
   #destinations = createDataDestinations();
   #waypoints = Array.from(createDataPoints(this.#destinations));
-
-  sortWaypoints() {
-    return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
-  }
+  #humanizedWaypoints = null;
 
   get waypoints() {
     return this.#waypoints;
@@ -40,7 +37,7 @@ export default class WaypointModel {
 
   get humanizedWaypoints() {
     const cloneWaypoints = [...this.#waypoints];
-    const humanizedWaypoints = [];
+    this.#humanizedWaypoints = [];
     for (const point of cloneWaypoints) {
       let allAvailableOffers = [];
       const availableOffers = [];
@@ -60,8 +57,25 @@ export default class WaypointModel {
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
 
       const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
-      humanizedWaypoints.push(humanizedPoint);
+      this.#humanizedWaypoints.push(humanizedPoint);
     }
-    return humanizedWaypoints.sort(sortWaypointByDate);
+    return this.#humanizedWaypoints.sort(sortWaypointByDate);
+  }
+
+  sortWaypoints(waypoints, sortType){
+    switch(sortType){
+      case sortType = 'day':
+        waypoints.sort(sortWaypointByDate);
+        break;
+      case sortType = 'time':
+        waypoints.sort(sortWaypointByDuration);
+        break;
+      case sortType = 'price':
+        waypoints.sort(sortWaypointByPrice);
+        break;
+      default:
+        waypoints.sort(sortWaypointByDate);
+    }
+    return waypoints;
   }
 }
