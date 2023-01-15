@@ -34,6 +34,7 @@ export default class ContentPresenter {
   #filters = null;
   #sortings = null;
   #trip = null;
+  #allDestinations = null;  
 
   constructor({ contentContainer, filtersContainer, sortingsContainer, tripContainer}) {
     this.#contentContainer = contentContainer;
@@ -98,6 +99,7 @@ export default class ContentPresenter {
 
   #renderPoint(point) {
     const waypointPresenter = new WaypointPresenter({
+      allDestinations: this.#allDestinations,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
       onDataChange: this.#handleWaypointChange});
@@ -132,6 +134,7 @@ export default class ContentPresenter {
   init() {
     this.#currentSortType = SortType.DAY;
     this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
+    this.#allDestinations = [...this.#waypointModel.destinations];
     this.#sortings = [...this.#sortingModel.humanizedSortings];
     this.#setupFilters();
     this.#setupSortings(this.#sortings, this.#currentSortType);

@@ -52,7 +52,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers, id, offersByType, allTypes } = waypoint;
+  const { type, destination, dateFrom, dateTo, basePrice, offers, id, offersByType, allTypes, allDestinationNames } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -80,9 +80,7 @@ function createEditViewTemplate(waypoint) {
         </label>
         ${!isEmptyObject(destination) ? showDestinationTitle(destination) : ''}
         <datalist id="destination-list-${destination.id}">
-          <option value="Amsterdam"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
+          ${allDestinationNames.map((destinationName) => `<option value="${destinationName}" ${destinationName === destination.name ? 'selected' : ''}></option>`).join('')}
         </datalist>
       </div>
 
@@ -153,7 +151,16 @@ export default class EditPointView extends AbstractStatefulView {
     const offers = OFFERS.find((_value, index, offer) => offer[index].type === evt.target.value);
     this.updateElement({
       type: evt.target.value,
-      offersByType: offers.offers
+      offersByType: offers.offers, 
+      offers: []
+    });
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
+    const destination = this._state.allDestinations.filter((destination) => destination.name === evt.target.value);
+    this.updateElement({
+      destination: destination[0]
     });
   };
 
@@ -171,6 +178,10 @@ export default class EditPointView extends AbstractStatefulView {
     for (let i = 0; i < types.length; i++){
       types[i].addEventListener('click', this.#typeChangeHandler);
     }
+
+    const currentDestinationId = this._state.destination.id;
+    const destinations = this.element.querySelector('.event__input--destination');
+    destinations.addEventListener('change', this.#destinationChangeHandler);
   }
 }
 

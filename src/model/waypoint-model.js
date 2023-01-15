@@ -1,10 +1,10 @@
 import { createDataDestinations } from '../mocks/mock-destination.js';
 import { createDataPoints } from '../mocks/mock-waypoint.js';
-import { OFFERS, POINT_TYPES } from '../const.js';
+import { DESTINATION_NAMES, OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
 import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 
-function createPoint(point, offers, destination, allAvailableOffers){
+function createPoint(point, offers, destination, allAvailableOffers, alldestinations){
   return {
     id: nanoid(),
     ...{
@@ -16,14 +16,16 @@ function createPoint(point, offers, destination, allAvailableOffers){
       offers: offers,
       type: point.type,
       offersByType: allAvailableOffers,
-      allTypes: POINT_TYPES
+      allTypes: POINT_TYPES,
+      allDestinationNames: DESTINATION_NAMES,
+      allDestinations: alldestinations
     }
   };
 }
 
 export default class WaypointModel {
   #offers = OFFERS;
-  #destinations = createDataDestinations();
+  #destinations = createDataDestinations(DESTINATION_NAMES.length);
   #waypoints = Array.from(createDataPoints(this.#destinations));
   #humanizedWaypoints = null;
 
@@ -60,7 +62,7 @@ export default class WaypointModel {
 
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
 
-      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
+      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations);
       this.#humanizedWaypoints.push(humanizedPoint);
     }
     return this.#humanizedWaypoints.sort(sortWaypointByDate);

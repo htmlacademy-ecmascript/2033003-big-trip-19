@@ -27,7 +27,7 @@ const createDataDestination = (integer) => {
   return {
     id: integer,
     description: destinationDescription,
-    name: destinationName,
+    name: DESTINATION_NAMES[integer],
     pictures: [
       {
         src: `https://loremflickr.com/248/152?random=${returnRandomInteger(MAX_RANDOM_IMAGE_INTEGER)}`,
@@ -36,7 +36,7 @@ const createDataDestination = (integer) => {
     ]
   };
 };
-const createDataDestinations = () => Array.from({ length: Integer.MAX_COUNT_OBJECTS }, (_element, integer) =>
-  createDataDestination(integer + 1));
+const createDataDestinations = (length) => Array.from({ length: length }, (_element, integer) =>
+  createDataDestination(integer));
 
 export { createDataDestinations };
