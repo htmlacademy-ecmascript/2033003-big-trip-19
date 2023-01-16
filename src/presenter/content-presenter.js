@@ -7,11 +7,18 @@ import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
 import { updateItem } from '../utils/common.js';
 import SortContainerView from '../view/sort-container-view.js';
-import { SortType } from '../const.js';
+import { newWaypoint, SortType } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { replace } from '../framework/render.js';
+import { remove, replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
+import AddPointView from '../view/add-point-view.js';
+import NewPointPresenter from './new-point-presenter.js';
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  ADDING : 'ADDING'
+};
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -28,13 +35,17 @@ export default class ContentPresenter {
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
+  #newWaypointPresenter = new Map();
   #waypointModel = new WaypointModel();
   #sortingsContainer = null;
   #currentSortType = null;
   #filters = null;
   #sortings = null;
   #trip = null;
-  #allDestinations = null;  
+  #allDestinations = null;
+  #newPointComponent = null;
+  #addButton = null;
+  #mode = Mode.DEFAULT;
 
   constructor({ contentContainer, filtersContainer, sortingsContainer, tripContainer}) {
     this.#contentContainer = contentContainer;
@@ -99,7 +110,6 @@ export default class ContentPresenter {
 
   #renderPoint(point) {
     const waypointPresenter = new WaypointPresenter({
-      allDestinations: this.#allDestinations,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
       onDataChange: this.#handleWaypointChange});
@@ -131,10 +141,85 @@ export default class ContentPresenter {
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
 
+  // #initAddPointComponent(){
+  //   this.#addButton = document.querySelector('.trip-main__event-add-btn');
+  //   this.#addButton.addEventListener('click', this.#addPointClickHandler);
+  //   const prevAddPointComponent = this.#newPointComponent;
+  //   this.#newPointComponent = new AddPointView({
+  //     waypoint: {
+  //       allDestinations: [...this.#waypointModel.destinations], 
+  //       allOffers: [...this.#waypointModel.offers], 
+  //       destination: [...this.#waypointModel.destinations][0],
+  //       dateFrom: new Date(),
+  //       dateTo: new Date(),
+  //       ...newWaypoint},
+  //     onCancelAddPointClick: this.#handleCancelAddPointClick
+  //   });
+  //   if(this.#modeAddNewPoint === Mode.ADDING){
+      
+  //     render(this.#newPointComponent, this.#contentContainer,'AFTEREND');
+  //     return;
+  //   }
+  //   this.#addButton.disabled = false;
+  //   remove(prevAddPointComponent);
+  // }
+
+  #initNewPointComponent(){
+    this.newWaypoint = {
+      allDestinations: [...this.#waypointModel.destinations], 
+      allOffers: [...this.#waypointModel.offers], 
+      destination: [...this.#waypointModel.destinations][0],
+      dateFrom: new Date(),
+      dateTo: new Date(),
+      ...newWaypoint};
+
+    const newWaypointPresenter = new NewPointPresenter({
+      newWaypointContainer: this.#boardComponent.element,
+      onDataChange: this.#handleWaypointChange,
+      onCancelClick: this.#handleCancelClick,
+      onSaveClick: this.#handleSaveClick
+    });
+
+    newWaypointPresenter.init(this.newWaypoint, this.#mode);
+    this.#newWaypointPresenter.set(this.newWaypoint.id, newWaypointPresenter);
+  }
+
+  #handleCancelClick = () => {
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
+    this.#addButton.disabled = false;
+    this.#initNewPointComponent();
+  };
+
+  #handleSaveClick = () => {
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
+    this.#addButton.disabled = false;
+    this.#initNewPointComponent();
+  };
+
+  #addPointClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#addButton.disabled = true;
+    this.#mode = Mode.ADDING;
+    this.#waypointPresenters.forEach((presenter) => presenter.resetView());
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#initNewPointComponent();
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#addButton.disabled = false;
+      this.#mode = Mode.DEFAULT;
+      this.#newWaypointPresenter.forEach((presenter) => presenter.destroy());
+      this.#initNewPointComponent();
+    }
+  };
+
   init() {
     this.#currentSortType = SortType.DAY;
     this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
-    this.#allDestinations = [...this.#waypointModel.destinations];
     this.#sortings = [...this.#sortingModel.humanizedSortings];
     this.#setupFilters();
     this.#setupSortings(this.#sortings, this.#currentSortType);
@@ -146,8 +231,14 @@ export default class ContentPresenter {
     }else{
       this.#renderPoints(this.#waypointsByCheckedFilter);
     }
+    
     this.#tripModel = new TripModel(this.#humanizedWaypoints);
     this.#trip = this.#tripModel.trip;
     this.#renderTrip(this.#trip);
+    
+    this.#addButton = document.querySelector('.trip-main__event-add-btn');
+    this.#addButton.addEventListener('click', this.#addPointClickHandler);
+
+    this.#initNewPointComponent();
   }
 }

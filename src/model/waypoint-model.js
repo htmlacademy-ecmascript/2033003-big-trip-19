@@ -4,7 +4,7 @@ import { DESTINATION_NAMES, OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
 import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 
-function createPoint(point, offers, destination, allAvailableOffers, alldestinations){
+function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
   return {
     id: nanoid(),
     ...{
@@ -16,8 +16,8 @@ function createPoint(point, offers, destination, allAvailableOffers, alldestinat
       offers: offers,
       type: point.type,
       offersByType: allAvailableOffers,
-      allTypes: POINT_TYPES,
-      allDestinationNames: DESTINATION_NAMES,
+      allTypes: allTypes,
+      allDestinationNames: destinationNames,
       allDestinations: alldestinations
     }
   };
@@ -25,12 +25,18 @@ function createPoint(point, offers, destination, allAvailableOffers, alldestinat
 
 export default class WaypointModel {
   #offers = OFFERS;
-  #destinations = createDataDestinations(DESTINATION_NAMES.length);
+  #destinationNames = DESTINATION_NAMES;
+  #destinations = createDataDestinations(this.#destinationNames.length);
   #waypoints = Array.from(createDataPoints(this.#destinations));
   #humanizedWaypoints = null;
+  #allTypes = POINT_TYPES;
 
   get waypoints() {
     return this.#waypoints;
+  }
+
+  get allTypes() {
+    return this.#allTypes;
   }
 
   get destinations() {
@@ -62,7 +68,7 @@ export default class WaypointModel {
 
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
 
-      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations);
+      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
       this.#humanizedWaypoints.push(humanizedPoint);
     }
     return this.#humanizedWaypoints.sort(sortWaypointByDate);

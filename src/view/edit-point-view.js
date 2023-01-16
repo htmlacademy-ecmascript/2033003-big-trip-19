@@ -179,7 +179,6 @@ export default class EditPointView extends AbstractStatefulView {
       types[i].addEventListener('click', this.#typeChangeHandler);
     }
 
-    const currentDestinationId = this._state.destination.id;
     const destinations = this.element.querySelector('.event__input--destination');
     destinations.addEventListener('change', this.#destinationChangeHandler);
   }
