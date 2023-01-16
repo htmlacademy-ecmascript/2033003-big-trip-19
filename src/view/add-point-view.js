@@ -103,12 +103,8 @@ const createAddPointViewTemplate = (waypoint) => {
     </label>
     <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}">
   </div>
-
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
-      <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>
     </header>
     <section class="event__details">
       ${offersByType.offers.length > 0 ? createOffersViewTemplate(waypoint, offersByType.offers) : createDestinationWithoutOffersViewTemplate(destination)}

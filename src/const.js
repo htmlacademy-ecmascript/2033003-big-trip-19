@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid';
 
 const waypointDate = {
   min: new Date(2018, 0, 1),

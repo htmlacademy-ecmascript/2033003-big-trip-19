@@ -140,12 +140,13 @@ export default class ContentPresenter {
 
   #initNewPointComponent(){
     this.newWaypoint = {
-      allDestinations: [...this.#waypointModel.destinations], 
-      allOffers: [...this.#waypointModel.offers], 
-      destination: [...this.#waypointModel.destinations][0],
-      dateFrom: new Date(),
-      dateTo: new Date(),
-      ...newWaypoint};
+      ...newWaypoint,
+        allDestinations: [...this.#waypointModel.destinations], 
+        allOffers: [...this.#waypointModel.offers], 
+        destination: [...this.#waypointModel.destinations][0],
+        dateFrom: new Date(),
+        dateTo: new Date()
+    };
 
     const newWaypointPresenter = new NewPointPresenter({
       newWaypointContainer: this.#boardComponent.element,
@@ -205,11 +206,11 @@ export default class ContentPresenter {
     }else{
       this.#renderPoints(this.#waypointsByCheckedFilter);
     }
-    
+
     this.#tripModel = new TripModel(this.#humanizedWaypoints);
     this.#trip = this.#tripModel.trip;
     this.#renderTrip(this.#trip);
-    
+
     this.#addButton = document.querySelector('.trip-main__event-add-btn');
     this.#addButton.addEventListener('click', this.#addPointClickHandler);
 
