@@ -38,8 +38,6 @@ export default class WaypointPresenter{
       onSaveClick: this.#handleCloseEditClick
     });
 
-    
-
     if(prevPointComponent === null || prevEditPointComponent === null){
       render(this.#pointComponent, this.#contentContainer);
       return;

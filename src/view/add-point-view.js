@@ -1,5 +1,4 @@
-
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js'
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import { getFullFormatDate } from '../utils/util-waypoint.js';
@@ -38,8 +37,7 @@ const isCheckedOffer = (offer, pointOffers) => {
 
 const showDestinationTitle = (destination) => `<input class="event__input  event__input--destination" id="event-destination-${destination.id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${destination.id}">`;
 
-const createOffersViewTemplate = (waypoint, offers) => {
-  return `<section class="event__section  event__section--offers">
+const createOffersViewTemplate = (waypoint, offers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${offers.map((offer) => `<div class="event__offer-selector">
@@ -51,10 +49,10 @@ const createOffersViewTemplate = (waypoint, offers) => {
             </label>
     </div>`).join('')}
     </div>
-  </section>`};
+  </section>`;
 
 const createAddPointViewTemplate = (waypoint) => {
-  const {id, basePrice, dateFrom, dateTo, destination, type, allTypes, allDestinationNames, allDestinations, allOffers} = waypoint;
+  const {id, basePrice, dateFrom, dateTo, destination, type, allTypes, allDestinationNames, allOffers} = waypoint;
   const offersByType = allOffers.find((offer) => offer.type === type);
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -119,7 +117,7 @@ export default class AddPointView extends AbstractStatefulView {
   constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
     super();
     this._setState(AddPointView.parseWaypointToState(waypoint));
-    this.#handleCancelAddPointClick = onCancelAddPointClick
+    this.#handleCancelAddPointClick = onCancelAddPointClick;
     this.#handleSaveNewPointClick = onSaveNewPointClick;
     this._restoreHandlers();
   }
@@ -138,7 +136,7 @@ export default class AddPointView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
-    const destination = this._state.allDestinations.filter((destination) => destination.name === evt.target.value);
+    const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     this.updateElement({
       destination: destination[0]
     });

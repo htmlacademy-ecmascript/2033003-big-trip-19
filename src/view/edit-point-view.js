@@ -1,4 +1,4 @@
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js'
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 import { OFFERS } from '../const.js';
@@ -52,7 +52,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers, id, offersByType, allTypes, allDestinationNames } = waypoint;
+  const { type, destination, dateFrom, dateTo, basePrice, id, offersByType, allTypes, allDestinationNames } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -127,7 +127,7 @@ export default class EditPointView extends AbstractStatefulView {
 
     this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
-    
+
     this._restoreHandlers();
   }
 
@@ -151,14 +151,14 @@ export default class EditPointView extends AbstractStatefulView {
     const offers = OFFERS.find((_value, index, offer) => offer[index].type === evt.target.value);
     this.updateElement({
       type: evt.target.value,
-      offersByType: offers.offers, 
+      offersByType: offers.offers,
       offers: []
     });
   };
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
-    const destination = this._state.allDestinations.filter((destination) => destination.name === evt.target.value);
+    const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     this.updateElement({
       destination: destination[0]
     });

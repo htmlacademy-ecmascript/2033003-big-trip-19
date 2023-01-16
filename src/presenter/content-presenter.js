@@ -150,7 +150,6 @@ export default class ContentPresenter {
 
     const newWaypointPresenter = new NewPointPresenter({
       newWaypointContainer: this.#boardComponent.element,
-      onDataChange: this.#handleWaypointChange,
       onCancelClick: this.#handleCancelClick,
       onSaveClick: this.#handleSaveClick
     });
