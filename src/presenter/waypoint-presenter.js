@@ -1,6 +1,4 @@
-import { newWaypoint } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
-import AddPointView from '../view/add-point-view.js';
 import EditPointView from '../view/edit-point-view';
 import WaypointView from '../view/waypoint-view.js';
 

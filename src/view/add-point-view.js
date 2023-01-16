@@ -1,10 +1,8 @@
 
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js'
-import { returnRandomBool, isEmptyObject } from '../utils/util-waypoint.js';
+import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
-import { nanoid } from 'nanoid';
 import { getFullFormatDate } from '../utils/util-waypoint.js';
-import { OFFERS } from '../const.js';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
