@@ -1,6 +1,5 @@
-import { remove } from "../framework/render";
-import { render } from "../render";
-import AddPointView from "../view/add-point-view";
+import { remove, render } from '../framework/render.js';
+import AddPointView from '../view/add-point-view.js';
 
 const Mode = {
     DEFAULT: 'DEFAULT',
