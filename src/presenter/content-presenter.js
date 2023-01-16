@@ -9,10 +9,9 @@ import { updateItem } from '../utils/common.js';
 import SortContainerView from '../view/sort-container-view.js';
 import { newWaypoint, SortType } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { remove, replace } from '../framework/render.js';
+import { replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
-import AddPointView from '../view/add-point-view.js';
 import NewPointPresenter from './new-point-presenter.js';
 
 const Mode = {
@@ -42,8 +41,6 @@ export default class ContentPresenter {
   #filters = null;
   #sortings = null;
   #trip = null;
-  #allDestinations = null;
-  #newPointComponent = null;
   #addButton = null;
   #mode = Mode.DEFAULT;
 
@@ -140,29 +137,6 @@ export default class ContentPresenter {
     this.#tripComponent = new TripInfoView({trip: trip});
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
-
-  // #initAddPointComponent(){
-  //   this.#addButton = document.querySelector('.trip-main__event-add-btn');
-  //   this.#addButton.addEventListener('click', this.#addPointClickHandler);
-  //   const prevAddPointComponent = this.#newPointComponent;
-  //   this.#newPointComponent = new AddPointView({
-  //     waypoint: {
-  //       allDestinations: [...this.#waypointModel.destinations], 
-  //       allOffers: [...this.#waypointModel.offers], 
-  //       destination: [...this.#waypointModel.destinations][0],
-  //       dateFrom: new Date(),
-  //       dateTo: new Date(),
-  //       ...newWaypoint},
-  //     onCancelAddPointClick: this.#handleCancelAddPointClick
-  //   });
-  //   if(this.#modeAddNewPoint === Mode.ADDING){
-      
-  //     render(this.#newPointComponent, this.#contentContainer,'AFTEREND');
-  //     return;
-  //   }
-  //   this.#addButton.disabled = false;
-  //   remove(prevAddPointComponent);
-  // }
 
   #initNewPointComponent(){
     this.newWaypoint = {

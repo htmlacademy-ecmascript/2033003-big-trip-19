@@ -22,7 +22,6 @@ const getDescriptionsForDestination = () => {
 
 const createDataDestination = (integer) => {
   const { MAX_RANDOM_IMAGE_INTEGER } = Integer;
-  const destinationName = getRandomArrayElement(DESTINATION_NAMES);
   const destinationDescription = returnDescriptionWithoutDuplicate(getDescriptionsForDestination());
   return {
     id: integer,
