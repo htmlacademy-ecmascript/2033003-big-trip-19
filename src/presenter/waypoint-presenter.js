@@ -4,7 +4,8 @@ import WaypointView from '../view/waypoint-view.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING'
+  EDITING: 'EDITING',
+  ADDING : 'ADDING'
 };
 export default class WaypointPresenter{
   #contentContainer = null;
@@ -15,7 +16,7 @@ export default class WaypointPresenter{
   #handleModeChange = null;
   #handleDataChange = null;
 
-  constructor({waypointContainer, onModeChange, onDataChange}){
+  constructor({ waypointContainer, onModeChange, onDataChange}){
     this.#contentContainer = waypointContainer;
     this.#handleModeChange = onModeChange;
     this.#handleDataChange = onDataChange;
@@ -48,6 +49,7 @@ export default class WaypointPresenter{
     if (this.#mode === Mode.EDITING) {
       replace(this.#editPointComponent, prevEditPointComponent);
     }
+
     remove(prevPointComponent);
     remove(prevEditPointComponent);
   }
@@ -94,5 +96,6 @@ export default class WaypointPresenter{
   #handleFavoriteClick = () => {
     this.#handleDataChange({...this.#waypoint, isFavorite: !this.#waypoint.isFavorite});
   };
+
 }
 

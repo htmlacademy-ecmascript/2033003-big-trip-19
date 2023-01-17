@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid';
+
 const waypointDate = {
   min: new Date(2018, 0, 1),
   max: new Date(2023, 11, 31)
@@ -168,6 +170,17 @@ const OFFERS = [
   }
 ];
 
+const newWaypoint = {
+  id: nanoid(),
+  ...{
+    basePrice: 0,
+    offers: [],
+    type: POINT_TYPES[0],
+    allTypes: POINT_TYPES,
+    allDestinationNames: DESTINATION_NAMES
+  }
+};
+
 export {
   Integer,
   DateFormat,
@@ -176,4 +189,5 @@ export {
   DESTINATION_NAMES,
   DESCRIPTIONS,
   waypointDate,
-  SortType};
+  SortType,
+  newWaypoint};
