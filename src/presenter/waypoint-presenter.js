@@ -61,6 +61,7 @@ export default class WaypointPresenter{
 
   resetView(){
     if (this.#mode !== Mode.DEFAULT){
+      this.#editPointComponent.reset(this.#waypoint);
       this.#replaceEditToPoint();
     }
   }
@@ -81,7 +82,7 @@ export default class WaypointPresenter{
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#replaceEditToPoint();
+      this.resetView();
     }
   };
 
@@ -90,7 +91,7 @@ export default class WaypointPresenter{
   };
 
   #handleCloseEditClick = () => {
-    this.#replaceEditToPoint();
+    this.resetView();
   };
 
   #handleFavoriteClick = () => {

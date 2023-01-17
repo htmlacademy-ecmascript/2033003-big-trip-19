@@ -118,6 +118,9 @@ export default class EditPointView extends AbstractStatefulView {
   #handleCloseEditClick = null;
   #handleDeleteClick = null;
   #handleSaveClick = null;
+  #datepickerStartWaypoint = null;
+  #datepickerEndWaypoint = null;
+
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
     this._setState(EditPointView.parseWaypointToState(waypoint));
@@ -125,10 +128,28 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleDeleteClick = onDeleteClick;
     this.#handleSaveClick = onSaveClick;
 
-    this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
-    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
-
     this._restoreHandlers();
+  }
+
+  #setDatepickers() {
+    this.#datepickerStartWaypoint = flatpickr(
+      this.element.querySelector('input[name="event-start-time"]'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateStartChangeHandler,
+      },
+    );
+    this.#datepickerEndWaypoint = flatpickr(
+      this.element.querySelector('input[name="event-end-time"]'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateEndChangeHandler,
+      },
+    );
   }
 
   #editClickHandler = (evt) => {
@@ -164,6 +185,14 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
+  #dateStartChangeHandler = (userDate) => {
+    this.updateElement({dateFrom: userDate});
+  };
+
+  #dateEndChangeHandler = (userDate) => {
+    this.updateElement({dateTo: userDate});
+  };
+
   get template() {
     return createEditViewTemplate(this._state);
   }
@@ -172,7 +201,21 @@ export default class EditPointView extends AbstractStatefulView {
     return {...waypoint};
   }
 
+  static parseStateToWaypoint(state) {
+    const waypoint = {...state};
+
+    return waypoint;
+  }
+
+  reset(waypoint) {
+    this.updateElement(
+      EditPointView.parseWaypointToState(waypoint),
+    );
+  }
+
   _restoreHandlers() {
+    this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
     const types = this.element.querySelectorAll('.event__type-input');
     for (let i = 0; i < types.length; i++){
@@ -181,6 +224,20 @@ export default class EditPointView extends AbstractStatefulView {
 
     const destinations = this.element.querySelector('.event__input--destination');
     destinations.addEventListener('change', this.#destinationChangeHandler);
+
+    this.#setDatepickers();
+  }
+
+  removeElement(){
+    super.removeElement();
+    if(this.#datepickerStartWaypoint){
+      this.#datepickerStartWaypoint.destroy();
+      this.#datepickerStartWaypoint = null;
+    }
+    if(this.#datepickerEndWaypoint){
+      this.#datepickerEndWaypoint.destroy();
+      this.#datepickerEndWaypoint = null;
+    }
   }
 }
 
