@@ -1,7 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
-import { getFullFormatDate } from '../utils/util-waypoint.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -30,8 +29,8 @@ const isCheckedOffer = (offer, pointOffers) => {
   let status = false;
   for (let i = 0; i < pointOffers.length; i++) {
     const pointOffer = pointOffers[i];
-    if(pointOffer.id === offer.id){
-      status = true;
+    if(pointOffer.offer === offer.id){
+      status = pointOffer.isChecked;
     }
   }
   return status;
@@ -43,8 +42,8 @@ const createOffersViewTemplate = (waypoint, offers) => `<section class="event__s
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${offers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${isCheckedOffer(offer, waypoint.offers) ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
+            <input class="event__offer-checkbox visually-hidden" data-offer="${offer.id}" id="event-offer-${lowwerCaseFirst(offer.title)}-${offer.id}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title)}" ${isCheckedOffer(offer, waypoint.offers) ? 'checked' : ''}>
+            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title)}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
@@ -54,8 +53,7 @@ const createOffersViewTemplate = (waypoint, offers) => `<section class="event__s
   </section>`;
 
 const createAddPointViewTemplate = (waypoint) => {
-  const {id, basePrice, dateFrom, dateTo, destination, type, allTypes, allDestinationNames, allOffers} = waypoint;
-  const offersByType = allOffers.find((offer) => offer.type === type);
+  const {id, basePrice, destination, type, allTypes, allDestinationNames, offersByType} = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -117,6 +115,7 @@ export default class AddPointView extends AbstractStatefulView {
   #handleSaveNewPointClick = null;
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
+  #offers = [];
 
   constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
     super();
@@ -167,6 +166,7 @@ export default class AddPointView extends AbstractStatefulView {
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value,
+      offersByType: this._state.allOffers.find((offer) => offer.type === evt.target.value),
       offers: []
     });
   };
@@ -175,7 +175,8 @@ export default class AddPointView extends AbstractStatefulView {
     evt.preventDefault();
     const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     this.updateElement({
-      destination: destination[0]
+      destination: destination[0],
+      offers: []
     });
   };
 
@@ -209,8 +210,29 @@ export default class AddPointView extends AbstractStatefulView {
     const destinations = this.element.querySelector('.event__input--destination');
     destinations.addEventListener('change', this.#destinationChangeHandler);
 
+    const offers = this.element.querySelectorAll('.event__offer-checkbox');
+    for (let i = 0; i < offers.length; i++){
+      offers[i].addEventListener('click', this.#setOfferClickHandler);
+    }
+
     this.#setDatepickers();
   }
+
+  #setOfferClickHandler = (evt) => {
+    evt.preventDefault();
+    const offer = Number(evt.currentTarget.dataset.offer);
+    if(!evt.target.checked){
+      this._state.offers.forEach((item, i) => {
+        if (item.offer === offer) {
+          this._state.offers.splice(i, 1);
+        }
+      });
+    }else{
+      this._state.offers.push({isChecked: evt.target.checked,...{offer}});
+    }
+
+    this.updateElement({offers: this._state.offers});
+  };
 
   removeElement(){
     super.removeElement();

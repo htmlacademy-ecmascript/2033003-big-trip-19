@@ -26,7 +26,7 @@ export default class NewPointPresenter{
     this.#mode = mode;
     this.#newPointComponent = new AddPointView({
       waypoint: this.#newWaypoint,
-      onCancelAddPointClick: this.#cancelAddPointClick,
+      onCancelAddPointClick: this.cancelAddPointClick,
       onSaveNewPointClick: this.#saveNewPointClick
     });
 
@@ -38,11 +38,17 @@ export default class NewPointPresenter{
     remove(prevNewPointComponent);
   }
 
+  resetView(){
+    if (this.#mode !== Mode.DEFAULT){
+      this.#newPointComponent.reset(this.#newWaypoint);
+    }
+  }
+
   destroy() {
     remove(this.#newPointComponent);
   }
 
-  #cancelAddPointClick = () => {
+  cancelAddPointClick = () => {
     remove(this.#newPointComponent);
     this.#handleCancelClick();
   };

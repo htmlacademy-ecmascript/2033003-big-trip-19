@@ -1,7 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
-import { OFFERS } from '../const.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createDestinationWithOffersViewTemplate = (destinationPoint) => {
   const { description } = destinationPoint;
@@ -41,8 +42,8 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}" ${isCheckedOffer(offer, point.offers) ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title.split(' ')[0])}-${offer.id}">
+            <input class="event__offer-checkbox  visually-hidden" data-offer="${offer.id}" id="event-offer-${lowwerCaseFirst(offer.title)}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title)}" ${isCheckedOffer(offer, point.offers) ? 'checked' : ''}>
+            <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title)}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
@@ -169,10 +170,10 @@ export default class EditPointView extends AbstractStatefulView {
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
-    const offers = OFFERS.find((_value, index, offer) => offer[index].type === evt.target.value);
+    const offersByType = this._state.allOffers.find((offer) => offer.type === evt.target.value);
     this.updateElement({
       type: evt.target.value,
-      offersByType: offers.offers,
+      offersByType: offersByType.offers,
       offers: []
     });
   };
@@ -181,7 +182,8 @@ export default class EditPointView extends AbstractStatefulView {
     evt.preventDefault();
     const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     this.updateElement({
-      destination: destination[0]
+      destination: destination[0],
+      offers: []
     });
   };
 
@@ -191,6 +193,22 @@ export default class EditPointView extends AbstractStatefulView {
 
   #dateEndChangeHandler = (userDate) => {
     this.updateElement({dateTo: userDate});
+  };
+
+  #setOfferClickHandler = (evt) => {
+    evt.preventDefault();
+    const offer = Number(evt.currentTarget.dataset.offer);
+    if(!evt.target.checked){
+      this._state.offers.forEach((item, i) => {
+        if (item.offer === offer) {
+          this._state.offers.splice(i, 1);
+        }
+      });
+    }else{
+      this._state.offers.push({isChecked: evt.target.checked,...{offer}});
+    }
+
+    this.updateElement({offers: this._state.offers});
   };
 
   get template() {
@@ -225,7 +243,16 @@ export default class EditPointView extends AbstractStatefulView {
     const destinations = this.element.querySelector('.event__input--destination');
     destinations.addEventListener('change', this.#destinationChangeHandler);
 
+    this.setOfferClickHandler();
+
     this.#setDatepickers();
+  }
+
+  setOfferClickHandler(){
+    const offers = this.element.querySelectorAll('.event__offer-checkbox');
+    for (let i = 0; i < offers.length; i++){
+      offers[i].addEventListener('click', this.#setOfferClickHandler);
+    }
   }
 
   removeElement(){
