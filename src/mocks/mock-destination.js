@@ -1,4 +1,4 @@
-import { DESCRIPTIONS, DESTINATION_NAMES, Integer} from '../const.js';
+import { DESCRIPTIONS, DESTINATION_NAMES, Integer } from '../const.js';
 import { returnRandomInteger, getRandomArrayElement } from '../utils/util-waypoint.js';
 
 const returnDescriptionWithoutDuplicate = (descriptions) => {
@@ -9,7 +9,6 @@ const returnDescriptionWithoutDuplicate = (descriptions) => {
   }
   return descriptionString;
 };
-
 const getDescriptionsForDestination = () => {
   const { MIN_COUNT_DESCRIPRIONS, MAX_COUNT_DESCRIPRIONS } = Integer;
   const countDescriptions = returnRandomInteger(MAX_COUNT_DESCRIPRIONS, MIN_COUNT_DESCRIPRIONS);

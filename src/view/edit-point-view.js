@@ -221,6 +221,12 @@ export default class EditPointView extends AbstractStatefulView {
     return waypoint;
   }
 
+  reset(waypoint) {
+    this.updateElement(
+      EditPointView.parseWaypointToState(waypoint),
+    );
+  }
+
   _restoreHandlers() {
     this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
