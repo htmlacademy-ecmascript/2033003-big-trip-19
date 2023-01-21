@@ -107,6 +107,7 @@ export default class ContentPresenter {
 
   #renderPoint(point) {
     const waypointPresenter = new WaypointPresenter({
+      newWaypointPresenter: this.#newWaypointPresenter,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
       onDataChange: this.#handleViewAction});

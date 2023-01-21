@@ -2,6 +2,8 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 import { OFFERS } from '../const.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
@@ -110,6 +112,9 @@ export default class EditPointView extends AbstractStatefulView {
   #handleCloseEditClick = null;
   #handleDeleteClick = null;
   #handleSaveClick = null;
+  #datepickerStartWaypoint = null;
+  #datepickerEndWaypoint = null;
+
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
     this._setState(EditPointView.parseWaypointToState(waypoint));
@@ -122,6 +127,27 @@ export default class EditPointView extends AbstractStatefulView {
 
     this._restoreHandlers();
   }
+
+  #setDatepickers() {
+    this.#datepickerStartWaypoint = flatpickr(
+      this.element.querySelector('input[name="event-start-time"]'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateStartChangeHandler,
+      },
+    );
+    this.#datepickerEndWaypoint = flatpickr(
+      this.element.querySelector('input[name="event-end-time"]'),
+      {
+        dateFormat: 'd/m/Y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateEndChangeHandler,
+      },
+    );
+  };
 
   #editClickHandler = (evt) => {
     evt.preventDefault();
@@ -152,8 +178,33 @@ export default class EditPointView extends AbstractStatefulView {
     evt.preventDefault();
     const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     this.updateElement({
-      destination: destination[0]
+      destination: destination[0],
+      offers: []
     });
+  };
+
+  #dateStartChangeHandler = (userDate) => {
+    this.updateElement({dateFrom: userDate});
+  };
+
+  #dateEndChangeHandler = (userDate) => {
+    this.updateElement({dateTo: userDate});
+  };
+
+  #setOfferClickHandler = (evt) => {
+    evt.preventDefault();
+    const offer = Number(evt.currentTarget.dataset.offer);
+    if(!evt.target.checked){
+      this._state.offers.forEach((item, i) => {
+        if (item.offer === offer) {
+          this._state.offers.splice(i, 1);
+        }
+      });
+    }else{
+      this._state.offers.push({isChecked: evt.target.checked,...{offer}});
+    }
+
+    this.updateElement({offers: this._state.offers});
   };
 
   get template() {
@@ -169,7 +220,10 @@ export default class EditPointView extends AbstractStatefulView {
 
     return waypoint;
   }
+
   _restoreHandlers() {
+    this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
     const types = this.element.querySelectorAll('.event__type-input');
     for (let i = 0; i < types.length; i++){
@@ -178,6 +232,29 @@ export default class EditPointView extends AbstractStatefulView {
 
     const destinations = this.element.querySelector('.event__input--destination');
     destinations.addEventListener('change', this.#destinationChangeHandler);
+
+    this.setOfferClickHandler();
+
+    this.#setDatepickers();
+  }
+
+  setOfferClickHandler(){
+    const offers = this.element.querySelectorAll('.event__offer-checkbox');
+    for (let i = 0; i < offers.length; i++){
+      offers[i].addEventListener('click', this.#setOfferClickHandler);
+    }
+  }
+
+  removeElement(){
+    super.removeElement();
+    if(this.#datepickerStartWaypoint){
+      this.#datepickerStartWaypoint.destroy();
+      this.#datepickerStartWaypoint = null;
+    }
+    if(this.#datepickerEndWaypoint){
+      this.#datepickerEndWaypoint.destroy();
+      this.#datepickerEndWaypoint = null;
+    }
   }
 }
 
