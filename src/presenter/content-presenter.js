@@ -140,11 +140,13 @@ export default class ContentPresenter {
   }
 
   #initNewPointComponent(){
+    const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
     this.newWaypoint = {
       ...newWaypoint,
       allDestinations: [...this.#waypointModel.destinations],
       allOffers: [...this.#waypointModel.offers],
       destination: [...this.#waypointModel.destinations][0],
+      offersByType: offersByType,
       dateFrom: new Date(),
       dateTo: new Date()
     };
