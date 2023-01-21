@@ -110,8 +110,8 @@ export default class ContentPresenter {
       newWaypointPresenter: this.#newWaypointPresenter,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
-      onDataChange: this.#handleViewAction});
-    waypointPresenter.init(point);
+      onDataChange: this.#handleWaypointChange});
+    waypointPresenter.init({...point, allOffers: [...this.#waypointModel.offers]});
     this.#waypointPresenters.set(point.id, waypointPresenter);
   }
 
