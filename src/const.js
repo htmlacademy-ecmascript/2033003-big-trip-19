@@ -177,7 +177,8 @@ const newWaypoint = {
     offers: [],
     type: POINT_TYPES[0],
     allTypes: POINT_TYPES,
-    allDestinationNames: DESTINATION_NAMES
+    allDestinationNames: DESTINATION_NAMES,
+    offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
   }
 };
 
