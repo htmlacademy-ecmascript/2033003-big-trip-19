@@ -3,15 +3,7 @@ import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 import { OFFERS } from '../const.js';
 
-const createDestinationWithOffersViewTemplate = (destinationPoint) => {
-  const { description } = destinationPoint;
-  return `<section class="event__section  event__section--destination">
-  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-  <p class="event__destination-description">${description}</p>
-  </section>`;
-};
-
-const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
+const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -107,8 +99,8 @@ function createEditViewTemplate(waypoint) {
       </button>
     </header>
     <section class="event__details">
-      ${offersByType.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : createDestinationWithoutOffersViewTemplate(destination)}
-      ${!isEmptyObject(destination) && offersByType.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
+      ${offersByType.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : ''}
+      ${!isEmptyObject(destination) ? createDestinationViewTemplate(destination) : ''}
     </section>
   </form>
   </li>`;
@@ -143,7 +135,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #saveClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleSaveClick();
+    this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
   };
 
   #typeChangeHandler = (evt) => {
@@ -172,6 +164,11 @@ export default class EditPointView extends AbstractStatefulView {
     return {...waypoint};
   }
 
+  static parseStateToWaypoint(state) {
+    const waypoint = {...state};
+
+    return waypoint;
+  }
   _restoreHandlers() {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
     const types = this.element.querySelectorAll('.event__type-input');

@@ -5,9 +5,8 @@ import FilterContainerView from '../view/filter-container-view.js';
 import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
-import { updateItem } from '../utils/common.js';
 import SortContainerView from '../view/sort-container-view.js';
-import { newWaypoint, SortType } from '../const.js';
+import { newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
 import { replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
@@ -30,14 +29,13 @@ export default class ContentPresenter {
   #filterModel = null;
   #sortingModel = new SortModel();
   #tripModel = null;
-  #humanizedWaypoints = [];
   #checkedFilter = null;
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
   #newWaypointPresenter = new Map();
   #waypointModel = new WaypointModel();
   #sortingsContainer = null;
-  #currentSortType = null;
+  #currentSortType = SortType.DAY;
   #filters = null;
   #sortings = null;
   #trip = null;
@@ -49,10 +47,12 @@ export default class ContentPresenter {
     this.#filtersContainer = filtersContainer;
     this.#sortingsContainer = sortingsContainer;
     this.#tripContainer = tripContainer;
+
+    this.#waypointModel.addObserver(this.#handleModelEvent);
   }
 
   #setupFilters(){
-    this.#filterModel = new FilterModel({waypoints: this.#humanizedWaypoints});
+    this.#filterModel = new FilterModel({waypoints: this.waypoints});
     this.#filters = [...this.#filterModel.humanizedFilters];
     this.#filterComponent = new FilterContainerView({
       filters: this.#filters
@@ -78,16 +78,16 @@ export default class ContentPresenter {
     if(this.#currentSortType === sortType){
       return;
     }
-    this.#humanizedWaypoints = this.#waypointModel.sortWaypoints(this.#humanizedWaypoints, sortType);
     this.#sortings = updateItem(this.#sortings, updatedSorting);
     this.#sortings.forEach((sorting) => {
       if(sorting.name !== sortType){
         sorting.isChecked = false;
       }
     });
+    this.#currentSortType = sortType;
     this.#setupSortings(this.#sortings, sortType);
     this.#clearWaypointsList();
-    this.#renderPoints(this.#humanizedWaypoints);
+    this.#renderPoints(this.waypoints);
   };
 
   #renderContentContainer(){
@@ -109,7 +109,7 @@ export default class ContentPresenter {
     const waypointPresenter = new WaypointPresenter({
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
-      onDataChange: this.#handleWaypointChange});
+      onDataChange: this.#handleViewAction});
     waypointPresenter.init(point);
     this.#waypointPresenters.set(point.id, waypointPresenter);
   }
@@ -128,8 +128,8 @@ export default class ContentPresenter {
     this.#waypointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleWaypointChange = (updatedWaypoint) => {
-    this.#humanizedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
+  #handleWaypointChange = ( userAction, updateType, updatedWaypoint) => {
+    //this.#humanizedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
     this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
@@ -191,9 +191,38 @@ export default class ContentPresenter {
     }
   };
 
+  #handleViewAction = (actionType, updateType, update) => {
+    switch(actionType){
+      case UserAction.UPDATE_WAYPOINT:
+        this.#waypointModel.updateWaypoint(updateType, update);
+        break;
+      case UserAction.ADD_WAYPOINT:
+        this.#waypointModel.addWaypoint(updateType, update);
+        break;
+      case UserAction.ADD_WAYPOINT:
+        this.#waypointModel.deleteWaypoint(updateType, update);
+        break;  
+      };
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch(updateType){
+      case UpdateType.PATCH:
+        this.#waypointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#waypointPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MAJOR:
+        
+        break;  
+      };
+  };
+
+  get waypoints(){
+    return [...this.#waypointModel.sortWaypoints(this.#waypointModel.humanizedWaypoints, this.#currentSortType)];
+  }
   init() {
-    this.#currentSortType = SortType.DAY;
-    this.#humanizedWaypoints = [...this.#waypointModel.humanizedWaypoints];
     this.#sortings = [...this.#sortingModel.humanizedSortings];
     this.#setupFilters();
     this.#setupSortings(this.#sortings, this.#currentSortType);
@@ -206,7 +235,7 @@ export default class ContentPresenter {
       this.#renderPoints(this.#waypointsByCheckedFilter);
     }
 
-    this.#tripModel = new TripModel(this.#humanizedWaypoints);
+    this.#tripModel = new TripModel(this.waypoints);
     this.#trip = this.#tripModel.trip;
     this.#renderTrip(this.#trip);
 

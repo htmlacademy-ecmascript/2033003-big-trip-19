@@ -1,4 +1,4 @@
-import { DESCRIPTIONS, DESTINATION_NAMES, Integer } from '../const.js';
+import { DESCRIPTIONS, DESTINATION_NAMES, Integer} from '../const.js';
 import { returnRandomInteger, getRandomArrayElement } from '../utils/util-waypoint.js';
 
 const returnDescriptionWithoutDuplicate = (descriptions) => {
@@ -21,20 +21,25 @@ const getDescriptionsForDestination = () => {
 };
 
 const createDataDestination = (integer) => {
-  const { MAX_RANDOM_IMAGE_INTEGER } = Integer;
   const destinationDescription = returnDescriptionWithoutDuplicate(getDescriptionsForDestination());
   return {
     id: integer,
     description: destinationDescription,
     name: DESTINATION_NAMES[integer],
-    pictures: [
-      {
-        src: `https://loremflickr.com/248/152?random=${returnRandomInteger(MAX_RANDOM_IMAGE_INTEGER)}`,
-        description: 'Chamonix parliament building'
-      }
-    ]
+    pictures: createPictures(returnRandomInteger(Integer.MAX_COUNT_OBJECTS), DESTINATION_NAMES[integer], destinationDescription)
   };
 };
+
+const createPicture = (destinationName, destinationDescription) => {
+  return {
+    src: `https://loremflickr.com/248/152?random=${returnRandomInteger(Integer.MAX_RANDOM_IMAGE_INTEGER)}`,
+    description: `${destinationName}, ${destinationDescription}`
+  }
+};
+
+const createPictures = (length, destinationName, destinationDescription) => Array.from({length: length}, (_element) => 
+  createPicture(destinationName, destinationDescription));
+
 const createDataDestinations = (length) => Array.from({ length: length }, (_element, integer) =>
   createDataDestination(integer));
 

@@ -14,8 +14,8 @@ const createFilter = (filter, humanizedWaypoints, filters) =>{
 export default class FilterModel {
   #filters = filterTypes;
   #humanizedWaypoints = null;
-  constructor(humanizedWaypoints) {
-    this.#humanizedWaypoints = humanizedWaypoints;
+  constructor(waypoints) {
+    this.#humanizedWaypoints = waypoints;
   }
 
   get filters() {

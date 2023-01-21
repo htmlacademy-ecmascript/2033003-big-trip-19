@@ -3,15 +3,7 @@ import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import { getFullFormatDate } from '../utils/util-waypoint.js';
 
-const createDestinationWithOffersViewTemplate = (destinationPoint) => {
-  const { description } = destinationPoint;
-  return `<section class="event__section  event__section--destination">
-  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-  <p class="event__destination-description">${description}</p>
-  </section>`;
-};
-
-const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
+const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -36,6 +28,16 @@ const isCheckedOffer = (offer, pointOffers) => {
 };
 
 const showDestinationTitle = (destination) => `<input class="event__input  event__input--destination" id="event-destination-${destination.id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${destination.id}">`;
+
+const showDestinationsList = (destination, type, allDestinationNames) => `<div class="event__field-group  event__field-group--destination">
+<label class="event__label  event__type-output" for="event-destination-${destination.id}">
+${upperCaseFirst(type)}
+</label>
+${showDestinationTitle(destination)}
+<datalist id="destination-list-${destination.id}">
+  ${allDestinationNames.map((name) => `<option value="${name}" ${name === destination.name ? 'selected' : ''}></option>`).join('')}
+</datalist>
+</div>`;
 
 const createOffersViewTemplate = (waypoint, offers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -74,16 +76,7 @@ const createAddPointViewTemplate = (waypoint) => {
           </fieldset>
         </div>
       </div>
-
-    <div class="event__field-group  event__field-group--destination">
-      <label class="event__label  event__type-output" for="event-destination-${destination.id}">
-      ${upperCaseFirst(type)}
-      </label>
-      ${!isEmptyObject(destination) ? showDestinationTitle(destination) : ''}
-      <datalist id="destination-list-${destination.id}">
-        ${allDestinationNames.map((name) => `<option value="${name}" ${name === destination.name ? 'selected' : ''}></option>`).join('')}
-      </datalist>
-    </div>
+    ${!isEmptyObject(destination) ? showDestinationsList(destination, type, allDestinationNames) : ''}
     <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-${id}">From</label>
     <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFullFormatDate(dateFrom)}">
@@ -103,8 +96,8 @@ const createAddPointViewTemplate = (waypoint) => {
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
     <section class="event__details">
-      ${offersByType.offers.length > 0 ? createOffersViewTemplate(waypoint, offersByType.offers) : createDestinationWithoutOffersViewTemplate(destination)}
-      ${!isEmptyObject(destination) && offersByType.offers.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
+      ${offersByType.offers.length > 0 ? createOffersViewTemplate(waypoint, offersByType.offers) : ''}
+      ${!isEmptyObject(destination) ? createDestinationViewTemplate(destination) : ''}
     </section>
   </form>
 </li>`;
