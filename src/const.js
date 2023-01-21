@@ -10,7 +10,7 @@ const Integer = {
   MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 4,
+  MAX_COUNT_OBJECTS: 40,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
@@ -188,10 +188,17 @@ const UserAction = {
   DELETE_WAYPOINT: 'DELETE_WAYPOINT'
 };
 
-const UpdateType ={
+const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR'
+};
+
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  FUTURE: 'FUTURE',
+  PRESENT: 'PRESENT',
+  PAST: 'PAST'
 };
 
 export {
@@ -205,4 +212,5 @@ export {
   SortType,
   newWaypoint,
   UserAction,
-  UpdateType};
+  UpdateType,
+  FilterType};

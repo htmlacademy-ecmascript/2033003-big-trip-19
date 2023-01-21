@@ -7,27 +7,53 @@ function createFilterContainerTemplate(filters) {
           <input id="filter-${filter.name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filter.name}" ${filter.isChecked ? 'checked' : ''} ${filter.isDisabled ? 'disabled' : ''}>
           <label class="trip-filters__filter-label" for="filter-${filter.name}">${upperCaseFirst(filter.name)}</label>
           </div>`).join('')}
-          <button class="visually-hidden" type="submit">Accept filter</button>
+          
           </form>`;
 }
+const createFilterItemTemplate = (filter, currentFilterType) => {
+  const {type, name, count} = filter;
 
+  return (
+    `<div class="trip-filters__filter">
+          <input id="filter-${type}" 
+          class="trip-filters__filter-input  visually-hidden" 
+          type="radio" 
+          name="trip-filter" 
+          value="${type}" 
+          ${type === currentFilterType ? 'checked' : ''}
+          ${count === 0 ? 'disabled' : ''}>
+          <label class="trip-filters__filter-label" for="filter-${type}">${name}</label>
+          </div>`
+  );
+}
+const createFilterTemplate = (filterItems, currentFilterType) => {
+  const filterItemsTemplate = filterItems.map((filter) => createFilterItemTemplate(filter, currentFilterType))
+  .join('');
+  return (`<form class="trip-filters" action="#" method="get">
+  ${filterItemsTemplate}
+  <button class="visually-hidden" type="submit">Accept filter</button>
+  </form>`);
+};
 export default class FilterContainerView extends AbstractView {
   #filters = null;
-  #handleFilterClick = null;
-  #filterElements = null;
-  constructor({filters}) {
+  #currenFilter = null;
+  #handleFilterTypeChange = null;
+
+  constructor({filters, currentFilterType, onFilterTypeChange}) {
     super();
     this.#filters = filters;
-    this.#filterElements = this.element.querySelectorAll('.trip-filters__filter-label');
+    this.#currenFilter = currentFilterType;
+    this.#handleFilterTypeChange = onFilterTypeChange;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
   get template() {
-    return createFilterContainerTemplate(this.#filters);
+    return createFilterTemplate(this.#filters, this.#currenFilter);
   }
 
-  get selectedFilter(){
-    const checkedFilterElement = this.element.querySelector('input[type="radio"]:checked');
-    return this.#filters.find((filter) => filter.name === checkedFilterElement.value);
-  }
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFilterTypeChange(evt.target.value);
+  };
 
 }

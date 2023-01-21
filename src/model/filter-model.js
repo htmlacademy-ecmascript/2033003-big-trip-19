@@ -1,4 +1,5 @@
-import { filterTypes } from '../mocks/mock-filter.js';
+import Observable from '../framework/observable.js';
+import { FilterType } from '../const.js';
 
 const createFilter = (filter, humanizedWaypoints, filters) =>{
   const waypointsByFilterType = filters.find((filterElement) => filterElement.name === filter.name).waypoints(humanizedWaypoints.waypoints);
@@ -11,23 +12,16 @@ const createFilter = (filter, humanizedWaypoints, filters) =>{
   };
 };
 
-export default class FilterModel {
-  #filters = filterTypes;
-  #humanizedWaypoints = null;
-  constructor(waypoints) {
-    this.#humanizedWaypoints = waypoints;
+export default class FilterModel extends Observable {
+  #filter = FilterType.EVERYTHING
+
+  get filter() {
+    return this.#filter;
   }
 
-  get filters() {
-    return this.#filters;
+  setFilter(updateType, filter) {
+    this.#filter = filter;
+    this._notify(updateType, filter);
   }
 
-  get humanizedFilters() {
-    const humanisedDataFilters = [];
-    for(const filter of this.#filters){
-      const humanizedFilter = createFilter(filter,this.#humanizedWaypoints, this.#filters);
-      humanisedDataFilters.push(humanizedFilter);
-    }
-    return humanisedDataFilters;
-  }
 }

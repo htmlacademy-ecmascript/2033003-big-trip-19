@@ -8,10 +8,11 @@ import WaypointModel from '../model/waypoint-model.js';
 import SortContainerView from '../view/sort-container-view.js';
 import { newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { replace } from '../framework/render.js';
+import { remove, replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
+import { filter } from '../utils/util-filter.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,7 +25,6 @@ export default class ContentPresenter {
   #filterComponent = null;
   #sortingComponent = null;
   #contentContainer = null;
-  #filtersContainer = null;
   #tripContainer = null;
   #filterModel = null;
   #sortingModel = new SortModel();
@@ -33,7 +33,7 @@ export default class ContentPresenter {
   #waypointsByCheckedFilter = null;
   #waypointPresenters = new Map();
   #newWaypointPresenter = new Map();
-  #waypointModel = new WaypointModel();
+  #waypointModel = null;
   #sortingsContainer = null;
   #currentSortType = SortType.DAY;
   #filters = null;
@@ -42,23 +42,24 @@ export default class ContentPresenter {
   #addButton = null;
   #mode = Mode.DEFAULT;
 
-  constructor({ contentContainer, filtersContainer, sortingsContainer, tripContainer}) {
+  constructor({ contentContainer, sortingsContainer, tripContainer, waypointModel, filterModel}) {
     this.#contentContainer = contentContainer;
-    this.#filtersContainer = filtersContainer;
     this.#sortingsContainer = sortingsContainer;
     this.#tripContainer = tripContainer;
-
+    this.#waypointModel = waypointModel;
+    this.#filterModel = filterModel;
     this.#waypointModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  #setupFilters(){
-    this.#filterModel = new FilterModel({waypoints: this.waypoints});
-    this.#filters = [...this.#filterModel.humanizedFilters];
-    this.#filterComponent = new FilterContainerView({
-      filters: this.#filters
-    });
-    render(this.#filterComponent, this.#filtersContainer);
-  }
+  // #setupFilters(){
+  //   this.#filterModel = new FilterModel({waypoints: this.waypoints});
+  //   this.#filters = [...this.#filterModel.humanizedFilters];
+  //   this.#filterComponent = new FilterContainerView({
+  //     filters: this.#filters
+  //   });
+  //   render(this.#filterComponent, this.#filtersContainer);
+  // }
 
   #setupSortings(sortings, selectedSortType){
     const prevSortComponent = this.#sortingComponent;
@@ -90,10 +91,6 @@ export default class ContentPresenter {
     this.#renderPoints(this.waypoints);
   };
 
-  #renderContentContainer(){
-    render(this.#boardComponent, this.#contentContainer);
-  }
-
   #getCurrentFilterAndWaypoints(){
     this.#checkedFilter = this.#filterComponent.selectedFilter;
     this.#waypointsByCheckedFilter = this.#checkedFilter.waypoints;
@@ -110,7 +107,7 @@ export default class ContentPresenter {
       newWaypointPresenter: this.#newWaypointPresenter,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
-      onDataChange: this.#handleWaypointChange});
+      onDataChange: this.#handleViewAction});
     waypointPresenter.init({...point, allOffers: [...this.#waypointModel.offers]});
     this.#waypointPresenters.set(point.id, waypointPresenter);
   }
@@ -134,7 +131,9 @@ export default class ContentPresenter {
     this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
-  #renderTrip(trip){
+  #renderTrip(){
+    const tripModel = new TripModel(this.waypoints);
+    const trip = tripModel.trip;
     this.#tripComponent = new TripInfoView({trip: trip});
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
@@ -214,37 +213,53 @@ export default class ContentPresenter {
         this.#waypointPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#waypointPresenters.get(data.id).init(data);
+        this.#clearContentContainer();
+        this.#renderContentContainer();
         break;
       case UpdateType.MAJOR:
-        
+        this.#clearContentContainer({resetSortType: true});
+        this.#renderContentContainer();
         break;  
       };
   };
 
   get waypoints(){
-    return [...this.#waypointModel.sortWaypoints(this.#waypointModel.humanizedWaypoints, this.#currentSortType)];
+    const filterType = this.#filterModel.filter;
+    const waypoints = this.#waypointModel.humanizedWaypoints;
+    const filteredWaypoints = filter[filterType](waypoints);
+    return [...this.#waypointModel.sortWaypoints(filteredWaypoints, this.#currentSortType)];
+  }
+
+  #clearContentContainer({resetSortType = false} = {}) {
+    const waypointCount = this.waypoints.length;
+    this.#waypointPresenters.forEach((presenter) => presenter.destroy());
+    this.#waypointPresenters.clear();
+    remove(this.#tripComponent);
+    //remove(this.#noTaskComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
+  }
+
+  #renderContentContainer() {
+    this.#setupSortings(this.#sortings, this.#currentSortType);
+    render(this.#boardComponent, this.#contentContainer);
+    this.#renderPoints(this.waypoints);
+    
+    this.#renderTrip();
+
+    const waypoints = this.waypoints;
+
+    if(waypoints.length === 0){
+      this.#renderMessage(this.checkedFilter);
+    }
   }
   init() {
     this.#sortings = [...this.#sortingModel.humanizedSortings];
-    this.#setupFilters();
-    this.#setupSortings(this.#sortings, this.#currentSortType);
-    this.#renderContentContainer();
-    this.#getCurrentFilterAndWaypoints();
-
-    if(this.#waypointsByCheckedFilter.length < 1){
-      this.#renderMessage(this.checkedFilter);
-    }else{
-      this.#renderPoints(this.#waypointsByCheckedFilter);
-    }
-
-    this.#tripModel = new TripModel(this.waypoints);
-    this.#trip = this.#tripModel.trip;
-    this.#renderTrip(this.#trip);
-
     this.#addButton = document.querySelector('.trip-main__event-add-btn');
     this.#addButton.addEventListener('click', this.#addPointClickHandler);
-
+    this.#renderContentContainer();
     this.#initNewPointComponent();
   }
 }
