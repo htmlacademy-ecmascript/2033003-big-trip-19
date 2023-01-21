@@ -15,8 +15,10 @@ export default class WaypointPresenter{
   #mode = Mode.DEFAULT;
   #handleModeChange = null;
   #handleDataChange = null;
+  #newWaypointPresenter = null;
 
-  constructor({ waypointContainer, onModeChange, onDataChange}){
+  constructor({newWaypointPresenter, waypointContainer, onModeChange, onDataChange}){
+    this.#newWaypointPresenter = newWaypointPresenter;
     this.#contentContainer = waypointContainer;
     this.#handleModeChange = onModeChange;
     this.#handleDataChange = onDataChange;
@@ -61,6 +63,7 @@ export default class WaypointPresenter{
 
   resetView(){
     if (this.#mode !== Mode.DEFAULT){
+      this.#editPointComponent.reset(this.#waypoint);
       this.#replaceEditToPoint();
     }
   }
@@ -70,6 +73,7 @@ export default class WaypointPresenter{
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
+    this.#newWaypointPresenter.forEach((presenter) => presenter.cancelAddPointClick());
   }
 
   #replaceEditToPoint() {
@@ -81,7 +85,7 @@ export default class WaypointPresenter{
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#replaceEditToPoint();
+      this.resetView();
     }
   };
 
@@ -90,7 +94,7 @@ export default class WaypointPresenter{
   };
 
   #handleCloseEditClick = () => {
-    this.#replaceEditToPoint();
+    this.resetView();
   };
 
   #handleFavoriteClick = () => {
