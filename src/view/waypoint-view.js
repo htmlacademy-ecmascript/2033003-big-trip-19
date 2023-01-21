@@ -15,7 +15,7 @@ function createWaypointTemplate(waypoint) {
     <h3 class="event__title">${upperCaseFirst(type)} ${destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${dateFrom.toISOString()}">${getTimeFromDate(dateFrom.toISOString())}</time>
+        <time class="event__start-time" datetime="${dateFrom}">${getTimeFromDate(dateFrom)}</time>
         &mdash;
         <time class="event__end-time" datetime="${dateTo}">${getTimeFromDate(dateTo)}</time>
       </p>
