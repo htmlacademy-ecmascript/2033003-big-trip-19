@@ -122,9 +122,6 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleDeleteClick = onDeleteClick;
     this.#handleSaveClick = onSaveClick;
 
-    this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
-    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
-
     this._restoreHandlers();
   }
 
@@ -166,10 +163,10 @@ export default class EditPointView extends AbstractStatefulView {
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
-    const offers = OFFERS.find((_value, index, offer) => offer[index].type === evt.target.value);
+    const offersByType = this._state.allOffers.find((offer) => offer.type === evt.target.value);
     this.updateElement({
       type: evt.target.value,
-      offersByType: offers.offers,
+      offersByType: offersByType.offers,
       offers: []
     });
   };
@@ -263,4 +260,5 @@ export default class EditPointView extends AbstractStatefulView {
     }
   }
 }
+
 
