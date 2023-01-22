@@ -153,7 +153,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #deleteClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleDeleteClick();
+    this.#handleDeleteClick(EditPointView.parseStateToWaypoint(this._state));
   };
 
   #saveClickHandler = (evt) =>{

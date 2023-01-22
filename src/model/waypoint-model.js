@@ -29,7 +29,7 @@ export default class WaypointModel extends Observable {
   #destinationNames = DESTINATION_NAMES;
   #destinations = createDataDestinations(this.#destinationNames.length);
   #waypoints = Array.from(createDataPoints(this.#destinations));
-  #humanizedWaypoints = [];
+  #humanizedWaypoints = null;
   #allTypes = POINT_TYPES;
 
   get waypoints() {
@@ -49,7 +49,8 @@ export default class WaypointModel extends Observable {
   }
 
   get humanizedWaypoints() {
-    if(this.#humanizedWaypoints.length === 0){
+    if(this.#humanizedWaypoints === null){
+      this.#humanizedWaypoints = [];
       const cloneWaypoints = [...this.#waypoints];
       for (const point of cloneWaypoints) {
         let allAvailableOffers = [];

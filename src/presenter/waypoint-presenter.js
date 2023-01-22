@@ -37,7 +37,7 @@ export default class WaypointPresenter{
     this.#editPointComponent = new EditPointView({
       waypoint: this.#waypoint,
       onCloseEditClick: this.#handleCloseEditClick,
-      onDeleteClick: this.#handleCloseEditClick,
+      onDeleteClick: this.#handleDeleteEditClick,
       onSaveClick: this.#handleFormSubmit,
     });
 
@@ -97,7 +97,14 @@ export default class WaypointPresenter{
   #handleCloseEditClick = () => {
     this.resetView();
   };
-
+  #handleDeleteEditClick = (waypoint) => {
+    this.#handleDataChange(
+      UserAction.DELETE_WAYPOINT,
+      UpdateType.MINOR,
+      waypoint
+    );
+    this.#replaceEditToPoint();
+  };
   #handleFormSubmit = (waypoint) => {
     this.#handleDataChange(
       UserAction.UPDATE_WAYPOINT,

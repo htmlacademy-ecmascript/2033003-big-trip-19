@@ -104,7 +104,15 @@ export default class ContentPresenter {
 
   #renderTrip(){
     const tripModel = new TripModel(this.waypoints);
-    const trip = tripModel.trip;
+    let trip = tripModel.trip;
+    const defaultTrip = {
+      cost: 0,
+      dates: '',
+      template: ''
+    }
+    if(this.waypoints.length === 0){
+      trip = defaultTrip;
+    }
     this.#tripComponent = new TripInfoView({trip: trip});
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
@@ -172,7 +180,7 @@ export default class ContentPresenter {
       case UserAction.ADD_WAYPOINT:
         this.#waypointModel.addWaypoint(updateType, update);
         break;
-      case UserAction.ADD_WAYPOINT:
+      case UserAction.DELETE_WAYPOINT:
         this.#waypointModel.deleteWaypoint(updateType, update);
         break;  
       };
