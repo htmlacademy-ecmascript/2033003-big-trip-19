@@ -1,4 +1,4 @@
-import { DateFormat, Integer } from '../const.js';
+import { DateFormat, FilterType, Integer } from '../const.js';
 import dayjs from 'dayjs';
 
 const returnRandomBool = (() => {
@@ -86,7 +86,15 @@ const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONT
 
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
 
+const NoWaypointsTextType = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now',
+};
+
 export {
+  NoWaypointsTextType,
   returnRandomBool,
   returnRandomInteger,
   addDays,

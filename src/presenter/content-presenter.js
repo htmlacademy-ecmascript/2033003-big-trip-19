@@ -6,7 +6,7 @@ import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import WaypointModel from '../model/waypoint-model.js';
 import SortContainerView from '../view/sort-container-view.js';
-import { newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
+import { FilterType, newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
 import { remove, replace } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
@@ -41,6 +41,8 @@ export default class ContentPresenter {
   #trip = null;
   #addButton = null;
   #mode = Mode.DEFAULT;
+  #filterType = FilterType.EVERYTHING;
+  #messageComponent = null;
 
   constructor({ contentContainer, sortingsContainer, tripContainer, waypointModel, filterModel}) {
     this.#contentContainer = contentContainer;
@@ -112,9 +114,9 @@ export default class ContentPresenter {
     this.#waypointPresenters.set(point.id, waypointPresenter);
   }
 
-  #renderMessage(filter){
-    const messageComponent = new MessageView({message: filter.message});
-    render(messageComponent, this.#contentContainer);
+  #renderMessage(){
+    this.#messageComponent = new MessageView({filterType: this.#filterType});
+    render(this.#messageComponent, this.#contentContainer);
   }
 
   #clearWaypointsList = () => {
@@ -224,9 +226,9 @@ export default class ContentPresenter {
   };
 
   get waypoints(){
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const waypoints = this.#waypointModel.humanizedWaypoints;
-    const filteredWaypoints = filter[filterType](waypoints);
+    const filteredWaypoints = filter[this.#filterType](waypoints);
     return [...this.#waypointModel.sortWaypoints(filteredWaypoints, this.#currentSortType)];
   }
 
@@ -239,6 +241,10 @@ export default class ContentPresenter {
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
+    }
+
+    if(this.#messageComponent){
+      remove(this.#messageComponent);
     }
   }
 
