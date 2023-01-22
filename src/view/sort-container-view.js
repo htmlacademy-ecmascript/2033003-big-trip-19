@@ -3,27 +3,27 @@ import { upperCaseFirst } from '../utils/common.js';
 
 // ${state.isChecked ? 'checked' : ''} ${state.isDisabled ? 'disabled' : ''}
 const createSortContainerTemplate = (sortings, selectedType) => (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-            ${sortings.map((sorting) => `<div class="trip-sort__item  trip-sort__item--${sorting.name}">
-            <input data-sort-type="${sorting.name}" id="sort-${sorting.name}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sorting.name}" ${sorting.name === selectedType ? 'checked' : ''} ${sorting.isDisabled ? 'disabled' : ''}>
-            <label class="trip-sort__btn" for="sort-${sorting.name}">${upperCaseFirst(sorting.name)}</label>
+            ${Object.entries(sortings).map((sorting) => `<div class="trip-sort__item  trip-sort__item--${sorting[1].name}">
+            <input data-sort-type="${sorting[1].name}" id="sort-${sorting[1].name}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sorting[1].name}" ${sorting[1].name === selectedType ? 'checked' : ''} ${sorting[1].isDisabled ? 'disabled' : ''}>
+            <label class="trip-sort__btn" for="sort-${sorting[1].name}">${sorting[1].name}</label>
             </div>`).join('')}
             <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`);
 export default class SortContainerView extends AbstractView {
-  #sortings = null;
   #handleSortTypeChange = null;
   #selectedSortType = null;
+  #sortTypes =null;
 
-  constructor({sortings, selectedSortType, onSortTypeChange}) {
+  constructor({sortTypes, selectedSortType, onSortTypeChange}) {
     super();
-    this.#sortings = sortings;
+    this.#sortTypes = sortTypes;
     this.#selectedSortType = selectedSortType;
     this.#handleSortTypeChange = onSortTypeChange;
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
   }
 
   get template() {
-    return createSortContainerTemplate(this.#sortings, this.#selectedSortType);
+    return createSortContainerTemplate(this.#sortTypes, this.#selectedSortType);
   }
 
   #sortTypeChangeHandler = (evt) => {
@@ -31,7 +31,6 @@ export default class SortContainerView extends AbstractView {
       return;
     }
     evt.preventDefault();
-    const sorting = this.#sortings.find((sortingElement) => sortingElement.name === evt.target.dataset.sortType);
-    this.#handleSortTypeChange(evt.target.dataset.sortType, {...sorting, isChecked: !sorting.isChecked});
+    this.#handleSortTypeChange(evt.target.dataset.sortType);
   };
 }

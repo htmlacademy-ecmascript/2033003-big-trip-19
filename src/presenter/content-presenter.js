@@ -54,49 +54,23 @@ export default class ContentPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  // #setupFilters(){
-  //   this.#filterModel = new FilterModel({waypoints: this.waypoints});
-  //   this.#filters = [...this.#filterModel.humanizedFilters];
-  //   this.#filterComponent = new FilterContainerView({
-  //     filters: this.#filters
-  //   });
-  //   render(this.#filterComponent, this.#filtersContainer);
-  // }
-
-  #setupSortings(sortings, selectedSortType){
-    const prevSortComponent = this.#sortingComponent;
-    this.#currentSortType = selectedSortType;
+  #renderSortings(){
     this.#sortingComponent = new SortContainerView({
-      sortings: sortings,
+      sortTypes: this.#sortingModel.sortings,
       selectedSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange});
-    if(prevSortComponent !== null){
-      replace(this.#sortingComponent, prevSortComponent);
-    }else{
       render(this.#sortingComponent, this.#sortingsContainer);
-    }
   }
 
   #handleSortTypeChange = (sortType, updatedSorting) => {
     if(this.#currentSortType === sortType){
       return;
     }
-    this.#sortings = updateItem(this.#sortings, updatedSorting);
-    this.#sortings.forEach((sorting) => {
-      if(sorting.name !== sortType){
-        sorting.isChecked = false;
-      }
-    });
-    this.#currentSortType = sortType;
-    this.#setupSortings(this.#sortings, sortType);
-    this.#clearWaypointsList();
-    this.#renderPoints(this.waypoints);
-  };
 
-  #getCurrentFilterAndWaypoints(){
-    this.#checkedFilter = this.#filterComponent.selectedFilter;
-    this.#waypointsByCheckedFilter = this.#checkedFilter.waypoints;
-  }
+    this.#currentSortType = sortType;
+    this.#clearContentContainer();
+    this.#renderContentContainer();
+  };
 
   #renderPoints(waypoints){
     for (let i = 0; i < waypoints.length; i++) {
@@ -126,11 +100,6 @@ export default class ContentPresenter {
 
   #handleModeChange = () => {
     this.#waypointPresenters.forEach((presenter) => presenter.resetView());
-  };
-
-  #handleWaypointChange = ( userAction, updateType, updatedWaypoint) => {
-    //this.#humanizedWaypoints = updateItem(this.#humanizedWaypoints, updatedWaypoint);
-    this.#waypointPresenters.get(updatedWaypoint.id).init(updatedWaypoint);
   };
 
   #renderTrip(){
@@ -236,11 +205,11 @@ export default class ContentPresenter {
     const waypointCount = this.waypoints.length;
     this.#waypointPresenters.forEach((presenter) => presenter.destroy());
     this.#waypointPresenters.clear();
+    remove(this.#sortingComponent);
     remove(this.#tripComponent);
-    //remove(this.#noTaskComponent);
 
     if (resetSortType) {
-      this.#currentSortType = SortType.DEFAULT;
+      this.#currentSortType = SortType.DAY;
     }
 
     if(this.#messageComponent){
@@ -249,7 +218,7 @@ export default class ContentPresenter {
   }
 
   #renderContentContainer() {
-    this.#setupSortings(this.#sortings, this.#currentSortType);
+    this.#renderSortings();
     render(this.#boardComponent, this.#contentContainer);
     this.#renderPoints(this.waypoints);
     
@@ -262,7 +231,7 @@ export default class ContentPresenter {
     }
   }
   init() {
-    this.#sortings = [...this.#sortingModel.humanizedSortings];
+    this.#sortings = this.#sortingModel.sortings;
     this.#addButton = document.querySelector('.trip-main__event-add-btn');
     this.#addButton.addEventListener('click', this.#addPointClickHandler);
     this.#renderContentContainer();
