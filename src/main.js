@@ -24,9 +24,9 @@ const contentPresenter = new ContentPresenter(
     sortingsContainer: siteSortEventsElement,
     tripContainer: siteTripMain,
     waypointModel,
-    filterModel
+    filterModel,
+    filterPresenter: filterPresenter
   }
 );
 
-filterPresenter.init();
 contentPresenter.init();

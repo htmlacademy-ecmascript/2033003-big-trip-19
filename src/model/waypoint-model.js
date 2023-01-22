@@ -32,10 +32,6 @@ export default class WaypointModel extends Observable {
   #humanizedWaypoints = null;
   #allTypes = POINT_TYPES;
 
-  get waypoints() {
-    return this.#waypoints;
-  }
-
   get allTypes() {
     return this.#allTypes;
   }
@@ -73,6 +69,7 @@ export default class WaypointModel extends Observable {
         const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
         this.#humanizedWaypoints.push(humanizedPoint);
       }
+      this.#waypoints = this.#humanizedWaypoints;
       return this.#humanizedWaypoints.sort(sortWaypointByDate);
     }else{
       return this.#humanizedWaypoints;

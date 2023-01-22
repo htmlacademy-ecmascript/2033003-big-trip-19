@@ -64,14 +64,22 @@ export default class FilterPresenter{
     remove(prevFilterComponent);
   }
 
+  destroy() {
+    remove(this.#filterComponent);
+  }
+
   #handleModelEvent = () => {
     this.init();
   };
+
+  setFilter(filterType){
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+  }
 
   #handleFilterTypeChange = (filterType) => {
     if(this.#filterModel.filter === filterType){
       return;
     }
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.setFilter(filterType);
   };
 }
