@@ -3,6 +3,7 @@ import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import { DESTINATION_NAMES } from '../const.js';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
@@ -167,12 +168,17 @@ export default class AddPointView extends AbstractStatefulView {
     });
   };
 
-  #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
-    const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+  #destinationChangeHandler = (evt, prevDestinationName) => {
+    let destination = null;
+    if(DESTINATION_NAMES.includes(evt.target.value)) {
+      destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+    }else{
+      destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
+    }
     this.updateElement({
-      destination: destination[0]
-    });
+      destination: destination[0],
+      offers: []
+    }); 
   };
 
   #closeClickHandler = (evt) =>{
@@ -203,8 +209,9 @@ export default class AddPointView extends AbstractStatefulView {
       types[i].addEventListener('click', this.#typeChangeHandler);
     }
 
-    const destinations = this.element.querySelector('.event__input--destination');
-    destinations.addEventListener('change', this.#destinationChangeHandler);
+    const destination = this.element.querySelector('.event__input--destination');
+    const destinationName = destination.value;
+    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     const offers = this.element.querySelectorAll('.event__offer-checkbox');
     for (let i = 0; i < offers.length; i++){
