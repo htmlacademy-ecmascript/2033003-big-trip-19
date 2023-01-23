@@ -31,7 +31,7 @@ function addDays(date) {
 }
 
 function returnRandomDate(start, end) {
-  let timestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+  const timestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
   return new Date(timestamp);
 }
 
@@ -68,9 +68,9 @@ const getDateDifference = (startDate, endDate) =>{
 const isEmptyObject = (obj) => Object.entries(obj).length === 0;
 
 const sortWaypointByDate = (waypointA, waypointB) => {
-  if (!waypointA.dateFrom && !waypointB.dateFrom) {return 0};
-  if (!waypointA.dateFrom) {return 1};
-  if (!waypointB.dateFrom) {return -1};
+  if (!waypointA.dateFrom && !waypointB.dateFrom) {return 0;}
+  if (!waypointA.dateFrom) {return 1;}
+  if (!waypointB.dateFrom) {return -1;}
   return new Date(waypointA.dateFrom) - new Date(waypointB.dateFrom);
 };
 

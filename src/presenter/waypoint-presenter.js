@@ -97,6 +97,7 @@ export default class WaypointPresenter{
   #handleCloseEditClick = () => {
     this.resetView();
   };
+
   #handleDeleteEditClick = (waypoint) => {
     this.#handleDataChange(
       UserAction.DELETE_WAYPOINT,
@@ -104,6 +105,7 @@ export default class WaypointPresenter{
       waypoint
     );
   };
+
   #handleFormSubmit = (waypoint) => {
     this.#handleDataChange(
       UserAction.UPDATE_WAYPOINT,

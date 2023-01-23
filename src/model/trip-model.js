@@ -7,7 +7,7 @@ export default class TripModel {
     this.#waypoints = waypoints;
   }
 
-  get trip() {
+  get trip(){
     const trip = {};
     if(this.#waypoints.length !== 0){
       const firstWaypoint = this.#waypoints[0];
@@ -24,7 +24,7 @@ export default class TripModel {
       }
       trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
       trip.cost = this.#waypoints.reduce((sum, elem) => sum + elem.basePrice, 0);
-      return trip;
     }
+    return trip;
   }
 }

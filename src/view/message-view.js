@@ -4,7 +4,8 @@ import { NoWaypointsTextType } from '../utils/util-waypoint.js';
 const createMessageTemplate = (filterType) => {
   const noWaypointTextValue = NoWaypointsTextType[filterType];
   return `<p class="trip-events__msg">${noWaypointTextValue}</p>`;
-}
+};
+
 export default class MessageView extends AbstractView {
   #filterType = null;
 

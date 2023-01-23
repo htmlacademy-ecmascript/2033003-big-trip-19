@@ -19,6 +19,14 @@ const getDescriptionsForDestination = () => {
   return descriptions;
 };
 
+const createPicture = (destinationName, destinationDescription) => ({
+  src: `https://loremflickr.com/248/152?random=${returnRandomInteger(Integer.MAX_RANDOM_IMAGE_INTEGER)}`,
+  description: `${destinationName}, ${destinationDescription}`
+});
+
+const createPictures = (length, destinationName, destinationDescription) => Array.from({length: length}, () =>
+  createPicture(destinationName, destinationDescription));
+
 const createDataDestination = (integer) => {
   const destinationDescription = returnDescriptionWithoutDuplicate(getDescriptionsForDestination());
   return {
@@ -28,16 +36,6 @@ const createDataDestination = (integer) => {
     pictures: createPictures(returnRandomInteger(Integer.MAX_COUNT_OBJECTS), DESTINATION_NAMES[integer], destinationDescription)
   };
 };
-
-const createPicture = (destinationName, destinationDescription) => {
-  return {
-    src: `https://loremflickr.com/248/152?random=${returnRandomInteger(Integer.MAX_RANDOM_IMAGE_INTEGER)}`,
-    description: `${destinationName}, ${destinationDescription}`
-  }
-};
-
-const createPictures = (length, destinationName, destinationDescription) => Array.from({length: length}, (_element) => 
-  createPicture(destinationName, destinationDescription));
 
 const createDataDestinations = (length) => Array.from({ length: length }, (_element, integer) =>
   createDataDestination(integer));

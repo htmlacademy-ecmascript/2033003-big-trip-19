@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
-import { DESTINATION_NAMES, OFFERS } from '../const.js';
+import { DESTINATION_NAMES } from '../const.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -127,11 +127,12 @@ export default class EditPointView extends AbstractStatefulView {
 
   #priceChange = (evt) => {
     const price = Number(evt.target.value);
-    if(!isNaN(price))
+    if(!isNaN(price)){
       this.updateElement({
         basePrice: Number(evt.target.value)
       });
-  }
+    }
+  };
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
@@ -152,7 +153,7 @@ export default class EditPointView extends AbstractStatefulView {
         onChange: this.#dateEndChangeHandler,
       },
     );
-  };
+  }
 
   #editClickHandler = (evt) => {
     evt.preventDefault();
@@ -189,7 +190,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.updateElement({
       destination: destination[0],
       offers: []
-    }); 
+    });
   };
 
   #dateStartChangeHandler = (userDate) => {

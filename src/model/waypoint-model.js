@@ -3,7 +3,7 @@ import { createDataPoints } from '../mocks/mock-waypoint.js';
 import { DESTINATION_NAMES, OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
 import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
-import Observable from '../framework/observable.js'
+import Observable from '../framework/observable.js';
 
 function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
   return {
@@ -94,7 +94,7 @@ export default class WaypointModel extends Observable {
   }
 
   updateWaypoint(updateType, update){
-    const index = this.#humanizedWaypoints.findIndex((waypoint => waypoint.id === update.id));
+    const index = this.#humanizedWaypoints.findIndex(((waypoint) => waypoint.id === update.id));
 
     if(index === -1){
       throw new Error('Can\'t update unexisting waypoint');
@@ -117,13 +117,13 @@ export default class WaypointModel extends Observable {
   }
 
   deleteWaypoint(updateType, update){
-    const index = this.#humanizedWaypoints.findIndex((waypoint => waypoint.id === update.id));
+    const index = this.#humanizedWaypoints.findIndex(((waypoint) => waypoint.id === update.id));
 
     if(index === -1){
       throw new Error('Can\'t delete unexisting waypoint');
     }
 
-    this.#humanizedWaypoints =[
+    this.#humanizedWaypoints = [
       ...this.#humanizedWaypoints.slice(0, index),
       ...this.#humanizedWaypoints.slice(index + 1),
     ];

@@ -1,5 +1,4 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { upperCaseFirst } from '../utils/common.js';
 
 // ${state.isChecked ? 'checked' : ''} ${state.isDisabled ? 'disabled' : ''}
 const createSortContainerTemplate = (sortings, selectedType) => (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -12,7 +11,7 @@ const createSortContainerTemplate = (sortings, selectedType) => (`<form class="t
 export default class SortContainerView extends AbstractView {
   #handleSortTypeChange = null;
   #selectedSortType = null;
-  #sortTypes =null;
+  #sortTypes = null;
 
   constructor({sortTypes, selectedSortType, onSortTypeChange}) {
     super();

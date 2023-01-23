@@ -132,11 +132,12 @@ export default class AddPointView extends AbstractStatefulView {
 
   #priceChange = (evt) => {
     const price = Number(evt.target.value);
-    if(!isNaN(price))
+    if(!isNaN(price)){
       this.updateElement({
         basePrice: Number(evt.target.value)
       });
-  }
+    }
+  };
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
@@ -178,7 +179,7 @@ export default class AddPointView extends AbstractStatefulView {
     this.updateElement({
       destination: destination[0],
       offers: []
-    }); 
+    });
   };
 
   #closeClickHandler = (evt) =>{

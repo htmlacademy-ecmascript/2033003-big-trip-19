@@ -1,14 +1,11 @@
 import { render } from '../render.js';
 import ContentView from '../view/content-view.js';
 import MessageView from '../view/message-view.js';
-import FilterContainerView from '../view/filter-container-view.js';
-import FilterModel from '../model/filter-model.js';
 import WaypointPresenter from './waypoint-presenter.js';
-import WaypointModel from '../model/waypoint-model.js';
 import SortContainerView from '../view/sort-container-view.js';
 import { FilterType, newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { remove, replace } from '../framework/render.js';
+import { remove } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
@@ -22,23 +19,16 @@ const Mode = {
 export default class ContentPresenter {
   #boardComponent = new ContentView();
   #tripComponent = null;
-  #filterComponent = null;
   #sortingComponent = null;
   #contentContainer = null;
   #tripContainer = null;
   #filterModel = null;
   #sortingModel = new SortModel();
-  #tripModel = null;
-  #checkedFilter = null;
-  #waypointsByCheckedFilter = null;
   #waypointPresentersList = new Map();
   #newWaypointPresenterList = new Map();
   #waypointModel = null;
   #sortingsContainer = null;
   #currentSortType = SortType.DAY;
-  #filters = null;
-  #sortings = null;
-  #trip = null;
   #addButton = null;
   #mode = Mode.DEFAULT;
   #filterType = FilterType.EVERYTHING;
@@ -62,10 +52,10 @@ export default class ContentPresenter {
       sortTypes: this.#sortingModel.sortings,
       selectedSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange});
-      render(this.#sortingComponent, this.#sortingsContainer);
+    render(this.#sortingComponent, this.#sortingsContainer);
   }
 
-  #handleSortTypeChange = (sortType, updatedSorting) => {
+  #handleSortTypeChange = (sortType) => {
     if(this.#currentSortType === sortType){
       return;
     }
@@ -103,11 +93,13 @@ export default class ContentPresenter {
   #renderTrip(){
     const tripModel = new TripModel(this.waypoints);
     let trip = tripModel.trip;
+
     const defaultTrip = {
       cost: 0,
       dates: '',
       template: ''
-    }
+    };
+
     if(this.waypoints.length === 0){
       trip = defaultTrip;
     }
@@ -117,6 +109,7 @@ export default class ContentPresenter {
 
   #initNewPointComponent(){
     const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
+
     this.newWaypoint = {
       ...newWaypoint,
       allDestinations: [...this.#waypointModel.destinations],
@@ -186,8 +179,8 @@ export default class ContentPresenter {
         break;
       case UserAction.DELETE_WAYPOINT:
         this.#waypointModel.deleteWaypoint(updateType, update);
-        break;  
-      };
+        break;
+    }
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -202,8 +195,8 @@ export default class ContentPresenter {
       case UpdateType.MAJOR:
         this.#clearContentContainer({resetSortType: true});
         this.#renderContentContainer();
-        break;  
-      };
+        break;
+    }
   };
 
   get waypoints(){
@@ -237,7 +230,7 @@ export default class ContentPresenter {
     this.#renderSortings();
     render(this.#boardComponent, this.#contentContainer);
     this.#renderPoints(this.waypoints);
-    
+
     this.#renderTrip();
 
     const waypoints = this.waypoints;
@@ -246,6 +239,7 @@ export default class ContentPresenter {
       this.#renderMessage();
     }
   }
+
   init() {
     this.#addButton = document.querySelector('.trip-main__event-add-btn');
     this.#addButton.addEventListener('click', this.#addPointClickHandler);
