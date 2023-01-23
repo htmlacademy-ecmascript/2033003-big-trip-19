@@ -53,8 +53,8 @@ export default class NewPointPresenter{
     this.#handleCancelClick();
   };
 
-  #saveNewPointClick = () => {
+  #saveNewPointClick = (waypoint) => {
     remove(this.#newPointComponent);
-    this.#handleSaveClick();
+    this.#handleSaveClick(waypoint);
   };
 }

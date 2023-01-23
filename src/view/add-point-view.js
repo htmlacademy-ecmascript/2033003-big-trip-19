@@ -91,7 +91,7 @@ const createAddPointViewTemplate = (waypoint) => {
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}">
+    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}">
   </div>
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
@@ -127,6 +127,14 @@ export default class AddPointView extends AbstractStatefulView {
     const waypoint = {...state};
 
     return waypoint;
+  }
+
+  #priceChange = (evt) => {
+    const price = Number(evt.target.value);
+    if(!isNaN(price))
+      this.updateElement({
+        basePrice: Number(evt.target.value)
+      });
   }
 
   #setDatepickers() {
@@ -174,7 +182,7 @@ export default class AddPointView extends AbstractStatefulView {
 
   #saveNewPointClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleSaveNewPointClick();
+    this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
   };
 
   #dateStartChangeHandler = (userDate) => {
@@ -188,6 +196,7 @@ export default class AddPointView extends AbstractStatefulView {
   _restoreHandlers() {
     this.element.querySelector('form').addEventListener('reset', this.#closeClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveNewPointClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
 
     const types = this.element.querySelectorAll('.event__type-input');
     for (let i = 0; i < types.length; i++){

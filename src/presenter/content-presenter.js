@@ -144,11 +144,16 @@ export default class ContentPresenter {
     this.#initNewPointComponent();
   };
 
-  #handleSaveClick = () => {
+  #handleSaveClick = (waypoint) => {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
     this.#addButton.disabled = false;
     this.#initNewPointComponent();
+    this.#handleViewAction(
+      UserAction.ADD_WAYPOINT,
+      UpdateType.MINOR,
+      waypoint
+    );
   };
 
   #addPointClickHandler = (evt) => {
