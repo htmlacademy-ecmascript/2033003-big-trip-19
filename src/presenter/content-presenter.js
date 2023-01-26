@@ -10,6 +10,7 @@ import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
+import { nanoid } from 'nanoid';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -35,6 +36,7 @@ export default class ContentPresenter {
   #messageComponent = null;
   #newWaypointPresenter = null;
   #filterPresenter = null;
+  #newWaypoint = null;
 
   constructor({ contentContainer, sortingsContainer, tripContainer, waypointModel, filterModel, filterPresenter}) {
     this.#contentContainer = contentContainer;
@@ -88,6 +90,7 @@ export default class ContentPresenter {
 
   #handleModeChange = () => {
     this.#waypointPresentersList.forEach((presenter) => presenter.resetView());
+    this.#newWaypointPresenterList.forEach((presenter) => presenter.cancelAddPointClick());
   };
 
   #renderTrip(){
@@ -109,64 +112,29 @@ export default class ContentPresenter {
 
   #initNewPointComponent(){
     const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
-
-    this.newWaypoint = {
+    this.#newWaypoint = {
+      id: nanoid(),
       ...newWaypoint,
-      allDestinations: [...this.#waypointModel.destinations],
-      allOffers: [...this.#waypointModel.offers],
-      destination: [...this.#waypointModel.destinations][0],
-      offersByType: offersByType,
-      dateFrom: new Date(),
-      dateTo: new Date()
+        allDestinations: [...this.#waypointModel.destinations],
+        allOffers: [...this.#waypointModel.offers],
+        destination: [...this.#waypointModel.destinations][0],
+        offersByType: offersByType,
+        dateFrom: new Date(),
+        dateTo: new Date()
+      
     };
-
-    this.#newWaypointPresenter = new NewPointPresenter({
-      newWaypointContainer: this.#boardComponent.element,
-      onCancelClick: this.#handleCancelClick,
-      onSaveClick: this.#handleSaveClick
-    });
-
-    this.#newWaypointPresenter.init(this.newWaypoint, this.#mode);
-    this.#newWaypointPresenterList.set(this.newWaypoint.id, this.#newWaypointPresenter);
   }
 
   #handleCancelClick = () => {
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
-    this.#addButton.disabled = false;
-    this.#initNewPointComponent();
+    this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
+    this.#newWaypointPresenterList.set(this.#newWaypoint.id, this.#newWaypointPresenter);
   };
 
-  #handleSaveClick = (waypoint) => {
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.DEFAULT;
-    this.#addButton.disabled = false;
-    this.#initNewPointComponent();
-    this.#handleViewAction(
-      UserAction.ADD_WAYPOINT,
-      UpdateType.MINOR,
-      waypoint
-    );
-  };
-
-  #addPointClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#addButton.disabled = true;
+  #addPointClickHandler = () => {
     this.#mode = Mode.ADDING;
     this.#filterType = FilterType.EVERYTHING;
     this.#filterPresenter.setFilter(this.#filterType);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#initNewPointComponent();
-  };
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.#addButton.disabled = false;
-      this.#mode = Mode.DEFAULT;
-      this.#newWaypointPresenterList.forEach((presenter) => presenter.destroy());
-      this.#initNewPointComponent();
-    }
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -189,7 +157,7 @@ export default class ContentPresenter {
         this.#waypointPresentersList.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#clearContentContainer();
+        this.#clearContentContainer({resetModeType: true});
         this.#renderContentContainer();
         break;
       case UpdateType.MAJOR:
@@ -206,11 +174,14 @@ export default class ContentPresenter {
     return [...this.#waypointModel.sortWaypoints(filteredWaypoints, this.#currentSortType)];
   }
 
-  #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
+  #clearContentContainer({resetSortType = false, resetFilterType = false, resetModeType = false} = {}) {
     this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
     this.#waypointPresentersList.clear();
     remove(this.#sortingComponent);
     remove(this.#tripComponent);
+
+    this.#newWaypointPresenterList.clear();
+    
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -220,12 +191,33 @@ export default class ContentPresenter {
       this.#filterType = FilterType.EVERYTHING;
     }
 
+    if(resetModeType){
+      this.#mode = Mode.DEFAULT;
+    }
+
     if(this.#messageComponent){
       remove(this.#messageComponent);
     }
   }
 
   #renderContentContainer() {
+    if(this.#newWaypointPresenter.mode !== this.#mode){
+      const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
+      this.#newWaypoint = {
+        id: nanoid(),
+        ...newWaypoint,
+          allDestinations: [...this.#waypointModel.destinations],
+          allOffers: [...this.#waypointModel.offers],
+          destination: [...this.#waypointModel.destinations][0],
+          offersByType: offersByType,
+          dateFrom: new Date(),
+          dateTo: new Date()
+        
+      };
+      this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
+    }
+    this.#newWaypointPresenterList.set(this.#newWaypoint.id, this.#newWaypointPresenter);
+
     this.#filterPresenter.init();
     this.#renderSortings();
     render(this.#boardComponent, this.#contentContainer);
@@ -241,9 +233,16 @@ export default class ContentPresenter {
   }
 
   init() {
-    this.#addButton = document.querySelector('.trip-main__event-add-btn');
-    this.#addButton.addEventListener('click', this.#addPointClickHandler);
     this.#initNewPointComponent();
+
+    this.#newWaypointPresenter = new NewPointPresenter({
+      newWaypointContainer: this.#boardComponent.element,
+      onCancelClick: this.#handleCancelClick,
+      onAddPointClick: this.#addPointClickHandler,
+      onDataChange: this.#handleViewAction
+    });
+    this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
+
     this.#renderContentContainer();
   }
 }

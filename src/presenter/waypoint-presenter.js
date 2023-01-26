@@ -37,7 +37,7 @@ export default class WaypointPresenter{
     this.#editPointComponent = new EditPointView({
       waypoint: this.#waypoint,
       onCloseEditClick: this.#handleCloseEditClick,
-      onDeleteClick: this.#handleDeleteEditClick,
+      onDeleteClick: this.#handleDeleteClick,
       onSaveClick: this.#handleFormSubmit,
     });
 
@@ -70,11 +70,11 @@ export default class WaypointPresenter{
   }
 
   #replacePointToEdit () {
+    
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
-    this.#newWaypointPresenterList.forEach((presenter) => presenter.cancelAddPointClick());
   }
 
   #replaceEditToPoint() {
@@ -98,7 +98,7 @@ export default class WaypointPresenter{
     this.resetView();
   };
 
-  #handleDeleteEditClick = (waypoint) => {
+  #handleDeleteClick = (waypoint) => {
     this.#handleDataChange(
       UserAction.DELETE_WAYPOINT,
       UpdateType.MINOR,

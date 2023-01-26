@@ -5,6 +5,11 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { DESTINATION_NAMES } from '../const.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  ADDING : 'ADDING'
+};
+
 const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
@@ -108,15 +113,23 @@ const createAddPointViewTemplate = (waypoint) => {
 export default class AddPointView extends AbstractStatefulView {
   #handleCancelAddPointClick = null;
   #handleSaveNewPointClick = null;
+  #handleAddPointClick = null;
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
-  #offers = [];
+  #mode = Mode.DEFAULT;
+  #addButton = null;
 
-  constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
+  constructor({ waypoint, mode, onCancelAddPointClick, onSaveNewPointClick, onAddPointClick}) {
     super();
     this._setState(AddPointView.parseWaypointToState(waypoint));
+    this.#mode = mode;
     this.#handleCancelAddPointClick = onCancelAddPointClick;
     this.#handleSaveNewPointClick = onSaveNewPointClick;
+    this.#handleAddPointClick = onAddPointClick;
+
+    this.#addButton = document.querySelector('.trip-main__event-add-btn');
+    this.#addButton.addEventListener('click', this.#addPointClickHandler);
+
     this._restoreHandlers();
   }
 
@@ -129,6 +142,15 @@ export default class AddPointView extends AbstractStatefulView {
 
     return waypoint;
   }
+
+  #updateButtonState = () =>{
+    if(this.#mode === Mode.DEFAULT){
+      this.#addButton.disabled = false;
+    }else{
+      this.#addButton.disabled = true;
+      this.#addButton.removeEventListener('click', this.#addPointClickHandler);
+    }
+  };
 
   #priceChange = (evt) => {
     const price = Number(evt.target.value);
@@ -192,6 +214,11 @@ export default class AddPointView extends AbstractStatefulView {
     this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
   };
 
+  #addPointClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleAddPointClick();
+  };
+
   #dateStartChangeHandler = (userDate) => {
     this.updateElement({dateFrom: userDate[0]});
   };
@@ -219,6 +246,8 @@ export default class AddPointView extends AbstractStatefulView {
       offers[i].addEventListener('click', this.#setOfferClickHandler);
     }
 
+    
+    this.#updateButtonState();
     this.#setDatepickers();
   }
 
@@ -251,6 +280,6 @@ export default class AddPointView extends AbstractStatefulView {
   }
 
   get template() {
-    return createAddPointViewTemplate(this._state);
+    return createAddPointViewTemplate(this._state, this.#mode);
   }
 }
