@@ -246,7 +246,6 @@ export default class AddPointView extends AbstractStatefulView {
       offers[i].addEventListener('click', this.#setOfferClickHandler);
     }
 
-    
     this.#updateButtonState();
     this.#setDatepickers();
   }

@@ -16,10 +16,8 @@ export default class WaypointPresenter{
   #mode = Mode.DEFAULT;
   #handleModeChange = null;
   #handleDataChange = null;
-  #newWaypointPresenterList = null;
 
-  constructor({ newWaypointPresenterList, waypointContainer, onModeChange, onDataChange}){
-    this.#newWaypointPresenterList = newWaypointPresenterList;
+  constructor({ waypointContainer, onModeChange, onDataChange}){
     this.#contentContainer = waypointContainer;
     this.#handleModeChange = onModeChange;
     this.#handleDataChange = onDataChange;
@@ -70,7 +68,6 @@ export default class WaypointPresenter{
   }
 
   #replacePointToEdit () {
-    
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();

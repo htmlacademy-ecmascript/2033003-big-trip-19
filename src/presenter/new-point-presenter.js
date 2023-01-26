@@ -1,6 +1,5 @@
-import { nanoid } from 'nanoid';
 import { UpdateType, UserAction } from '../const.js';
-import { remove, render, replace } from '../framework/render.js';
+import { remove, render } from '../framework/render.js';
 import AddPointView from '../view/add-point-view.js';
 
 const Mode = {

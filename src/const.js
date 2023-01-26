@@ -169,12 +169,12 @@ const OFFERS = [
 ];
 
 const newWaypoint = {
-    basePrice: 0,
-    offers: [],
-    type: POINT_TYPES[0],
-    allTypes: POINT_TYPES,
-    allDestinationNames: DESTINATION_NAMES,
-    offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
+  basePrice: 0,
+  offers: [],
+  type: POINT_TYPES[0],
+  allTypes: POINT_TYPES,
+  allDestinationNames: DESTINATION_NAMES,
+  offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
 };
 
 const UserAction = {

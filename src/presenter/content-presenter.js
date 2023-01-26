@@ -30,7 +30,6 @@ export default class ContentPresenter {
   #waypointModel = null;
   #sortingsContainer = null;
   #currentSortType = SortType.DAY;
-  #addButton = null;
   #mode = Mode.DEFAULT;
   #filterType = FilterType.EVERYTHING;
   #messageComponent = null;
@@ -75,7 +74,6 @@ export default class ContentPresenter {
 
   #renderPoint(point) {
     const waypointPresenter = new WaypointPresenter({
-      newWaypointPresenterList: this.#newWaypointPresenterList,
       waypointContainer: this.#boardComponent.element,
       onModeChange: this.#handleModeChange,
       onDataChange: this.#handleViewAction});
@@ -115,13 +113,12 @@ export default class ContentPresenter {
     this.#newWaypoint = {
       id: nanoid(),
       ...newWaypoint,
-        allDestinations: [...this.#waypointModel.destinations],
-        allOffers: [...this.#waypointModel.offers],
-        destination: [...this.#waypointModel.destinations][0],
-        offersByType: offersByType,
-        dateFrom: new Date(),
-        dateTo: new Date()
-      
+      allDestinations: [...this.#waypointModel.destinations],
+      allOffers: [...this.#waypointModel.offers],
+      destination: [...this.#waypointModel.destinations][0],
+      offersByType: offersByType,
+      dateFrom: new Date(),
+      dateTo: new Date()
     };
   }
 
@@ -181,7 +178,6 @@ export default class ContentPresenter {
     remove(this.#tripComponent);
 
     this.#newWaypointPresenterList.clear();
-    
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -206,13 +202,12 @@ export default class ContentPresenter {
       this.#newWaypoint = {
         id: nanoid(),
         ...newWaypoint,
-          allDestinations: [...this.#waypointModel.destinations],
-          allOffers: [...this.#waypointModel.offers],
-          destination: [...this.#waypointModel.destinations][0],
-          offersByType: offersByType,
-          dateFrom: new Date(),
-          dateTo: new Date()
-        
+        allDestinations: [...this.#waypointModel.destinations],
+        allOffers: [...this.#waypointModel.offers],
+        destination: [...this.#waypointModel.destinations][0],
+        offersByType: offersByType,
+        dateFrom: new Date(),
+        dateTo: new Date()
       };
       this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
     }
