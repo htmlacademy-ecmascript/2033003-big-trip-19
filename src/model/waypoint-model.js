@@ -1,9 +1,10 @@
-import { createDataDestinations } from '../mock-destination.js';
-import { createDataPoints } from '../mock-waypoint.js';
-import { OFFERS, POINT_TYPES } from '../const.js';
+import { createDataDestinations } from '../mocks/mock-destination.js';
+import { createDataPoints } from '../mocks/mock-waypoint.js';
+import { DESTINATION_NAMES, OFFERS, POINT_TYPES } from '../const.js';
 import { nanoid } from 'nanoid';
+import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 
-function createPoint(point, offers, destination, allAvailableOffers){
+function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
   return {
     id: nanoid(),
     ...{
@@ -15,31 +16,40 @@ function createPoint(point, offers, destination, allAvailableOffers){
       offers: offers,
       type: point.type,
       offersByType: allAvailableOffers,
-      allTypes: POINT_TYPES
+      allTypes: allTypes,
+      allDestinationNames: destinationNames,
+      allDestinations: alldestinations
     }
   };
 }
 
 export default class WaypointModel {
   #offers = OFFERS;
-  #destinations = createDataDestinations();
+  #destinationNames = DESTINATION_NAMES;
+  #destinations = createDataDestinations(this.#destinationNames.length);
   #waypoints = Array.from(createDataPoints(this.#destinations));
-
-  sortWaypoints() {
-    return this.#waypoints.sort((a, b) => a.dateFrom - b.dateFrom);
-  }
+  #humanizedWaypoints = null;
+  #allTypes = POINT_TYPES;
 
   get waypoints() {
     return this.#waypoints;
+  }
+
+  get allTypes() {
+    return this.#allTypes;
   }
 
   get destinations() {
     return this.#destinations;
   }
 
+  get offers(){
+    return this.#offers;
+  }
+
   get humanizedWaypoints() {
     const cloneWaypoints = [...this.#waypoints];
-    const humanizedWaypoints = [];
+    this.#humanizedWaypoints = [];
     for (const point of cloneWaypoints) {
       let allAvailableOffers = [];
       const availableOffers = [];
@@ -58,9 +68,26 @@ export default class WaypointModel {
 
       const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
 
-      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers);
-      humanizedWaypoints.push(humanizedPoint);
+      const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
+      this.#humanizedWaypoints.push(humanizedPoint);
     }
-    return humanizedWaypoints.sort((a, b) => a.dateFrom - b.dateFrom);
+    return this.#humanizedWaypoints.sort(sortWaypointByDate);
+  }
+
+  sortWaypoints(waypoints, sortType){
+    switch(sortType){
+      case sortType = 'day':
+        waypoints.sort(sortWaypointByDate);
+        break;
+      case sortType = 'time':
+        waypoints.sort(sortWaypointByDuration);
+        break;
+      case sortType = 'price':
+        waypoints.sort(sortWaypointByPrice);
+        break;
+      default:
+        waypoints.sort(sortWaypointByDate);
+    }
+    return waypoints;
   }
 }

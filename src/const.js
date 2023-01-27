@@ -1,11 +1,16 @@
-const MIN_DATE = new Date(2018, 0, 1);
-const MAX_DATE = new Date(2023, 11, 31);
+import { nanoid } from 'nanoid';
+
+const waypointDate = {
+  min: new Date(2018, 0, 1),
+  max: new Date(2023, 11, 31)
+};
+
 const Integer = {
   MIN_RANDOME_HOUR: 1,
   MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 3,
+  MAX_COUNT_OBJECTS: 4,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
@@ -19,7 +24,9 @@ const DateFormat = {
 };
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 const DESTINATION_NAMES = ['Moscow', 'Saint-Petersburg', 'Rostov', 'Ulan-Ude','Saratov', 'Samara','Izevsk','Krasnodar','Sochi','Adler'];
+
 const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -30,28 +37,15 @@ const DESCRIPTIONS = [
   'Sed sed nisi sed augue convallis suscipit in sed felis.',
   'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
 ];
-const SORTINGS = {
-  day: {
-    isDisabled: false,
-    isChecked: false
-  },
-  event: {
-    isDisabled: true,
-    isChecked: false
-  },
-  time: {
-    isDisabled: false,
-    isChecked: false
-  },
-  price: {
-    isDisabled: false,
-    isChecked: true
-  },
-  offer: {
-    isDisabled: true,
-    isChecked: false
-  }
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
 };
+
 const OFFERS = [
   {
     type: 'taxi',
@@ -176,13 +170,25 @@ const OFFERS = [
   }
 ];
 
+const newWaypoint = {
+  id: nanoid(),
+  ...{
+    basePrice: 0,
+    offers: [],
+    type: POINT_TYPES[0],
+    allTypes: POINT_TYPES,
+    allDestinationNames: DESTINATION_NAMES,
+    offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
+  }
+};
+
 export {
   Integer,
   DateFormat,
   POINT_TYPES,
-  MIN_DATE,
-  MAX_DATE,
   OFFERS,
   DESTINATION_NAMES,
   DESCRIPTIONS,
-  SORTINGS};
+  waypointDate,
+  SortType,
+  newWaypoint};

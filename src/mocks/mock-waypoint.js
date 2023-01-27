@@ -1,5 +1,5 @@
-import { MAX_DATE, Integer, MIN_DATE, OFFERS, POINT_TYPES} from './const';
-import { addDays, getRandomArrayElement, returnRandomBool, returnRandomDate, returnRandomInteger } from './util.js';
+import { Integer, waypointDate, OFFERS, POINT_TYPES} from '../const.js';
+import { returnRandomBool, returnRandomInteger, addDays, returnRandomDate, getRandomArrayElement } from '../utils/util-waypoint.js';
 
 const lengthArrayPointType = (type) => {
   const pointTypes = OFFERS.find((pointType) => pointType.type === type);
@@ -19,7 +19,7 @@ const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, 
   const destinationElement = getRandomArrayElement(destinations);
   const arrayOffersByTypeLength = lengthArrayPointType(pointType);
   const randomeOffersIds = getUniqIdOffers(generateArrayIdOffers(arrayOffersByTypeLength,arrayOffersByTypeLength,MIN_LENGTH_ARRAY_ID_OFFERS));
-  const dateTo = addDays(dateFrom,returnRandomInteger(maxIntegerDate));
+  const dateTo = addDays(dateFrom, returnRandomInteger(maxIntegerDate));
   return{
     basePrice:returnRandomInteger(MIN_BASE_PRICE,MAX_BASE_PRICE),
     dateFrom: dateFrom,
@@ -32,6 +32,6 @@ const createDataPoint = (integer, maxRandomDate, minRandomDate, maxIntegerDate, 
   };
 };
 const createDataPoints = (destinations)=> Array.from({ length: Integer.MAX_COUNT_OBJECTS }, (_element,integer) =>
-  createDataPoint(integer + 1, MAX_DATE, MIN_DATE,Integer.MAX_INTEGER_DATE_DURATION, getRandomArrayElement(POINT_TYPES), destinations));
+  createDataPoint(integer + 1, waypointDate.max, waypointDate.min,Integer.MAX_INTEGER_DATE_DURATION, getRandomArrayElement(POINT_TYPES), destinations));
 
 export {createDataPoints};

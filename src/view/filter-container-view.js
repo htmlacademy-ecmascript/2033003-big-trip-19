@@ -1,5 +1,5 @@
-import { upperCaseFirst } from '../util.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import { upperCaseFirst } from '../utils/common.js';
 
 function createFilterContainerTemplate(filters) {
   return `<form class="trip-filters" action="#" method="get">
