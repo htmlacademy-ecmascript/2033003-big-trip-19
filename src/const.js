@@ -1,8 +1,6 @@
-import { nanoid } from 'nanoid';
-
 const waypointDate = {
   min: new Date(2018, 0, 1),
-  max: new Date(2023, 11, 31)
+  max: new Date(2024, 11, 31)
 };
 
 const Integer = {
@@ -10,12 +8,12 @@ const Integer = {
   MAX_RANDOME_HOUR: 1200,
   MAX_INTEGER_DATE_DURATION : 3,
   MIN_LENGTH_ARRAY_ID_OFFERS: 1,
-  MAX_COUNT_OBJECTS: 4,
+  MAX_COUNT_OBJECTS: 3,
   MIN_BASE_PRICE: 30,
   MAX_BASE_PRICE: 2000,
   MIN_COUNT_DESCRIPRIONS: 1,
   MAX_COUNT_DESCRIPRIONS: 5,
-  MAX_RANDOM_IMAGE_INTEGER: 1000
+  MAX_RANDOM_IMAGE_INTEGER: 400
 };
 const DateFormat = {
   MONTH_AND_DATE: 'MMM DD',
@@ -171,15 +169,31 @@ const OFFERS = [
 ];
 
 const newWaypoint = {
-  id: nanoid(),
-  ...{
-    basePrice: 0,
-    offers: [],
-    type: POINT_TYPES[0],
-    allTypes: POINT_TYPES,
-    allDestinationNames: DESTINATION_NAMES,
-    offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
-  }
+  basePrice: 0,
+  offers: [],
+  type: POINT_TYPES[0],
+  allTypes: POINT_TYPES,
+  allDestinationNames: DESTINATION_NAMES,
+  offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
+};
+
+const UserAction = {
+  UPDATE_WAYPOINT: 'UPDATE_WAYPOINT',
+  ADD_WAYPOINT: 'ADD_WAYPOINT',
+  DELETE_WAYPOINT: 'DELETE_WAYPOINT'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};
+
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  FUTURE: 'FUTURE',
+  PRESENT: 'PRESENT',
+  PAST: 'PAST'
 };
 
 export {
@@ -191,4 +205,7 @@ export {
   DESCRIPTIONS,
   waypointDate,
   SortType,
-  newWaypoint};
+  newWaypoint,
+  UserAction,
+  UpdateType,
+  FilterType};

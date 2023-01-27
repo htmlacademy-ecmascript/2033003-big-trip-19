@@ -1,18 +1,11 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
+import { DESTINATION_NAMES } from '../const.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createDestinationWithOffersViewTemplate = (destinationPoint) => {
-  const { description } = destinationPoint;
-  return `<section class="event__section  event__section--destination">
-  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-  <p class="event__destination-description">${description}</p>
-  </section>`;
-};
-
-const createDestinationWithoutOffersViewTemplate = (destinationPoint) => {
+const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -42,7 +35,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${allOffers.map((offer) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" data-offer="${offer.id}" id="event-offer-${lowwerCaseFirst(offer.title)}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title)}" ${isCheckedOffer(offer, point.offers) ? 'checked' : ''}>
+            <input class="event__offer-checkbox  visually-hidden" data-offer="${offer.id}" id="event-offer-${lowwerCaseFirst(offer.title)}-${offer.id}" type="checkbox" name="event-offer-${lowwerCaseFirst(offer.title)}" ${isCheckedOffer(offer, point.offers) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-${lowwerCaseFirst(offer.title)}-${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
@@ -98,7 +91,7 @@ function createEditViewTemplate(waypoint) {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}">
+        <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -108,8 +101,8 @@ function createEditViewTemplate(waypoint) {
       </button>
     </header>
     <section class="event__details">
-      ${offersByType.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : createDestinationWithoutOffersViewTemplate(destination)}
-      ${!isEmptyObject(destination) && offersByType.length > 0 ? createDestinationWithOffersViewTemplate(destination) : ''}
+      ${offersByType.length > 0 ? createOffersViewTemplate(waypoint, offersByType) : ''}
+      ${!isEmptyObject(destination) ? createDestinationViewTemplate(destination) : ''}
     </section>
   </form>
   </li>`;
@@ -131,6 +124,15 @@ export default class EditPointView extends AbstractStatefulView {
 
     this._restoreHandlers();
   }
+
+  #priceChange = (evt) => {
+    const price = Number(evt.target.value);
+    if(!isNaN(price)){
+      this.updateElement({
+        basePrice: Number(evt.target.value)
+      });
+    }
+  };
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
@@ -160,12 +162,12 @@ export default class EditPointView extends AbstractStatefulView {
 
   #deleteClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleDeleteClick();
+    this.#handleDeleteClick(EditPointView.parseStateToWaypoint(this._state));
   };
 
   #saveClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleSaveClick();
+    this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
   };
 
   #typeChangeHandler = (evt) => {
@@ -178,9 +180,13 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
-    const destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+  #destinationChangeHandler = (evt, prevDestinationName) => {
+    let destination = null;
+    if(DESTINATION_NAMES.includes(evt.target.value)) {
+      destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+    }else{
+      destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
+    }
     this.updateElement({
       destination: destination[0],
       offers: []
@@ -188,11 +194,11 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #dateStartChangeHandler = (userDate) => {
-    this.updateElement({dateFrom: userDate});
+    this.updateElement({dateFrom: userDate[0]});
   };
 
   #dateEndChangeHandler = (userDate) => {
-    this.updateElement({dateTo: userDate});
+    this.updateElement({dateTo: userDate[0]});
   };
 
   #setOfferClickHandler = (evt) => {
@@ -235,13 +241,15 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
     const types = this.element.querySelectorAll('.event__type-input');
     for (let i = 0; i < types.length; i++){
       types[i].addEventListener('click', this.#typeChangeHandler);
     }
 
-    const destinations = this.element.querySelector('.event__input--destination');
-    destinations.addEventListener('change', this.#destinationChangeHandler);
+    const destination = this.element.querySelector('.event__input--destination');
+    const destinationName = destination.value;
+    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.setOfferClickHandler();
 
@@ -267,4 +275,5 @@ export default class EditPointView extends AbstractStatefulView {
     }
   }
 }
+
 

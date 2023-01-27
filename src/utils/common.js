@@ -1,8 +1,6 @@
 
-const upperCaseFirst = (str) => str[0].toUpperCase() + str.slice(1);
+const upperCaseFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
-const lowwerCaseFirst = (str) => str[0].split(' ')[0].toLowerCase() + str.slice(1);
+const lowwerCaseFirst = (str) => str.charAt(0).toLowerCase() + str.slice(1);
 
-const updateItem = (items, update) => items.map((item) => item.id === update.id ? update : item);
-
-export {upperCaseFirst, lowwerCaseFirst, updateItem};
+export {upperCaseFirst, lowwerCaseFirst};

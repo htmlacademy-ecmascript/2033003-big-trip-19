@@ -1,17 +1,20 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { NoWaypointsTextType } from '../utils/util-waypoint.js';
 
-function createMessageTemplate(filterMessage) {
-  const { message} = filterMessage;
-  return `<p class="trip-events__msg">${message}</p>`;
-}
+const createMessageTemplate = (filterType) => {
+  const noWaypointTextValue = NoWaypointsTextType[filterType];
+  return `<p class="trip-events__msg">${noWaypointTextValue}</p>`;
+};
+
 export default class MessageView extends AbstractView {
-  #message = null;
-  constructor(message){
+  #filterType = null;
+
+  constructor({filterType}) {
     super();
-    this.#message = message;
+    this.#filterType = filterType;
   }
 
   get template() {
-    return createMessageTemplate(this.#message);
+    return createMessageTemplate(this.#filterType);
   }
 }

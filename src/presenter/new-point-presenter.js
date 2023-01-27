@@ -1,3 +1,4 @@
+import { UpdateType, UserAction } from '../const.js';
 import { remove, render } from '../framework/render.js';
 import AddPointView from '../view/add-point-view.js';
 
@@ -11,26 +12,31 @@ export default class NewPointPresenter{
   #newPointComponent = null;
   #newWaypoint = null;
   #handleCancelClick = null;
-  #handleSaveClick = null;
-  #mode = null;
+  #handleAddPointClick = null;
+  #handleDataChange = null;
+  mode = null;
 
-  constructor({ newWaypointContainer, onCancelClick, onSaveClick}){
+  constructor({ newWaypointContainer, onCancelClick, onAddPointClick, onDataChange}){
     this.#contentContainer = newWaypointContainer;
     this.#handleCancelClick = onCancelClick;
-    this.#handleSaveClick = onSaveClick;
+    this.#handleAddPointClick = onAddPointClick;
+    this.#handleDataChange = onDataChange;
   }
 
   init(newWaypoint, mode){
     const prevNewPointComponent = this.#newPointComponent;
     this.#newWaypoint = newWaypoint;
-    this.#mode = mode;
+    this.mode = mode;
+
     this.#newPointComponent = new AddPointView({
       waypoint: this.#newWaypoint,
+      mode: this.mode,
       onCancelAddPointClick: this.cancelAddPointClick,
-      onSaveNewPointClick: this.#saveNewPointClick
+      onSaveNewPointClick: this.#saveNewPointClick,
+      onAddPointClick : this.#addPointClick
     });
 
-    if(this.#mode === Mode.ADDING){
+    if(prevNewPointComponent !== null && this.mode === Mode.ADDING){
       render(this.#newPointComponent, this.#contentContainer,'BEFOREBEGIN');
       return;
     }
@@ -39,22 +45,45 @@ export default class NewPointPresenter{
   }
 
   resetView(){
-    if (this.#mode !== Mode.DEFAULT){
-      this.#newPointComponent.reset(this.#newWaypoint);
+    if (this.mode !== Mode.DEFAULT){
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+      remove(this.#newPointComponent);
+      this.mode = Mode.DEFAULT;
     }
   }
 
-  destroy() {
-    remove(this.#newPointComponent);
-  }
-
   cancelAddPointClick = () => {
-    remove(this.#newPointComponent);
-    this.#handleCancelClick();
+    if(this.mode === Mode.ADDING){
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+      remove(this.#newPointComponent);
+      this.#handleCancelClick();
+    }
   };
 
-  #saveNewPointClick = () => {
+  #saveNewPointClick = (waypoint) => {
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+
     remove(this.#newPointComponent);
-    this.#handleSaveClick();
+    this.#handleDataChange(
+      UserAction.ADD_WAYPOINT,
+      UpdateType.MINOR,
+      waypoint
+    );
+  };
+
+  #addPointClick = () =>{
+    this.#handleAddPointClick();
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      if(this.mode === Mode.ADDING){
+        document.removeEventListener('keydown', this.#escKeyDownHandler);
+        remove(this.#newPointComponent);
+        this.#handleCancelClick();
+      }
+    }
   };
 }

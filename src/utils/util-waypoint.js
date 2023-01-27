@@ -1,4 +1,4 @@
-import { DateFormat, Integer } from '../const.js';
+import { DateFormat, FilterType, Integer } from '../const.js';
 import dayjs from 'dayjs';
 
 const returnRandomBool = (() => {
@@ -30,8 +30,9 @@ function addDays(date) {
   return result;
 }
 
-function returnRandomDate(minDate, maxDate) {
-  return new Date(minDate.getTime() + Math.random() * (maxDate.getTime() - minDate.getTime()));
+function returnRandomDate(start, end) {
+  const timestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+  return new Date(timestamp);
 }
 
 const getTimeFromDate = (date) => {
@@ -42,75 +43,40 @@ const getFullFormatDate = (date) => {
   const withoutDate = dayjs(date).format(DateFormat.FULL_DATE_AND_TIME);
   return withoutDate;
 };
-const getHumanizeTime = (diff) => {
-  const humaniseTime = diff;
-  return humaniseTime;
-};
-
-const PrependZeros = (str, len, seperator) => {
-  if (typeof str === 'number' || Number(str)) {
-    str = str.toString();
-    return (len - str.length > 0) ? new Array(len + 1 - str.length).join('0') + str : str;
-  }
-  else {
-    const spl = str.split(seperator || ' ');
-    for (let i = 0 ; i < spl.length; i++) {
-      if (Number(spl[i]) && spl[i].length < len) {
-        spl[i] = PrependZeros(spl[i], len);
-      }
-    }
-    return spl.join(seperator || ' ');
-  }
-};
 
 const getDateDifference = (startDate, endDate) =>{
-  const diff = Date.parse(endDate) - Date.parse(startDate);
-  const days = Math.floor(diff / (1000 * 3600 * 24));
-  const hours = Math.floor((diff / (1000 * 3600)) % 24);
-  const minutes = Math.floor((diff / 1000 / 60) % 60);
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  const diff = end.diff(start, 'day');
+  const days = diff < 10 ? `0${diff}` : diff;
+  const hours = end.diff(start, 'hour') % 24;
+  const minutes = end.diff(start, 'minute') % 60;
+  const formattedHours = hours < 10 ? `0${hours}` : hours;
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
   let humaniseTime = '';
   if(days > 0){
-    humaniseTime = `${PrependZeros(days,2)}D ${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${days}D ${formattedHours}H ${formattedMinutes}M`;
   }else if(days < 1 && hours > 0){
-    humaniseTime = `${PrependZeros(hours,2)}H ${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${formattedHours}H ${formattedMinutes}M`;
   }else{
-    humaniseTime = `${PrependZeros(minutes,2)}M`;
+    humaniseTime = `${formattedMinutes}M`;
   }
   return humaniseTime;
 };
 
-const isEmptyObject = (obj) => {
-  if (Object.keys(obj).length === 0) {
-    return true;
-  }
-  return false;
-};
-
-const getWeightForNullDate = (dateA, dateB) => {
-  if (dateA === null && dateB === null) {
-    return 0;
-  }
-
-  if (dateA === null) {
-    return 1;
-  }
-
-  if (dateB === null) {
-    return -1;
-  }
-
-  return null;
-};
+const isEmptyObject = (obj) => Object.entries(obj).length === 0;
 
 const sortWaypointByDate = (waypointA, waypointB) => {
-  const weight = getWeightForNullDate(waypointA.dateFrom, waypointB.dateFrom);
-
-  return weight ?? dayjs(waypointA.dateFrom).diff(dayjs(waypointB.dateFrom));
+  if (!waypointA.dateFrom && !waypointB.dateFrom) {return 0;}
+  if (!waypointA.dateFrom) {return 1;}
+  if (!waypointB.dateFrom) {return -1;}
+  return new Date(waypointA.dateFrom) - new Date(waypointB.dateFrom);
 };
 
 const sortWaypointByDuration = (waypointA, waypointB) => {
-  const durationA = waypointA.dateTo.getTime() - waypointA.dateFrom.getTime();
-  const durationB = waypointB.dateTo.getTime() - waypointB.dateFrom.getTime();
+  const durationA = dayjs(waypointA.dateTo).diff(dayjs(waypointA.dateFrom), 'millisecond');
+  const durationB = dayjs(waypointB.dateTo).diff(dayjs(waypointB.dateFrom), 'millisecond');
   return durationB - durationA;
 };
 
@@ -119,14 +85,22 @@ const sortWaypointByPrice = (waypointA, waypointB) => waypointB.basePrice - wayp
 const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
 
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
+
+const NoWaypointsTextType = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now',
+};
+
 export {
+  NoWaypointsTextType,
   returnRandomBool,
   returnRandomInteger,
   addDays,
   returnRandomDate,
   getTimeFromDate,
   getFullFormatDate,
-  getHumanizeTime,
   getDateDifference,
   isEmptyObject,
   humanizeWaypointDate,

@@ -9,7 +9,6 @@ const returnDescriptionWithoutDuplicate = (descriptions) => {
   }
   return descriptionString;
 };
-
 const getDescriptionsForDestination = () => {
   const { MIN_COUNT_DESCRIPRIONS, MAX_COUNT_DESCRIPRIONS } = Integer;
   const countDescriptions = returnRandomInteger(MAX_COUNT_DESCRIPRIONS, MIN_COUNT_DESCRIPRIONS);
@@ -20,21 +19,24 @@ const getDescriptionsForDestination = () => {
   return descriptions;
 };
 
+const createPicture = (destinationName, destinationDescription) => ({
+  src: `https://loremflickr.com/248/152?random=${returnRandomInteger(Integer.MAX_RANDOM_IMAGE_INTEGER)}`,
+  description: `${destinationName}, ${destinationDescription}`
+});
+
+const createPictures = (length, destinationName, destinationDescription) => Array.from({length: length}, () =>
+  createPicture(destinationName, destinationDescription));
+
 const createDataDestination = (integer) => {
-  const { MAX_RANDOM_IMAGE_INTEGER } = Integer;
   const destinationDescription = returnDescriptionWithoutDuplicate(getDescriptionsForDestination());
   return {
     id: integer,
     description: destinationDescription,
     name: DESTINATION_NAMES[integer],
-    pictures: [
-      {
-        src: `https://loremflickr.com/248/152?random=${returnRandomInteger(MAX_RANDOM_IMAGE_INTEGER)}`,
-        description: 'Chamonix parliament building'
-      }
-    ]
+    pictures: createPictures(returnRandomInteger(Integer.MAX_COUNT_OBJECTS), DESTINATION_NAMES[integer], destinationDescription)
   };
 };
+
 const createDataDestinations = (length) => Array.from({ length: length }, (_element, integer) =>
   createDataDestination(integer));
 
