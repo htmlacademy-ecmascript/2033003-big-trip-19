@@ -51,6 +51,7 @@ export default class WaypointModel extends Observable {
       for (const point of cloneWaypoints) {
         let allAvailableOffers = [];
         const availableOffers = [];
+
         point.offers.sort((a, b) => a - b);
         allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
 
