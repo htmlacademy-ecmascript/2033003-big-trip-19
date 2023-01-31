@@ -204,15 +204,23 @@ export default class EditPointView extends AbstractStatefulView {
 
   #setOfferClickHandler = (evt) => {
     evt.preventDefault();
-    const offer = Number(evt.currentTarget.dataset.offer);
+    const datasetOffer = Number(evt.currentTarget.dataset.offer);
+    let offer = {};
+    for(let i = 0; i < this._state.allOffers.length; i++){
+      if(this._state.type === this._state.allOffers[i].type){
+        offer = this._state.allOffers[i].offers.find((element) => element.id === datasetOffer);
+        break;
+      }
+    }
+    
     if(!evt.target.checked){
       this._state.offers.forEach((item, i) => {
-        if (item.offer === offer) {
+        if (item.id === datasetOffer) {
           this._state.offers.splice(i, 1);
         }
       });
     }else{
-      this._state.offers.push({isChecked: evt.target.checked,...{offer}});
+      this._state.offers.push(offer);
     }
 
     this.updateElement({offers: this._state.offers});

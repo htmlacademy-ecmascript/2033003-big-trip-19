@@ -181,6 +181,7 @@ export default class ContentPresenter {
 
   createWaypoint() {
     const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
+    
     const destinations = this.#waypointModel.destinations;
       this.#newWaypoint = {
         id: nanoid(),
@@ -188,7 +189,7 @@ export default class ContentPresenter {
         allDestinations: destinations,
         allOffers: [...this.#waypointModel.offers],
         destination: destinations[0],
-        offersByType: offersByType,
+        offersByType: offersByType.offers,
         dateFrom: new Date(),
         dateTo: new Date(),
         isFavorite: false,
