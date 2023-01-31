@@ -1,7 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
-import { DESTINATION_NAMES } from '../const.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -212,7 +211,7 @@ export default class EditPointView extends AbstractStatefulView {
         break;
       }
     }
-    
+
     if(!evt.target.checked){
       this._state.offers.forEach((item, i) => {
         if (item.id === datasetOffer) {

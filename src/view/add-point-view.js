@@ -4,11 +4,6 @@ import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  ADDING : 'ADDING'
-};
-
 const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
   return `<section class="event__section  event__section--destination">
@@ -60,8 +55,7 @@ const createOffersViewTemplate = (waypoint, offers) => `<section class="event__s
   </section>`;
 
 const createAddPointViewTemplate = (waypoint) => {
-  const {id, basePrice, destination, type, allTypes, allDestinationNames, allOffers, offersByType} = waypoint;
-  //const offersByType = allOffers.map((offer) => offer.type === type);
+  const {id, basePrice, destination, type, allTypes, allDestinationNames, offersByType} = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -225,7 +219,6 @@ export default class AddPointView extends AbstractStatefulView {
       offers[i].addEventListener('click', this.#setOfferClickHandler);
     }
 
-    //this.#updateButtonState();
     this.#setDatepickers();
   }
 
@@ -239,7 +232,7 @@ export default class AddPointView extends AbstractStatefulView {
         break;
       }
     }
-    
+
     if(!evt.target.checked){
       this._state.offers.forEach((item, i) => {
         if (item.id === datasetOffer) {

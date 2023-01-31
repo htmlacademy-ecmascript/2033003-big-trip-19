@@ -2,10 +2,9 @@ import FilterModel from './model/filter-model.js';
 import WaypointModel from './model/waypoint-model.js';
 import ContentPresenter from './presenter/content-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-import { render } from './render.js';
 import { returnRandomString } from './utils/common.js';
 import NewWaypointButtonView from './view/new-waypoint-button-view.js';
-import WaypointsApiService from './waypoints-api-service.js'
+import WaypointsApiService from './waypoints-api-service.js';
 
 const AUTHORIZATION = `Basic ${returnRandomString()}`;
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
@@ -52,9 +51,9 @@ function handleNewWaypointButtonClick() {
 
 
 waypointModel.init()
-.finally(() => {
-  newWaypointButtonComponent.addButton.disabled = false;
-});
+  .finally(() => {
+    newWaypointButtonComponent.addButton.disabled = false;
+  });
 filterPresenter.init();
 contentPresenter.init();
 

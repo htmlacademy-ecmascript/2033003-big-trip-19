@@ -1,11 +1,10 @@
-import { render } from '../render.js';
 import ContentView from '../view/content-view.js';
 import MessageView from '../view/message-view.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import SortContainerView from '../view/sort-container-view.js';
 import { FilterType, newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { remove } from '../framework/render.js';
+import { remove, render } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
@@ -164,7 +163,6 @@ export default class ContentPresenter {
     remove(this.#tripComponent);
     remove(this.#loadingComponent);
     this.#newWaypointPresenterList.clear();
-    
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -181,20 +179,20 @@ export default class ContentPresenter {
 
   createWaypoint() {
     const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
-    
+
     const destinations = this.#waypointModel.destinations;
-      this.#newWaypoint = {
-        id: nanoid(),
-        ...newWaypoint,
-        allDestinations: destinations,
-        allOffers: [...this.#waypointModel.offers],
-        destination: destinations[0],
-        offersByType: offersByType.offers,
-        dateFrom: new Date(),
-        dateTo: new Date(),
-        isFavorite: false,
-        allDestinationNames: this.#waypointModel.cities,
-      };
+    this.#newWaypoint = {
+      id: nanoid(),
+      ...newWaypoint,
+      allDestinations: destinations,
+      allOffers: [...this.#waypointModel.offers],
+      destination: destinations[0],
+      offersByType: offersByType.offers,
+      dateFrom: new Date(),
+      dateTo: new Date(),
+      isFavorite: false,
+      allDestinationNames: this.#waypointModel.cities,
+    };
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newWaypointPresenter.init(this.#newWaypoint);
@@ -207,7 +205,9 @@ export default class ContentPresenter {
     }
 
     this.#renderSortings();
+
     render(this.#boardComponent, this.#contentContainer);
+
     this.#renderPoints(this.waypoints);
 
     this.#renderTrip();

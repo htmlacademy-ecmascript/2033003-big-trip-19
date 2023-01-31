@@ -60,7 +60,7 @@ export default class NewPointPresenter{
   }
 
   cancelAddPointClick = () => {
-      this.destroy();
+    this.destroy();
   };
 
   #saveNewPointClick = (waypoint) => {

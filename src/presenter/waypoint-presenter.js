@@ -122,6 +122,5 @@ export default class WaypointPresenter{
       {...this.#waypoint, isFavorite: !this.#waypoint.isFavorite}
     );
   };
-
 }
 

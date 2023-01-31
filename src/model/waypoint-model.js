@@ -4,18 +4,18 @@ import Observable from '../framework/observable.js';
 
 function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
   return {
-      id:point.id,
-      basePrice: point.basePrice,
-      dateFrom: point.dateFrom,
-      dateTo: point.dateTo,
-      destination: destination,
-      isFavorite: point.isFavorite,
-      offers: offers,
-      type: point.type,
-      offersByType: allAvailableOffers,
-      allTypes: allTypes,
-      allDestinationNames: destinationNames,
-      allDestinations: alldestinations
+    id:point.id,
+    basePrice: point.basePrice,
+    dateFrom: point.dateFrom,
+    dateTo: point.dateTo,
+    destination: destination,
+    isFavorite: point.isFavorite,
+    offers: offers,
+    type: point.type,
+    offersByType: allAvailableOffers,
+    allTypes: allTypes,
+    allDestinationNames: destinationNames,
+    allDestinations: alldestinations
   };
 }
 
@@ -45,6 +45,7 @@ export default class WaypointModel extends Observable {
     }catch(err){
       this.#waypoints = [];
       this.#destinations = [];
+      this.#offers = [];
     }
     this._notify(UpdateType.INIT);
   }
@@ -98,7 +99,7 @@ export default class WaypointModel extends Observable {
   }
 
   #adaptToClient(waypoint) {
-    const adaptedWaypoint= {...waypoint,
+    const adaptedWaypoint = {...waypoint,
       basePrice: waypoint['base_price'],
       dateFrom: waypoint['date_from'] !== null ? new Date(waypoint['date_from']) : waypoint['date_from'],
       dateTo: waypoint['date_to'] !== null ? new Date(waypoint['date_to']) : waypoint['date_to'],
