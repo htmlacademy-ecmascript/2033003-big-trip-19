@@ -1,5 +1,5 @@
 import { FilterType, UpdateType } from '../const.js';
-import { remove, replace } from '../framework/render.js';
+import { remove, RenderPosition, replace } from '../framework/render.js';
 import { render } from '../render.js';
 import { filter } from '../utils/util-filter.js';
 import FilterContainerView from '../view/filter-container-view.js';
@@ -20,28 +20,28 @@ export default class FilterPresenter{
   }
 
   get filters(){
-    const waypoints = this.#waypointModel.humanizedWaypoints;
+    //const waypoints = this.#waypointModel.humanizedWaypoints;
 
     return [
       {
         type: FilterType.EVERYTHING,
         name:'everything',
-        count: filter[FilterType.EVERYTHING](waypoints).length,
+        //count: filter[FilterType.EVERYTHING](waypoints).length,
       },
       {
         type: FilterType.FUTURE,
         name:'future',
-        count: filter[FilterType.FUTURE](waypoints).length,
+        //count: filter[FilterType.FUTURE](waypoints).length,
       },
       {
         type: FilterType.PRESENT,
         name:'present',
-        count: filter[FilterType.PRESENT](waypoints).length,
+        //count: filter[FilterType.PRESENT](waypoints).length,
       },
       {
         type: FilterType.PAST,
         name:'past',
-        count: filter[FilterType.PAST](waypoints).length,
+        //count: filter[FilterType.PAST](waypoints).length,
       },
     ];
   }

@@ -1,39 +1,5 @@
-import { DateFormat, FilterType, Integer } from '../const.js';
+import { DateFormat, FilterType} from '../const.js';
 import dayjs from 'dayjs';
-
-const returnRandomBool = (() => {
-  const a = new Uint8Array(1);
-  return function() {
-    crypto.getRandomValues(a);
-    return a[0] > 127;
-  };
-})();
-
-const returnRandomInteger = (max, min = 0) => {
-  if (min < 0 || max < 0 || typeof min !== 'number' || typeof max !== 'number')
-  {
-    return NaN;
-  }
-  if (max < min)
-  {
-    [min, max] = [max, min];
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-function addDays(date) {
-  const {MIN_RANDOME_HOUR, MAX_RANDOME_HOUR, MAX_INTEGER_DATE_DURATION} = Integer;
-  const result = new Date(date);
-  result.setDate(result.getDate() + returnRandomInteger(MAX_INTEGER_DATE_DURATION));
-  result.setHours(result.getHours() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
-  result.setMinutes(result.getMinutes() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
-  return result;
-}
-
-function returnRandomDate(start, end) {
-  const timestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
-  return new Date(timestamp);
-}
 
 const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format(DateFormat.HOURS_AND_MINUTES);
@@ -95,10 +61,6 @@ const NoWaypointsTextType = {
 
 export {
   NoWaypointsTextType,
-  returnRandomBool,
-  returnRandomInteger,
-  addDays,
-  returnRandomDate,
   getTimeFromDate,
   getFullFormatDate,
   getDateDifference,

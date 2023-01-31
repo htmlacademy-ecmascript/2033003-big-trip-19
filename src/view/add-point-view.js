@@ -3,7 +3,6 @@ import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { DESTINATION_NAMES } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -113,23 +112,16 @@ const createAddPointViewTemplate = (waypoint) => {
 export default class AddPointView extends AbstractStatefulView {
   #handleCancelAddPointClick = null;
   #handleSaveNewPointClick = null;
-  #handleAddPointClick = null;
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
-  #mode = Mode.DEFAULT;
-  #addButton = null;
+  #destinationNames = null;
 
-  constructor({ waypoint, mode, onCancelAddPointClick, onSaveNewPointClick, onAddPointClick}) {
+  constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
     super();
     this._setState(AddPointView.parseWaypointToState(waypoint));
-    this.#mode = mode;
     this.#handleCancelAddPointClick = onCancelAddPointClick;
     this.#handleSaveNewPointClick = onSaveNewPointClick;
-    this.#handleAddPointClick = onAddPointClick;
-
-    this.#addButton = document.querySelector('.trip-main__event-add-btn');
-    this.#addButton.addEventListener('click', this.#addPointClickHandler);
-
+    this.#destinationNames = waypoint.allDestinationNames;
     this._restoreHandlers();
   }
 
@@ -142,15 +134,6 @@ export default class AddPointView extends AbstractStatefulView {
 
     return waypoint;
   }
-
-  #updateButtonState = () =>{
-    if(this.#mode === Mode.DEFAULT){
-      this.#addButton.disabled = false;
-    }else{
-      this.#addButton.disabled = true;
-      this.#addButton.removeEventListener('click', this.#addPointClickHandler);
-    }
-  };
 
   #priceChange = (evt) => {
     const price = Number(evt.target.value);
@@ -193,7 +176,7 @@ export default class AddPointView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt, prevDestinationName) => {
     let destination = null;
-    if(DESTINATION_NAMES.includes(evt.target.value)) {
+    if(this.#destinationNames.includes(evt.target.value)) {
       destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     }else{
       destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
@@ -212,11 +195,6 @@ export default class AddPointView extends AbstractStatefulView {
   #saveNewPointClickHandler = (evt) =>{
     evt.preventDefault();
     this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
-  };
-
-  #addPointClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleAddPointClick();
   };
 
   #dateStartChangeHandler = (userDate) => {
@@ -246,7 +224,7 @@ export default class AddPointView extends AbstractStatefulView {
       offers[i].addEventListener('click', this.#setOfferClickHandler);
     }
 
-    this.#updateButtonState();
+    //this.#updateButtonState();
     this.#setDatepickers();
   }
 
@@ -279,6 +257,6 @@ export default class AddPointView extends AbstractStatefulView {
   }
 
   get template() {
-    return createAddPointViewTemplate(this._state, this.#mode);
+    return createAddPointViewTemplate(this._state);
   }
 }

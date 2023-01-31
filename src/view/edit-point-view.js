@@ -114,6 +114,7 @@ export default class EditPointView extends AbstractStatefulView {
   #handleSaveClick = null;
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
+  #destinationNames = null;
 
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
@@ -121,7 +122,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleCloseEditClick = onCloseEditClick;
     this.#handleDeleteClick = onDeleteClick;
     this.#handleSaveClick = onSaveClick;
-
+    this.#destinationNames = waypoint.allDestinationNames;
     this._restoreHandlers();
   }
 
@@ -182,7 +183,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt, prevDestinationName) => {
     let destination = null;
-    if(DESTINATION_NAMES.includes(evt.target.value)) {
+    if(this.#destinationNames.includes(evt.target.value)) {
       destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
     }else{
       destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
