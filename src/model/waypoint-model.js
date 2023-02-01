@@ -58,7 +58,7 @@ export default class WaypointModel extends Observable {
       this.#humanizedWaypoints = [];
       const cloneWaypoints = waypoints;
       for (const point of cloneWaypoints) {
-        const humanizedPoint = this.#createHumanizeWaypoint(point);
+        const humanizedPoint = this.#createHumanizedWaypoint(point);
         this.#humanizedWaypoints.push(humanizedPoint);
       }
       this.#waypoints = this.#humanizedWaypoints;
@@ -68,12 +68,9 @@ export default class WaypointModel extends Observable {
     }
   }
 
-  #createHumanizeWaypoint(point){
-    let allAvailableOffers = [];
-    let availableOffers = [];
-    point.offers.sort((a, b) => a - b);
-    allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
-    availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
+  #createHumanizedWaypoint(point){
+    const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
+    const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
     const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
     return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
   }
@@ -106,7 +103,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.updateWaypoint(update);
       const updatedWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizeWaypoint(updatedWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint(updatedWaypoint);
       this.#humanizedWaypoints = [
         ...this.#humanizedWaypoints.slice(0, index),
         humanizedPoint,
@@ -122,7 +119,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.addWaypoint(update);
       const newWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizeWaypoint(newWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint(newWaypoint);
       this.#humanizedWaypoints = [
         humanizedPoint,
         ...this.#humanizedWaypoints,

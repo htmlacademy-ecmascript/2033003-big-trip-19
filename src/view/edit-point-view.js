@@ -255,7 +255,7 @@ export default class EditPointView extends AbstractStatefulView {
         basePrice: Number(evt.target.value)
       });
     }else{
-      evt.target.setCustomValidity("Значение должно быть больше 0");
+      evt.target.setCustomValidity('Значение должно быть больше 0');
     }
   };
 
