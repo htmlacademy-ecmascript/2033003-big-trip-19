@@ -56,11 +56,7 @@ export default class WaypointModel extends Observable {
   #getHumanizedWaypoints(waypoints) {
     if(this.#humanizedWaypoints === null){
       this.#humanizedWaypoints = [];
-      const cloneWaypoints = waypoints;
-      for (const point of cloneWaypoints) {
-        const humanizedPoint = this.#createHumanizedWaypoint(point);
-        this.#humanizedWaypoints.push(humanizedPoint);
-      }
+      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint(waypoint));
       this.#waypoints = this.#humanizedWaypoints;
       return this.#humanizedWaypoints.sort(sortWaypointByDate);
     }else{

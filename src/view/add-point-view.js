@@ -119,18 +119,14 @@ export default class AddPointView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
 
     const types = this.element.querySelectorAll('.event__type-input');
-    for (let i = 0; i < types.length; i++){
-      types[i].addEventListener('click', this.#typeChangeHandler);
+    for (const type of types){
+      type.addEventListener('click', this.#typeChangeHandler);
     }
 
     const destination = this.element.querySelector('.event__input--destination');
     const destinationName = destination.value;
     destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
-    const offers = this.element.querySelectorAll('.event__offer-checkbox');
-    for (let i = 0; i < offers.length; i++){
-      offers[i].addEventListener('click', this.#offerClickHandler);
-    }
     this.#setOfferClickHandler();
     this.#setDatepickers();
   }
@@ -149,8 +145,8 @@ export default class AddPointView extends AbstractStatefulView {
 
   #setOfferClickHandler(){
     const offers = this.element.querySelectorAll('.event__offer-checkbox');
-    for (let i = 0; i < offers.length; i++){
-      offers[i].addEventListener('click', this.#offerClickHandler);
+    for (const offer of offers){
+      offer.addEventListener('click', this.#offerClickHandler);
     }
   }
 
