@@ -16,7 +16,7 @@ export default class TripModel {
       if (this.#waypoints.length > 3) {
         trip.template = `${firstWaypoint.destination.name} — ... — ${lastWaypoint.destination.name}`;
       } else {
-        let mappedWaypoints = this.#waypoints.slice(1).map(waypoint => waypoint.destination.name);
+        const mappedWaypoints = this.#waypoints.slice(1).map((waypoint) => waypoint.destination.name);
         if (this.#waypoints.length > 1) {
           trip.template = mappedWaypoints.join(' — ');
           trip.template = `${firstWaypoint.destination.name} — ${trip.template}`;

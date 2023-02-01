@@ -67,9 +67,7 @@ const NoWaypointsTextType = {
   [FilterType.FUTURE]: 'There are no future events now',
 };
 
-const isCheckedOffer = (offer, pointOffers) => {
-  return pointOffers.some(pointOffer => pointOffer.id === offer.id);
-};
+const isCheckedOffer = (offer, pointOffers) => pointOffers.some((pointOffer) => pointOffer.id === offer.id);
 
 export {
   NoWaypointsTextType,

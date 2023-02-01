@@ -195,7 +195,7 @@ export default class AddPointView extends AbstractStatefulView {
     }
 
     if(!evt.target.checked){
-      this._state.offers = this._state.offers.filter(item => item.id !== datasetOffer);
+      this._state.offers = this._state.offers.filter((element) => element.id !== datasetOffer);
     }else{
       this._state.offers.push(offer);
     }
