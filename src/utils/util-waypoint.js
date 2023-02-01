@@ -2,7 +2,7 @@ import { DateFormat, FilterType, POINT_TYPES} from '../const.js';
 import dayjs from 'dayjs';
 
 const newWaypoint = {
-  basePrice: 0,
+  basePrice: '',
   offers: [],
   type: POINT_TYPES[0],
   allTypes: POINT_TYPES,

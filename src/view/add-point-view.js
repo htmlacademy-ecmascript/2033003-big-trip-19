@@ -80,7 +80,7 @@ const createAddPointViewTemplate = (waypoint) => {
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}">
+    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}" required>
   </div>
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
@@ -177,10 +177,12 @@ export default class AddPointView extends AbstractStatefulView {
 
   #priceChange = (evt) => {
     const price = Number(evt.target.value);
-    if(!isNaN(price)){
+    if(!isNaN(price) && price > 0){
       this.updateElement({
         basePrice: Number(evt.target.value)
       });
+    }else{
+      evt.target.setCustomValidity("Значение должно быть больше 0");
     }
   };
 
@@ -241,7 +243,9 @@ export default class AddPointView extends AbstractStatefulView {
 
   #saveNewPointClickHandler = (evt) =>{
     evt.preventDefault();
-    this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
+    if(this._state.basePrice > 0){
+      this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
+    }
   };
 
   static parseWaypointToState(waypoint) {
