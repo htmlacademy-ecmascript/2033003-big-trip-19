@@ -61,13 +61,13 @@ export default class FilterPresenter{
     remove(this.#filterComponent);
   }
 
-  #handleModelEvent = () => {
-    this.init();
-  };
-
   setFilter(filterType){
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
+
+  #handleModelEvent = () => {
+    this.init();
+  };
 
   #handleFilterTypeChange = (filterType) => {
     if(this.#filterModel.filter === filterType){

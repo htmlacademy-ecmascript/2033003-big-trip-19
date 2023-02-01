@@ -14,18 +14,16 @@ const SortType = {
   OFFER: 'offer'
 };
 
-const newWaypoint = {
-  basePrice: 0,
-  offers: [],
-  type: POINT_TYPES[0],
-  allTypes: POINT_TYPES,
-  offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
-};
-
 const UserAction = {
   UPDATE_WAYPOINT: 'UPDATE_WAYPOINT',
   ADD_WAYPOINT: 'ADD_WAYPOINT',
   DELETE_WAYPOINT: 'DELETE_WAYPOINT'
+};
+
+const ViewMode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+  ADDING : 'ADDING'
 };
 
 const UpdateType = {
@@ -46,7 +44,7 @@ export {
   DateFormat,
   POINT_TYPES,
   SortType,
-  newWaypoint,
   UserAction,
   UpdateType,
-  FilterType};
+  FilterType,
+  ViewMode};

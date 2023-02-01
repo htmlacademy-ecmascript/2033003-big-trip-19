@@ -1,19 +1,14 @@
-import { UpdateType, UserAction } from '../const.js';
+import { UpdateType, UserAction, ViewMode } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
 import EditPointView from '../view/edit-point-view';
 import WaypointView from '../view/waypoint-view.js';
 
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-  ADDING : 'ADDING'
-};
 export default class WaypointPresenter{
   #contentContainer = null;
   #pointComponent = null;
   #editPointComponent = null;
   #waypoint = null;
-  #mode = Mode.DEFAULT;
+  #mode = ViewMode.DEFAULT;
   #handleModeChange = null;
   #handleDataChange = null;
   #newWaypointPresenter = null;
@@ -45,11 +40,11 @@ export default class WaypointPresenter{
       render(this.#pointComponent, this.#contentContainer);
       return;
     }
-    if (this.#mode === Mode.DEFAULT) {
+    if (this.#mode === ViewMode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
 
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === ViewMode.EDITING) {
       replace(this.#editPointComponent, prevEditPointComponent);
     }
 
@@ -63,7 +58,7 @@ export default class WaypointPresenter{
   }
 
   resetView(){
-    if (this.#mode !== Mode.DEFAULT){
+    if (this.#mode !== ViewMode.DEFAULT){
       this.#editPointComponent.reset(this.#waypoint);
       this.#replaceEditToPoint();
     }
@@ -73,14 +68,14 @@ export default class WaypointPresenter{
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
-    this.#mode = Mode.EDITING;
-    this.#newWaypointPresenter.cancelAddPointClick();
+    this.#mode = ViewMode.EDITING;
+    this.#newWaypointPresenter.destroy();
   }
 
   #replaceEditToPoint() {
     replace(this.#pointComponent, this.#editPointComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.DEFAULT;
+    this.#mode = ViewMode.DEFAULT;
   }
 
   #escKeyDownHandler = (evt) => {

@@ -33,23 +33,6 @@ export default class WaypointModel extends Observable {
     this.#waypointApiService = waypointApiService;
   }
 
-  async init(){
-    try{
-      const waypoints = await this.#waypointApiService.waypoints;
-      this.#waypoints = waypoints.map(this.#adaptToClient);
-      const destinations = await this.#waypointApiService.destinations;
-      this.#destinations = destinations;
-      this.#destinationNames = this.#destinations.map((destination) => destination.name);
-      const offers = await this.#waypointApiService.offers;
-      this.#offers = offers;
-    }catch(err){
-      this.#waypoints = [];
-      this.#destinations = [];
-      this.#offers = [];
-    }
-    this._notify(UpdateType.INIT);
-  }
-
   get cities() {
     return this.#destinationNames;
   }
@@ -98,37 +81,21 @@ export default class WaypointModel extends Observable {
     }
   }
 
-  #adaptToClient(waypoint) {
-    const adaptedWaypoint = {...waypoint,
-      basePrice: waypoint['base_price'],
-      dateFrom: waypoint['date_from'] !== null ? new Date(waypoint['date_from']) : waypoint['date_from'],
-      dateTo: waypoint['date_to'] !== null ? new Date(waypoint['date_to']) : waypoint['date_to'],
-      isFavorite: waypoint['is_favorite'],
-    };
-
-    delete adaptedWaypoint['base_price'];
-    delete adaptedWaypoint['date_from'];
-    delete adaptedWaypoint['date_to'];
-    delete adaptedWaypoint['is_favorite'];
-
-    return adaptedWaypoint;
-  }
-
-  sortWaypoints(waypoints, sortType){
-    switch(sortType){
-      case sortType = 'day':
-        waypoints.sort(sortWaypointByDate);
-        break;
-      case sortType = 'time':
-        waypoints.sort(sortWaypointByDuration);
-        break;
-      case sortType = 'price':
-        waypoints.sort(sortWaypointByPrice);
-        break;
-      default:
-        waypoints.sort(sortWaypointByDate);
+  async init(){
+    try{
+      const waypoints = await this.#waypointApiService.waypoints;
+      this.#waypoints = waypoints.map(this.#adaptToClient);
+      const destinations = await this.#waypointApiService.destinations;
+      this.#destinations = destinations;
+      this.#destinationNames = this.#destinations.map((destination) => destination.name);
+      const offers = await this.#waypointApiService.offers;
+      this.#offers = offers;
+    }catch(err){
+      this.#waypoints = [];
+      this.#destinations = [];
+      this.#offers = [];
     }
-    return waypoints;
+    this._notify(UpdateType.INIT);
   }
 
   async updateWaypoint(updateType, update){
@@ -184,5 +151,37 @@ export default class WaypointModel extends Observable {
       throw new Error('Can\'t delete waypoint');
     }
   }
-}
 
+  sortWaypoints(waypoints, sortType){
+    switch(sortType){
+      case sortType = 'day':
+        waypoints.sort(sortWaypointByDate);
+        break;
+      case sortType = 'time':
+        waypoints.sort(sortWaypointByDuration);
+        break;
+      case sortType = 'price':
+        waypoints.sort(sortWaypointByPrice);
+        break;
+      default:
+        waypoints.sort(sortWaypointByDate);
+    }
+    return waypoints;
+  }
+
+  #adaptToClient(waypoint) {
+    const adaptedWaypoint = {...waypoint,
+      basePrice: waypoint['base_price'],
+      dateFrom: waypoint['date_from'] !== null ? new Date(waypoint['date_from']) : waypoint['date_from'],
+      dateTo: waypoint['date_to'] !== null ? new Date(waypoint['date_to']) : waypoint['date_to'],
+      isFavorite: waypoint['is_favorite'],
+    };
+
+    delete adaptedWaypoint['base_price'];
+    delete adaptedWaypoint['date_from'];
+    delete adaptedWaypoint['date_to'];
+    delete adaptedWaypoint['is_favorite'];
+
+    return adaptedWaypoint;
+  }
+}

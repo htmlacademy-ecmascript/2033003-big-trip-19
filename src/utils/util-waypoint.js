@@ -1,5 +1,13 @@
-import { DateFormat, FilterType} from '../const.js';
+import { DateFormat, FilterType, POINT_TYPES} from '../const.js';
 import dayjs from 'dayjs';
+
+const newWaypoint = {
+  basePrice: 0,
+  offers: [],
+  type: POINT_TYPES[0],
+  allTypes: POINT_TYPES,
+  offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
+};
 
 const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format(DateFormat.HOURS_AND_MINUTES);
@@ -59,8 +67,20 @@ const NoWaypointsTextType = {
   [FilterType.FUTURE]: 'There are no future events now',
 };
 
+const isCheckedOffer = (offer, pointOffers) => {
+  let status = false;
+  for (let i = 0; i < pointOffers.length; i++) {
+    const pointOffer = pointOffers[i];
+    if(pointOffer.id === offer.id){
+      status = true;
+    }
+  }
+  return status;
+};
+
 export {
   NoWaypointsTextType,
+  newWaypoint,
   getTimeFromDate,
   getFullFormatDate,
   getDateDifference,
@@ -69,5 +89,6 @@ export {
   getRandomArrayElement,
   sortWaypointByDate,
   sortWaypointByDuration,
-  sortWaypointByPrice
+  sortWaypointByPrice,
+  isCheckedOffer
 };

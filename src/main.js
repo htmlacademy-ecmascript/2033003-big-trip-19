@@ -49,7 +49,6 @@ function handleNewWaypointButtonClick() {
   newWaypointButtonComponent.addButton.disabled = true;
 }
 
-
 waypointModel.init()
   .finally(() => {
     newWaypointButtonComponent.addButton.disabled = false;

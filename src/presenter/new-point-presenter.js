@@ -1,18 +1,12 @@
-import { UpdateType, UserAction } from '../const.js';
+import { UpdateType, UserAction} from '../const.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
 import AddPointView from '../view/add-point-view.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  ADDING : 'ADDING'
-};
 
 export default class NewPointPresenter{
   #contentContainer = null;
   #newPointComponent = null;
   #newWaypoint = null;
   #handleDataChange = null;
-  mode = null;
   #handleDestroy = null;
 
   constructor({ newWaypointContainer, onDataChange, onDestroy}){
@@ -30,7 +24,7 @@ export default class NewPointPresenter{
 
     this.#newPointComponent = new AddPointView({
       waypoint: this.#newWaypoint,
-      onCancelAddPointClick: this.cancelAddPointClick,
+      onCancelAddPointClick: this.#cancelAddPointClick,
       onSaveNewPointClick: this.#saveNewPointClick
     });
 
@@ -51,15 +45,7 @@ export default class NewPointPresenter{
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  resetView(){
-    if (this.mode !== Mode.DEFAULT){
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-      remove(this.#newPointComponent);
-      this.mode = Mode.DEFAULT;
-    }
-  }
-
-  cancelAddPointClick = () => {
+  #cancelAddPointClick = () => {
     this.destroy();
   };
 

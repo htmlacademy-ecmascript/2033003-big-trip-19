@@ -3,6 +3,7 @@ import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import { isCheckedOffer } from '../utils/util-waypoint.js';
 
 const createDestinationViewTemplate = (destinationPoint) => {
   const { description, pictures } = destinationPoint;
@@ -15,17 +16,6 @@ const createDestinationViewTemplate = (destinationPoint) => {
                       </div>
                     </div>
   </section>`;
-};
-
-const isCheckedOffer = (offer, pointOffers) => {
-  let status = false;
-  for (let i = 0; i < pointOffers.length; i++) {
-    const pointOffer = pointOffers[i];
-    if(pointOffer.id === offer.id){
-      status = true;
-    }
-  }
-  return status;
 };
 
 const showDestinationTitle = (destination) => `<input class="event__input  event__input--destination" id="event-destination-${destination.id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${destination.id}">`;
@@ -119,24 +109,50 @@ export default class AddPointView extends AbstractStatefulView {
     this._restoreHandlers();
   }
 
-  static parseWaypointToState(waypoint) {
-    return {...waypoint};
+  get template() {
+    return createAddPointViewTemplate(this._state);
   }
 
-  static parseStateToWaypoint(state) {
-    const waypoint = {...state};
+  _restoreHandlers() {
+    this.element.querySelector('form').addEventListener('reset', this.#closeClickHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#saveNewPointClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
 
-    return waypoint;
-  }
-
-  #priceChange = (evt) => {
-    const price = Number(evt.target.value);
-    if(!isNaN(price)){
-      this.updateElement({
-        basePrice: Number(evt.target.value)
-      });
+    const types = this.element.querySelectorAll('.event__type-input');
+    for (let i = 0; i < types.length; i++){
+      types[i].addEventListener('click', this.#typeChangeHandler);
     }
-  };
+
+    const destination = this.element.querySelector('.event__input--destination');
+    const destinationName = destination.value;
+    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
+
+    const offers = this.element.querySelectorAll('.event__offer-checkbox');
+    for (let i = 0; i < offers.length; i++){
+      offers[i].addEventListener('click', this.#offerClickHandler);
+    }
+    this.#setOfferClickHandler();
+    this.#setDatepickers();
+  }
+
+  removeElement(){
+    super.removeElement();
+    if(this.#datepickerStartWaypoint){
+      this.#datepickerStartWaypoint.destroy();
+      this.#datepickerStartWaypoint = null;
+    }
+    if(this.#datepickerEndWaypoint){
+      this.#datepickerEndWaypoint.destroy();
+      this.#datepickerEndWaypoint = null;
+    }
+  }
+
+  #setOfferClickHandler(){
+    const offers = this.element.querySelectorAll('.event__offer-checkbox');
+    for (let i = 0; i < offers.length; i++){
+      offers[i].addEventListener('click', this.#offerClickHandler);
+    }
+  }
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
@@ -158,6 +174,47 @@ export default class AddPointView extends AbstractStatefulView {
       },
     );
   }
+
+  #priceChange = (evt) => {
+    const price = Number(evt.target.value);
+    if(!isNaN(price)){
+      this.updateElement({
+        basePrice: Number(evt.target.value)
+      });
+    }
+  };
+
+  #offerClickHandler = (evt) => {
+    evt.preventDefault();
+    const datasetOffer = Number(evt.currentTarget.dataset.offer);
+    let offer = {};
+    for(let i = 0; i < this._state.allOffers.length; i++){
+      if(this._state.type === this._state.allOffers[i].type){
+        offer = this._state.allOffers[i].offers.find((element) => element.id === datasetOffer);
+        break;
+      }
+    }
+
+    if(!evt.target.checked){
+      this._state.offers.forEach((item, i) => {
+        if (item.id === datasetOffer) {
+          this._state.offers.splice(i, 1);
+        }
+      });
+    }else{
+      this._state.offers.push(offer);
+    }
+
+    this.updateElement({offers: this._state.offers});
+  };
+
+  #dateStartChangeHandler = (userDate) => {
+    this.updateElement({dateFrom: userDate[0]});
+  };
+
+  #dateEndChangeHandler = (userDate) => {
+    this.updateElement({dateTo: userDate[0]});
+  };
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
@@ -192,73 +249,13 @@ export default class AddPointView extends AbstractStatefulView {
     this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
   };
 
-  #dateStartChangeHandler = (userDate) => {
-    this.updateElement({dateFrom: userDate[0]});
-  };
-
-  #dateEndChangeHandler = (userDate) => {
-    this.updateElement({dateTo: userDate[0]});
-  };
-
-  _restoreHandlers() {
-    this.element.querySelector('form').addEventListener('reset', this.#closeClickHandler);
-    this.element.querySelector('form').addEventListener('submit', this.#saveNewPointClickHandler);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
-
-    const types = this.element.querySelectorAll('.event__type-input');
-    for (let i = 0; i < types.length; i++){
-      types[i].addEventListener('click', this.#typeChangeHandler);
-    }
-
-    const destination = this.element.querySelector('.event__input--destination');
-    const destinationName = destination.value;
-    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
-
-    const offers = this.element.querySelectorAll('.event__offer-checkbox');
-    for (let i = 0; i < offers.length; i++){
-      offers[i].addEventListener('click', this.#setOfferClickHandler);
-    }
-
-    this.#setDatepickers();
+  static parseWaypointToState(waypoint) {
+    return {...waypoint};
   }
 
-  #setOfferClickHandler = (evt) => {
-    evt.preventDefault();
-    const datasetOffer = Number(evt.currentTarget.dataset.offer);
-    let offer = {};
-    for(let i = 0; i < this._state.allOffers.length; i++){
-      if(this._state.type === this._state.allOffers[i].type){
-        offer = this._state.allOffers[i].offers.find((element) => element.id === datasetOffer);
-        break;
-      }
-    }
+  static parseStateToWaypoint(state) {
+    const waypoint = {...state};
 
-    if(!evt.target.checked){
-      this._state.offers.forEach((item, i) => {
-        if (item.id === datasetOffer) {
-          this._state.offers.splice(i, 1);
-        }
-      });
-    }else{
-      this._state.offers.push(offer);
-    }
-
-    this.updateElement({offers: this._state.offers});
-  };
-
-  removeElement(){
-    super.removeElement();
-    if(this.#datepickerStartWaypoint){
-      this.#datepickerStartWaypoint.destroy();
-      this.#datepickerStartWaypoint = null;
-    }
-    if(this.#datepickerEndWaypoint){
-      this.#datepickerEndWaypoint.destroy();
-      this.#datepickerEndWaypoint = null;
-    }
-  }
-
-  get template() {
-    return createAddPointViewTemplate(this._state);
+    return waypoint;
   }
 }
