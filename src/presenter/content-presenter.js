@@ -9,7 +9,6 @@ import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
-import { nanoid } from 'nanoid';
 import LoadingView from '../view/loading-view.js';
 import { newWaypoint } from '../utils/util-waypoint.js';
 
@@ -66,7 +65,6 @@ export default class ContentPresenter {
 
     const destinations = this.#waypointModel.destinations;
     this.#newWaypoint = {
-      id: nanoid(),
       ...newWaypoint,
       allDestinations: destinations,
       allOffers: [...this.#waypointModel.offers],
