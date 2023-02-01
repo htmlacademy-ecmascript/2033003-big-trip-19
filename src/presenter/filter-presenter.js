@@ -23,18 +23,22 @@ export default class FilterPresenter{
       {
         type: FilterType.EVERYTHING,
         name:'everything',
+        count: filter[FilterType.EVERYTHING](waypoints).length,
       },
       {
         type: FilterType.FUTURE,
         name:'future',
+        count: filter[FilterType.FUTURE](waypoints).length,
       },
       {
         type: FilterType.PRESENT,
         name:'present',
+        count: filter[FilterType.PRESENT](waypoints).length,
       },
       {
         type: FilterType.PAST,
         name:'past',
+        count: filter[FilterType.PAST](waypoints).length,
       },
     ];
   }
