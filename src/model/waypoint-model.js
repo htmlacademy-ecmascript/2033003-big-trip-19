@@ -55,20 +55,12 @@ export default class WaypointModel extends Observable {
       const cloneWaypoints = this.#waypoints;
       for (const point of cloneWaypoints) {
         let allAvailableOffers = [];
-        const availableOffers = [];
+        let availableOffers = [];
 
         point.offers.sort((a, b) => a - b);
+
         allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
-
-        for (const pointOffer of point.offers) {
-          for (const availableOffer of allAvailableOffers.offers) {
-            if (pointOffer === availableOffer.id) {
-              availableOffers.push(availableOffer);
-              break;
-            }
-          }
-        }
-
+        availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
         const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
 
         const humanizedPoint = createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);

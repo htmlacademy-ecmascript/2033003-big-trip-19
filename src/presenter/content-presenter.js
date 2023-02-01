@@ -91,9 +91,7 @@ export default class ContentPresenter {
   }
 
   #renderPoints(waypoints){
-    for (let i = 0; i < waypoints.length; i++) {
-      this.#renderPoint(waypoints[i]);
-    }
+    waypoints.forEach(waypoint => this.#renderPoint(waypoint));
   }
 
   #renderPoint(point) {
@@ -140,14 +138,9 @@ export default class ContentPresenter {
     remove(this.#loadingComponent);
     this.#newWaypointPresenterList.clear();
 
-    if (resetSortType) {
-      this.#currentSortType = SortType.DAY;
-    }
-
-    if (resetFilterType) {
-      this.#filterType = FilterType.EVERYTHING;
-    }
-
+    this.#currentSortType = resetSortType ? SortType.DAY : this.#currentSortType;
+    this.#filterType = resetFilterType ? FilterType.EVERYTHING : this.#filterType;
+    
     if(this.#messageComponent){
       remove(this.#messageComponent);
     }

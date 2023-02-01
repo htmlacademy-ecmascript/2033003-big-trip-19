@@ -68,14 +68,7 @@ const NoWaypointsTextType = {
 };
 
 const isCheckedOffer = (offer, pointOffers) => {
-  let status = false;
-  for (let i = 0; i < pointOffers.length; i++) {
-    const pointOffer = pointOffers[i];
-    if(pointOffer.id === offer.id){
-      status = true;
-    }
-  }
-  return status;
+  return pointOffers.some(pointOffer => pointOffer.id === offer.id);
 };
 
 export {

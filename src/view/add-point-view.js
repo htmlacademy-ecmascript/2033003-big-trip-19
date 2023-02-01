@@ -187,20 +187,15 @@ export default class AddPointView extends AbstractStatefulView {
   #offerClickHandler = (evt) => {
     evt.preventDefault();
     const datasetOffer = Number(evt.currentTarget.dataset.offer);
-    let offer = {};
-    for(let i = 0; i < this._state.allOffers.length; i++){
-      if(this._state.type === this._state.allOffers[i].type){
-        offer = this._state.allOffers[i].offers.find((element) => element.id === datasetOffer);
-        break;
-      }
+
+    let offer;
+    const offersByType = this._state.allOffers.find((element) => element.type === this._state.type);
+    if (offersByType) {
+      offer = offersByType.offers.find((element) => element.id === datasetOffer);
     }
 
     if(!evt.target.checked){
-      this._state.offers.forEach((item, i) => {
-        if (item.id === datasetOffer) {
-          this._state.offers.splice(i, 1);
-        }
-      });
+      this._state.offers = this._state.offers.filter(item => item.id !== datasetOffer);
     }else{
       this._state.offers.push(offer);
     }
