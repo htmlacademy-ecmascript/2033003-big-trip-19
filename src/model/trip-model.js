@@ -12,14 +12,16 @@ export default class TripModel {
     if(this.#waypoints.length !== 0){
       const firstWaypoint = this.#waypoints[0];
       const lastWaypoint = this.#waypoints.slice(-1)[0];
-      trip.template = `${firstWaypoint.destination.name}`;
-      if(this.#waypoints.length > 3){
+
+      if (this.#waypoints.length > 3) {
         trip.template = `${firstWaypoint.destination.name} — ... — ${lastWaypoint.destination.name}`;
-      }else{
-        for (let i = 0; i < this.#waypoints.length; i++){
-          if(i > 0){
-            trip.template += ` — ${this.#waypoints[i].destination.name}`;
-          }
+      } else {
+        const mappedWaypoints = this.#waypoints.slice(1).map((waypoint) => waypoint.destination.name);
+        if (this.#waypoints.length > 1) {
+          trip.template = mappedWaypoints.join(' — ');
+          trip.template = `${firstWaypoint.destination.name} — ${trip.template}`;
+        } else {
+          trip.template = firstWaypoint.destination.name;
         }
       }
       trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;

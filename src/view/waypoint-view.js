@@ -3,9 +3,8 @@ import { getTimeFromDate } from '../utils/util-waypoint.js';
 import { upperCaseFirst } from '../utils/common.js';
 import { getDateDifference, humanizeWaypointDate } from '../utils/util-waypoint.js';
 
-function createWaypointTemplate(waypoint) {
+const createWaypointTemplate = (waypoint) => {
   const {type,destination,dateFrom,dateTo,basePrice,offers} = waypoint;
-
   return (`<li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime="${dateFrom}">${humanizeWaypointDate(dateFrom)}</time>
@@ -43,7 +42,8 @@ function createWaypointTemplate(waypoint) {
     </button>
   </div>
 </li>`);
-}
+};
+
 export default class WaypointView extends AbstractView {
   #waypoint = null;
   #handleShowEditClick = null;
@@ -57,6 +57,10 @@ export default class WaypointView extends AbstractView {
     this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
 
+  get template() {
+    return createWaypointTemplate(this.#waypoint);
+  }
+
   #editClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleShowEditClick();
@@ -66,8 +70,4 @@ export default class WaypointView extends AbstractView {
     evt.preventDefault();
     this.#handleFavoriteClick();
   };
-
-  get template() {
-    return createWaypointTemplate(this.#waypoint);
-  }
 }

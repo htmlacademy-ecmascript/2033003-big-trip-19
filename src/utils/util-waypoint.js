@@ -1,39 +1,13 @@
-import { DateFormat, FilterType, Integer } from '../const.js';
+import { DateFormat, FilterType, POINT_TYPES} from '../const.js';
 import dayjs from 'dayjs';
 
-const returnRandomBool = (() => {
-  const a = new Uint8Array(1);
-  return function() {
-    crypto.getRandomValues(a);
-    return a[0] > 127;
-  };
-})();
-
-const returnRandomInteger = (max, min = 0) => {
-  if (min < 0 || max < 0 || typeof min !== 'number' || typeof max !== 'number')
-  {
-    return NaN;
-  }
-  if (max < min)
-  {
-    [min, max] = [max, min];
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+const newWaypoint = {
+  basePrice: '',
+  offers: [],
+  type: POINT_TYPES[0],
+  allTypes: POINT_TYPES,
+  offersByType: (allOffers) => allOffers.find((offer) => offer.type === POINT_TYPES[0])
 };
-
-function addDays(date) {
-  const {MIN_RANDOME_HOUR, MAX_RANDOME_HOUR, MAX_INTEGER_DATE_DURATION} = Integer;
-  const result = new Date(date);
-  result.setDate(result.getDate() + returnRandomInteger(MAX_INTEGER_DATE_DURATION));
-  result.setHours(result.getHours() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
-  result.setMinutes(result.getMinutes() + returnRandomInteger(MAX_RANDOME_HOUR, MIN_RANDOME_HOUR));
-  return result;
-}
-
-function returnRandomDate(start, end) {
-  const timestamp = start.getTime() + Math.random() * (end.getTime() - start.getTime());
-  return new Date(timestamp);
-}
 
 const getTimeFromDate = (date) => {
   const withoutDate = dayjs(date).format(DateFormat.HOURS_AND_MINUTES);
@@ -93,12 +67,11 @@ const NoWaypointsTextType = {
   [FilterType.FUTURE]: 'There are no future events now',
 };
 
+const isCheckedOffer = (offer, pointOffers) => pointOffers.some((pointOffer) => pointOffer.id === offer.id);
+
 export {
   NoWaypointsTextType,
-  returnRandomBool,
-  returnRandomInteger,
-  addDays,
-  returnRandomDate,
+  newWaypoint,
   getTimeFromDate,
   getFullFormatDate,
   getDateDifference,
@@ -107,5 +80,6 @@ export {
   getRandomArrayElement,
   sortWaypointByDate,
   sortWaypointByDuration,
-  sortWaypointByPrice
+  sortWaypointByPrice,
+  isCheckedOffer
 };

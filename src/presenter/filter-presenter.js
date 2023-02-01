@@ -1,6 +1,5 @@
 import { FilterType, UpdateType } from '../const.js';
-import { remove, replace } from '../framework/render.js';
-import { render } from '../render.js';
+import { remove, render, replace } from '../framework/render.js';
 import { filter } from '../utils/util-filter.js';
 import FilterContainerView from '../view/filter-container-view.js';
 
@@ -20,28 +19,27 @@ export default class FilterPresenter{
   }
 
   get filters(){
-    const waypoints = this.#waypointModel.humanizedWaypoints;
 
     return [
       {
         type: FilterType.EVERYTHING,
         name:'everything',
-        count: filter[FilterType.EVERYTHING](waypoints).length,
+        count: filter[FilterType.EVERYTHING](this.#waypointModel.humanizedWaypoints).length,
       },
       {
         type: FilterType.FUTURE,
         name:'future',
-        count: filter[FilterType.FUTURE](waypoints).length,
+        count: filter[FilterType.FUTURE](this.#waypointModel.humanizedWaypoints).length,
       },
       {
         type: FilterType.PRESENT,
         name:'present',
-        count: filter[FilterType.PRESENT](waypoints).length,
+        count: filter[FilterType.PRESENT](this.#waypointModel.humanizedWaypoints).length,
       },
       {
         type: FilterType.PAST,
         name:'past',
-        count: filter[FilterType.PAST](waypoints).length,
+        count: filter[FilterType.PAST](this.#waypointModel.humanizedWaypoints).length,
       },
     ];
   }
@@ -68,13 +66,13 @@ export default class FilterPresenter{
     remove(this.#filterComponent);
   }
 
-  #handleModelEvent = () => {
-    this.init();
-  };
-
   setFilter(filterType){
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
+
+  #handleModelEvent = () => {
+    this.init();
+  };
 
   #handleFilterTypeChange = (filterType) => {
     if(this.#filterModel.filter === filterType){

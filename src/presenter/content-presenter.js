@@ -1,21 +1,16 @@
-import { render } from '../render.js';
 import ContentView from '../view/content-view.js';
 import MessageView from '../view/message-view.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import SortContainerView from '../view/sort-container-view.js';
-import { FilterType, newWaypoint, SortType, UpdateType, UserAction } from '../const.js';
+import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import SortModel from '../model/sort-model.js';
-import { remove } from '../framework/render.js';
+import { remove, render } from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 import TripModel from '../model/trip-model.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
-import { nanoid } from 'nanoid';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  ADDING : 'ADDING'
-};
+import LoadingView from '../view/loading-view.js';
+import { newWaypoint } from '../utils/util-waypoint.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -30,22 +25,59 @@ export default class ContentPresenter {
   #waypointModel = null;
   #sortingsContainer = null;
   #currentSortType = SortType.DAY;
-  #mode = Mode.DEFAULT;
   #filterType = FilterType.EVERYTHING;
   #messageComponent = null;
   #newWaypointPresenter = null;
-  #filterPresenter = null;
   #newWaypoint = null;
+  #isLoading = true;
+  #loadingComponent = new LoadingView();
 
-  constructor({ contentContainer, sortingsContainer, tripContainer, waypointModel, filterModel, filterPresenter}) {
+  constructor({ contentContainer, sortingsContainer, tripContainer, waypointModel, filterModel, onNewWaypointDestroy}) {
     this.#contentContainer = contentContainer;
     this.#sortingsContainer = sortingsContainer;
     this.#tripContainer = tripContainer;
     this.#waypointModel = waypointModel;
     this.#filterModel = filterModel;
-    this.#filterPresenter = filterPresenter;
+
+    this.#newWaypointPresenter = new NewPointPresenter({
+      newWaypointContainer: this.#boardComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: onNewWaypointDestroy
+    });
+
     this.#waypointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+  }
+
+  get waypoints(){
+    this.#filterType = this.#filterModel.filter;
+    const waypoints = this.#waypointModel.humanizedWaypoints;
+    const filteredWaypoints = filter[this.#filterType](waypoints);
+    return [...this.#waypointModel.sortWaypoints(filteredWaypoints, this.#currentSortType)];
+  }
+
+  init() {
+    this.#renderContentContainer();
+  }
+
+  createWaypoint() {
+    const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
+
+    const destinations = this.#waypointModel.destinations;
+    this.#newWaypoint = {
+      ...newWaypoint,
+      allDestinations: destinations,
+      allOffers: [...this.#waypointModel.offers],
+      destination: destinations[0],
+      offersByType: offersByType.offers,
+      dateFrom: new Date(),
+      dateTo: new Date(),
+      isFavorite: false,
+      allDestinationNames: this.#waypointModel.cities,
+    };
+    this.#currentSortType = SortType.DEFAULT;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newWaypointPresenter.init(this.#newWaypoint);
   }
 
   #renderSortings(){
@@ -56,20 +88,8 @@ export default class ContentPresenter {
     render(this.#sortingComponent, this.#sortingsContainer);
   }
 
-  #handleSortTypeChange = (sortType) => {
-    if(this.#currentSortType === sortType){
-      return;
-    }
-
-    this.#currentSortType = sortType;
-    this.#clearContentContainer();
-    this.#renderContentContainer();
-  };
-
   #renderPoints(waypoints){
-    for (let i = 0; i < waypoints.length; i++) {
-      this.#renderPoint(waypoints[i]);
-    }
+    waypoints.forEach((waypoint) => this.#renderPoint(waypoint));
   }
 
   #renderPoint(point) {
@@ -86,11 +106,6 @@ export default class ContentPresenter {
     this.#messageComponent = new MessageView({filterType: this.#filterType});
     render(this.#messageComponent, this.#contentContainer);
   }
-
-  #handleModeChange = () => {
-    this.#waypointPresentersList.forEach((presenter) => presenter.resetView());
-    this.#newWaypointPresenterList.forEach((presenter) => presenter.cancelAddPointClick());
-  };
 
   #renderTrip(){
     const tripModel = new TripModel(this.waypoints);
@@ -109,30 +124,60 @@ export default class ContentPresenter {
     render(this.#tripComponent, this.#tripContainer,'AFTERBEGIN');
   }
 
-  #initNewPointComponent(){
-    const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
-    this.#newWaypoint = {
-      id: nanoid(),
-      ...newWaypoint,
-      allDestinations: [...this.#waypointModel.destinations],
-      allOffers: [...this.#waypointModel.offers],
-      destination: [...this.#waypointModel.destinations][0],
-      offersByType: offersByType,
-      dateFrom: new Date(),
-      dateTo: new Date()
-    };
+  #renderLoading(){
+    render(this.#loadingComponent, this.#contentContainer);
   }
 
-  #handleCancelClick = () => {
-    this.#mode = Mode.DEFAULT;
-    this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
-    this.#newWaypointPresenterList.set(this.#newWaypoint.id, this.#newWaypointPresenter);
+  #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
+    this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
+    this.#waypointPresentersList.clear();
+    remove(this.#sortingComponent);
+    remove(this.#tripComponent);
+    remove(this.#loadingComponent);
+    this.#newWaypointPresenterList.clear();
+
+    this.#currentSortType = resetSortType ? SortType.DAY : this.#currentSortType;
+    this.#filterType = resetFilterType ? FilterType.EVERYTHING : this.#filterType;
+
+    if(this.#messageComponent){
+      remove(this.#messageComponent);
+    }
+  }
+
+  #renderContentContainer() {
+    if(this.#isLoading){
+      this.#renderLoading();
+      return;
+    }
+
+    this.#renderSortings();
+
+    render(this.#boardComponent, this.#contentContainer);
+
+    this.#renderPoints(this.waypoints);
+
+    this.#renderTrip();
+
+    const waypoints = this.waypoints;
+
+    if(waypoints.length === 0){
+      this.#renderMessage();
+    }
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if(this.#currentSortType === sortType){
+      return;
+    }
+
+    this.#currentSortType = sortType;
+    this.#clearContentContainer();
+    this.#renderContentContainer();
   };
 
-  #addPointClickHandler = () => {
-    this.#mode = Mode.ADDING;
-    this.#filterType = FilterType.EVERYTHING;
-    this.#filterPresenter.setFilter(this.#filterType);
+  #handleModeChange = () => {
+    this.#waypointPresentersList.forEach((presenter) => presenter.resetView());
+    this.#newWaypointPresenterList.forEach((presenter) => presenter.destroy());
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -155,90 +200,18 @@ export default class ContentPresenter {
         this.#waypointPresentersList.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#clearContentContainer({resetModeType: true});
+        this.#clearContentContainer();
         this.#renderContentContainer();
         break;
       case UpdateType.MAJOR:
-        this.#clearContentContainer({resetSortType: true});
+        this.#clearContentContainer({resetSortType: true, resetFilterType:true});
         this.#renderContentContainer();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.init();
         break;
     }
   };
-
-  get waypoints(){
-    this.#filterType = this.#filterModel.filter;
-    const waypoints = this.#waypointModel.humanizedWaypoints;
-    const filteredWaypoints = filter[this.#filterType](waypoints);
-    return [...this.#waypointModel.sortWaypoints(filteredWaypoints, this.#currentSortType)];
-  }
-
-  #clearContentContainer({resetSortType = false, resetFilterType = false, resetModeType = false} = {}) {
-    this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
-    this.#waypointPresentersList.clear();
-    remove(this.#sortingComponent);
-    remove(this.#tripComponent);
-
-    this.#newWaypointPresenterList.clear();
-
-    if (resetSortType) {
-      this.#currentSortType = SortType.DAY;
-    }
-
-    if (resetFilterType) {
-      this.#filterType = FilterType.EVERYTHING;
-    }
-
-    if(resetModeType){
-      this.#mode = Mode.DEFAULT;
-    }
-
-    if(this.#messageComponent){
-      remove(this.#messageComponent);
-    }
-  }
-
-  #renderContentContainer() {
-    if(this.#newWaypointPresenter.mode !== this.#mode){
-      const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
-      this.#newWaypoint = {
-        id: nanoid(),
-        ...newWaypoint,
-        allDestinations: [...this.#waypointModel.destinations],
-        allOffers: [...this.#waypointModel.offers],
-        destination: [...this.#waypointModel.destinations][0],
-        offersByType: offersByType,
-        dateFrom: new Date(),
-        dateTo: new Date()
-      };
-      this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
-    }
-    this.#newWaypointPresenterList.set(this.#newWaypoint.id, this.#newWaypointPresenter);
-
-    this.#filterPresenter.init();
-    this.#renderSortings();
-    render(this.#boardComponent, this.#contentContainer);
-    this.#renderPoints(this.waypoints);
-
-    this.#renderTrip();
-
-    const waypoints = this.waypoints;
-
-    if(waypoints.length === 0){
-      this.#renderMessage();
-    }
-  }
-
-  init() {
-    this.#initNewPointComponent();
-
-    this.#newWaypointPresenter = new NewPointPresenter({
-      newWaypointContainer: this.#boardComponent.element,
-      onCancelClick: this.#handleCancelClick,
-      onAddPointClick: this.#addPointClickHandler,
-      onDataChange: this.#handleViewAction
-    });
-    this.#newWaypointPresenter.init(this.#newWaypoint, this.#mode);
-
-    this.#renderContentContainer();
-  }
 }
