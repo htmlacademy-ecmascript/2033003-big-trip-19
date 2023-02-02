@@ -45,7 +45,7 @@ const createOffersViewTemplate = (waypoint, offers) => `<section class="event__s
   </section>`;
 
 const createAddPointViewTemplate = (waypoint) => {
-  const {id, basePrice, destination, type, allTypes, allDestinationNames, offersByType} = waypoint;
+  const {id, basePrice, destination, type, allTypes, allDestinationNames, offersByType, isDisabled, isSaving} = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -82,7 +82,9 @@ const createAddPointViewTemplate = (waypoint) => {
     </label>
     <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}" required>
   </div>
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+      ${isSaving ? 'Saving...' : 'Save'}
+      </button>
       <button class="event__reset-btn" type="reset">Cancel</button>
     </header>
     <section class="event__details">
