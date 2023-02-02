@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { isEmptyObject } from '../utils/util-waypoint.js';
+import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -45,16 +45,16 @@ const createOffersViewTemplate = (waypoint, offers) => `<section class="event__s
   </section>`;
 
 const createAddPointViewTemplate = (waypoint) => {
-  const {id, basePrice, destination, type, allTypes, allDestinationNames, offersByType, isDisabled, isSaving} = waypoint;
+  const {basePrice, destination, type, allTypes, allDestinationNames, offersByType, isDisabled, isSaving} = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
-      <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
+      <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
       <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox"}>
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox"}>
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -68,19 +68,19 @@ const createAddPointViewTemplate = (waypoint) => {
       </div>
     ${!isEmptyObject(destination) ? showDestinationsList(destination, type, allDestinationNames) : ''}
     <div class="event__field-group  event__field-group--time">
-    <label class="visually-hidden" for="event-start-time-${id}">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="" required>
+    <label class="visually-hidden" for="event-start-time-1">From</label>
+    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="" required>
     &mdash;
-    <label class="visually-hidden" for="event-end-time-${id}">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="" required>
+    <label class="visually-hidden" for="event-end-time-1">To</label>
+    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="" required>
   </div>
 
   <div class="event__field-group  event__field-group--price">
-    <label class="event__label" for="event-price-${id}">
+    <label class="event__label" for="event-price-1">
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}" required>
+    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}" required>
   </div>
       <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
       ${isSaving ? 'Saving...' : 'Save'}
@@ -101,6 +101,8 @@ export default class AddPointView extends AbstractStatefulView {
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
   #destinationNames = null;
+  #startDatePickerElement = null;
+  #endDatePickerElement = null;
 
   constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
     super();
@@ -108,6 +110,7 @@ export default class AddPointView extends AbstractStatefulView {
     this.#handleCancelAddPointClick = onCancelAddPointClick;
     this.#handleSaveNewPointClick = onSaveNewPointClick;
     this.#destinationNames = waypoint.allDestinationNames;
+
     this._restoreHandlers();
   }
 
@@ -130,6 +133,9 @@ export default class AddPointView extends AbstractStatefulView {
     destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.#setOfferClickHandler();
+
+    this.#startDatePickerElement = this.element.querySelector('input[name="event-start-time"]');
+    this.#endDatePickerElement = this.element.querySelector('input[name="event-end-time"]');
     this.#setDatepickers();
   }
 
@@ -152,19 +158,9 @@ export default class AddPointView extends AbstractStatefulView {
     }
   }
 
-  #isEndDateAfterStartDate = () => {
-    const startDate = this._state.dateFrom.getTime();
-    const endDate = this._state.dateTo.getTime();
-
-    if (endDate < startDate) {
-      return false;
-    }
-    return true;
-  };
-
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
-      this.element.querySelector('input[name="event-start-time"]'),
+      this.#startDatePickerElement,
       {
         dateFormat: 'd/m/Y H:i',
         enableTime: true,
@@ -173,7 +169,7 @@ export default class AddPointView extends AbstractStatefulView {
       },
     );
     this.#datepickerEndWaypoint = flatpickr(
-      this.element.querySelector('input[name="event-end-time"]'),
+      this.#endDatePickerElement,
       {
         dateFormat: 'd/m/Y H:i',
         enableTime: true,
@@ -181,7 +177,7 @@ export default class AddPointView extends AbstractStatefulView {
         onChange: this.#dateEndChangeHandler,
         disable: [
           (date) => date < this.#datepickerStartWaypoint.selectedDates[0]
-        ],
+        ]
       },
     );
   }
@@ -217,6 +213,9 @@ export default class AddPointView extends AbstractStatefulView {
   };
 
   #dateStartChangeHandler = (userDate) => {
+    if (this.#datepickerStartWaypoint.selectedDates[0] > this.#datepickerEndWaypoint.selectedDates[0]) {
+      this.#datepickerEndWaypoint.clear();
+    }
     this.updateElement({dateFrom: userDate[0]});
   };
 
@@ -253,9 +252,24 @@ export default class AddPointView extends AbstractStatefulView {
   };
 
   #saveNewPointClickHandler = (evt) =>{
-    evt.preventDefault();
+    let isValid = true;
+    if (!this.#startDatePickerElement.value) {
+      isValid = false;
+    } else {
+      this.#startDatePickerElement.setCustomValidity('');
+    }
+    
+    if (!this.#endDatePickerElement.value) {
+      isValid = false;
+    } else {
+      this.#endDatePickerElement.setCustomValidity('');
+    }
 
-    if(this._state.basePrice > 0){
+    if (this._state.basePrice <= 0) {
+      isValid = false;
+    }
+    evt.preventDefault();
+    if (isValid) {
       this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
     }
   };

@@ -108,6 +108,8 @@ export default class EditPointView extends AbstractStatefulView {
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
   #destinationNames = null;
+  #startDatePickerElement = null;
+  #endDatePickerElement = null;
 
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
@@ -156,6 +158,9 @@ export default class EditPointView extends AbstractStatefulView {
     destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.#setOfferClickHandler();
+
+    this.#startDatePickerElement = this.element.querySelector('input[name="event-start-time"]');
+    this.#endDatePickerElement = this.element.querySelector('input[name="event-end-time"]');
     this.#setDatepickers();
   }
 
@@ -209,6 +214,9 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #dateStartChangeHandler = (userDate) => {
+    if (this.#datepickerStartWaypoint.selectedDates[0] > this.#datepickerEndWaypoint.selectedDates[0]) {
+      this.#datepickerEndWaypoint.clear();
+    }
     this.updateElement({dateFrom: userDate[0]});
   };
 
@@ -227,8 +235,26 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #saveClickHandler = (evt) =>{
+    let isValid = true;
+    if (!this.#startDatePickerElement.value) {
+      isValid = false;
+    } else {
+      this.#startDatePickerElement.setCustomValidity('');
+    }
+    
+    if (!this.#endDatePickerElement.value) {
+      isValid = false;
+    } else {
+      this.#endDatePickerElement.setCustomValidity('');
+    }
+
+    if (this._state.basePrice <= 0) {
+      isValid = false;
+    }
     evt.preventDefault();
-    this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
+    if (isValid) {
+      this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
+    }
   };
 
   #typeChangeHandler = (evt) => {
