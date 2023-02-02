@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
+import { isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -35,7 +35,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination, dateFrom, dateTo, basePrice, id, offersByType, allTypes, allDestinationNames, isDisabled, isSaving, isDeleting } = waypoint;
+  const { type, destination, basePrice, id, offersByType, allTypes, allDestinationNames, isDisabled, isSaving, isDeleting } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -184,9 +184,7 @@ export default class EditPointView extends AbstractStatefulView {
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
         disable: [
-          (date) => {
-            return (date < this.#datepickerStartWaypoint.selectedDates[0]);
-          }
+          (date) => date < this.#datepickerStartWaypoint.selectedDates[0]
         ],
       },
     );

@@ -143,16 +143,16 @@ export default class ContentPresenter {
       this.#renderLoading();
       return;
     }
-
-    this.#renderSortings();
+    const waypoints = this.waypoints;
+    if(waypoints.length !== 0){
+      this.#renderSortings();
+    }
 
     render(this.#boardComponent, this.#contentContainer);
 
     this.#renderPoints(this.waypoints);
 
     this.#renderTrip();
-
-    const waypoints = this.waypoints;
 
     if(waypoints.length === 0){
       this.#renderMessage();

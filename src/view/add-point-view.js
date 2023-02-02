@@ -153,14 +153,14 @@ export default class AddPointView extends AbstractStatefulView {
   }
 
   #isEndDateAfterStartDate = () => {
-    var startDate = this._state.dateFrom.getTime();
-    var endDate = this._state.dateTo.getTime();
-  
+    const startDate = this._state.dateFrom.getTime();
+    const endDate = this._state.dateTo.getTime();
+
     if (endDate < startDate) {
       return false;
     }
     return true;
-  }
+  };
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
@@ -180,9 +180,7 @@ export default class AddPointView extends AbstractStatefulView {
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
         disable: [
-          (date) => {
-            return (date < this.#datepickerStartWaypoint.selectedDates[0]);
-          }
+          (date) => date < this.#datepickerStartWaypoint.selectedDates[0]
         ],
       },
     );
