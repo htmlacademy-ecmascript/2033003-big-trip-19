@@ -247,11 +247,20 @@ export default class AddPointView extends AbstractStatefulView {
   };
 
   static parseWaypointToState(waypoint) {
-    return {...waypoint};
+    return {
+      ...waypoint,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    };
   }
 
   static parseStateToWaypoint(state) {
     const waypoint = {...state};
+
+    delete waypoint.isDisabled;
+    delete waypoint.isSaving;
+    delete waypoint.isDeleting;
 
     return waypoint;
   }

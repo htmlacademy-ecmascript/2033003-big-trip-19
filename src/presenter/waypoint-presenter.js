@@ -142,7 +142,6 @@ export default class WaypointPresenter{
       UpdateType.MINOR,
       waypoint
     );
-    //this.#replaceEditToPoint();
   };
 
   #handleFavoriteClick = () => {
