@@ -69,10 +69,10 @@ const createAddPointViewTemplate = (waypoint) => {
     ${!isEmptyObject(destination) ? showDestinationsList(destination, type, allDestinationNames) : ''}
     <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-${id}">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="">
+    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="" required>
     &mdash;
     <label class="visually-hidden" for="event-end-time-${id}">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="">
+    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="" required>
   </div>
 
   <div class="event__field-group  event__field-group--price">
@@ -152,6 +152,16 @@ export default class AddPointView extends AbstractStatefulView {
     }
   }
 
+  #isEndDateAfterStartDate = () => {
+    var startDate = this._state.dateFrom.getTime();
+    var endDate = this._state.dateTo.getTime();
+  
+    if (endDate < startDate) {
+      return false;
+    }
+    return true;
+  }
+
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
       this.element.querySelector('input[name="event-start-time"]'),
@@ -169,6 +179,11 @@ export default class AddPointView extends AbstractStatefulView {
         enableTime: true,
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
+        disable: [
+          (date) => {
+            return (date < this.#datepickerStartWaypoint.selectedDates[0]);
+          }
+        ],
       },
     );
   }
@@ -241,6 +256,7 @@ export default class AddPointView extends AbstractStatefulView {
 
   #saveNewPointClickHandler = (evt) =>{
     evt.preventDefault();
+
     if(this._state.basePrice > 0){
       this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
     }

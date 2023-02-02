@@ -69,10 +69,10 @@ function createEditViewTemplate(waypoint) {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-${id}">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFullFormatDate(dateFrom)}">
+        <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="" required>
         &mdash;
         <label class="visually-hidden" for="event-end-time-${id}">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${getFullFormatDate(dateTo)}">
+        <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="" required>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -183,6 +183,11 @@ export default class EditPointView extends AbstractStatefulView {
         enableTime: true,
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
+        disable: [
+          (date) => {
+            return (date < this.#datepickerStartWaypoint.selectedDates[0]);
+          }
+        ],
       },
     );
   }

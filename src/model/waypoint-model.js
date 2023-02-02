@@ -2,7 +2,7 @@ import { POINT_TYPES, UpdateType } from '../const.js';
 import { humanizeWaypointDate, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 import Observable from '../framework/observable.js';
 
-function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
+function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames, allOffers){
   return {
     id:point.id,
     basePrice: point.basePrice,
@@ -15,7 +15,8 @@ function createPoint(point, offers, destination, allAvailableOffers, alldestinat
     offersByType: allAvailableOffers,
     allTypes: allTypes,
     allDestinationNames: destinationNames,
-    allDestinations: alldestinations
+    allDestinations: alldestinations,
+    allOffers: allOffers
   };
 }
 
@@ -35,10 +36,6 @@ export default class WaypointModel extends Observable {
 
   get cities() {
     return this.#destinationNames;
-  }
-
-  get allTypes() {
-    return this.#allTypes;
   }
 
   get destinations() {
@@ -91,7 +88,7 @@ export default class WaypointModel extends Observable {
     const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
     const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
     const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
+    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames, this.#offers);
   }
 
   async init(){
