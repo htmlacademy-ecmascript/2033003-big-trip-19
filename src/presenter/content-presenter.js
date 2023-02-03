@@ -138,9 +138,9 @@ export default class ContentPresenter {
 
     trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
 
-    const offersPrice = filteredWaypoints.map(({ offers }) => offers.reduce((sum, { price }) => sum + price, 0)).reduce((sum, price) => sum + price, 0);
-    const basePrice = filteredWaypoints.map(({ basePrice }) => basePrice).reduce((sum, price) => sum + price, 0);
-    trip.cost = offersPrice + basePrice;
+    const offersCost = filteredWaypoints.map(({ offers }) => offers.reduce((sum, { price }) => sum + price, 0)).reduce((sum, price) => sum + price, 0);
+    const baseCost = filteredWaypoints.map(({ basePrice }) => basePrice).reduce((sum, price) => sum + price, 0);
+    trip.cost = offersCost + baseCost;
 
     return trip;
   }
