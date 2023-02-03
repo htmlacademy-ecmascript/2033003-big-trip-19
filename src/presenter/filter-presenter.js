@@ -19,7 +19,6 @@ export default class FilterPresenter{
   }
 
   get filters(){
-
     return [
       {
         type: FilterType.EVERYTHING,

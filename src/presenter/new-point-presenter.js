@@ -45,10 +45,6 @@ export default class NewPointPresenter{
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  #cancelAddPointClick = () => {
-    this.destroy();
-  };
-
   setSaving() {
     this.#newPointComponent.updateElement({
       isDisabled: true,
@@ -74,6 +70,10 @@ export default class NewPointPresenter{
 
     this.#newPointComponent.shake(resetFormState);
   }
+
+  #cancelAddPointClick = () => {
+    this.destroy();
+  };
 
   #saveNewPointClick = (waypoint) => {
     this.#handleDataChange(

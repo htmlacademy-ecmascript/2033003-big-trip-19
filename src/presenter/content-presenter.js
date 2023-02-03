@@ -1,35 +1,34 @@
+import { remove, render } from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import ContentView from '../view/content-view.js';
 import MessageView from '../view/message-view.js';
-import WaypointPresenter from './waypoint-presenter.js';
 import SortContainerView from '../view/sort-container-view.js';
-import { FilterType, SortType, TimeLimit, UpdateType, UserAction } from '../const.js';
-import { remove, render } from '../framework/render.js';
+import LoadingView from '../view/loading-view.js';
 import TripInfoView from '../view/trip-info-view.js';
+import WaypointPresenter from './waypoint-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
-import LoadingView from '../view/loading-view.js';
 import { humanizeWaypointDate, newWaypoint } from '../utils/util-waypoint.js';
-import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { sortTypes } from '../utils/util-sort.js';
+import { FilterType, SortType, TimeLimit, UpdateType, UserAction } from '../const.js';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
+  #loadingComponent = new LoadingView();
+  #waypointPresentersList = new Map();
   #tripComponent = null;
   #sortingComponent = null;
+  #messageComponent = null;
   #contentContainer = null;
+  #sortingsContainer = null;
   #tripContainer = null;
   #filterModel = null;
-  #waypointPresentersList = new Map();
-  #newWaypointPresenterList = new Map();
   #waypointModel = null;
-  #sortingsContainer = null;
-  #currentSortType = SortType.DAY;
-  #filterType = FilterType.EVERYTHING;
-  #messageComponent = null;
   #newWaypointPresenter = null;
   #newWaypoint = null;
   #isLoading = true;
-  #loadingComponent = new LoadingView();
+  #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -63,7 +62,7 @@ export default class ContentPresenter {
     this.#renderContentContainer();
   }
 
-  createWaypoint() {
+  createNewWaypoint() {
     const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
 
     const destinations = this.#waypointModel.destinations;
@@ -81,6 +80,46 @@ export default class ContentPresenter {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newWaypointPresenter.init(this.#newWaypoint);
+  }
+
+  #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
+    this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
+    this.#waypointPresentersList.clear();
+    remove(this.#sortingComponent);
+    remove(this.#tripComponent);
+    remove(this.#loadingComponent);
+
+    this.#currentSortType = resetSortType ? SortType.DAY : this.#currentSortType;
+    this.#filterType = resetFilterType ? FilterType.EVERYTHING : this.#filterType;
+
+    if(this.#messageComponent){
+      remove(this.#messageComponent);
+    }
+  }
+
+  #renderContentContainer() {
+    if(this.#isLoading){
+      this.#renderLoading();
+      return;
+    }
+    const waypoints = this.waypoints;
+    if(waypoints.length !== 0){
+      this.#renderSortings();
+    }
+
+    render(this.#boardComponent, this.#contentContainer);
+
+    this.#renderPoints(this.waypoints);
+
+    this.#renderTripInfo();
+
+    if(waypoints.length === 0){
+      this.#renderMessage();
+    }
+  }
+
+  #renderLoading(){
+    render(this.#loadingComponent, this.#contentContainer);
   }
 
   #renderSortings(){
@@ -105,12 +144,7 @@ export default class ContentPresenter {
     this.#waypointPresentersList.set(point.id, waypointPresenter);
   }
 
-  #renderMessage(){
-    this.#messageComponent = new MessageView({filterType: this.#filterType});
-    render(this.#messageComponent, this.#contentContainer);
-  }
-
-  #renderTrip(){
+  #renderTripInfo(){
     const trip = this.waypoints.length === 0
       ? {cost: 0, dates: '', template: ''}
       : this.#returnTripInfo();
@@ -145,45 +179,9 @@ export default class ContentPresenter {
     return trip;
   }
 
-  #renderLoading(){
-    render(this.#loadingComponent, this.#contentContainer);
-  }
-
-  #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
-    this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
-    this.#waypointPresentersList.clear();
-    remove(this.#sortingComponent);
-    remove(this.#tripComponent);
-    remove(this.#loadingComponent);
-    this.#newWaypointPresenterList.clear();
-
-    this.#currentSortType = resetSortType ? SortType.DAY : this.#currentSortType;
-    this.#filterType = resetFilterType ? FilterType.EVERYTHING : this.#filterType;
-
-    if(this.#messageComponent){
-      remove(this.#messageComponent);
-    }
-  }
-
-  #renderContentContainer() {
-    if(this.#isLoading){
-      this.#renderLoading();
-      return;
-    }
-    const waypoints = this.waypoints;
-    if(waypoints.length !== 0){
-      this.#renderSortings();
-    }
-
-    render(this.#boardComponent, this.#contentContainer);
-
-    this.#renderPoints(this.waypoints);
-
-    this.#renderTrip();
-
-    if(waypoints.length === 0){
-      this.#renderMessage();
-    }
+  #renderMessage(){
+    this.#messageComponent = new MessageView({filterType: this.#filterType});
+    render(this.#messageComponent, this.#contentContainer);
   }
 
   #handleSortTypeChange = (sortType) => {
@@ -198,7 +196,7 @@ export default class ContentPresenter {
 
   #handleModeChange = () => {
     this.#waypointPresentersList.forEach((presenter) => presenter.resetView());
-    this.#newWaypointPresenterList.forEach((presenter) => presenter.destroy());
+    this.#newWaypointPresenter.destroy();
   };
 
   #handleViewAction = async (actionType, updateType, update) => {

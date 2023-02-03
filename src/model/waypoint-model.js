@@ -50,24 +50,6 @@ export default class WaypointModel extends Observable {
     return this.#humanizedWaypoints;
   }
 
-  #getHumanizedWaypoints(waypoints) {
-    if(this.#humanizedWaypoints === null){
-      this.#humanizedWaypoints = [];
-      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint(waypoint));
-      this.#waypoints = this.#humanizedWaypoints;
-      return this.#humanizedWaypoints.sort(sortWaypointByDate);
-    }else{
-      return this.#humanizedWaypoints;
-    }
-  }
-
-  #createHumanizedWaypoint(point){
-    const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
-    const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
-    const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames, this.#offers);
-  }
-
   async init(){
     try{
       const waypoints = await this.#waypointApiService.waypoints;
@@ -80,6 +62,7 @@ export default class WaypointModel extends Observable {
       this.#humanizedWaypoints = this.#getHumanizedWaypoints(this.#waypoints);
     }catch(err){
       this.#waypoints = [];
+      this.#humanizedWaypoints = [];
       this.#destinations = [];
       this.#offers = [];
     }
@@ -157,6 +140,24 @@ export default class WaypointModel extends Observable {
         waypoints.sort(sortWaypointByDate);
     }
     return waypoints;
+  }
+
+  #getHumanizedWaypoints(waypoints) {
+    if(this.#humanizedWaypoints === null){
+      this.#humanizedWaypoints = [];
+      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint(waypoint));
+      this.#waypoints = this.#humanizedWaypoints;
+      return this.#humanizedWaypoints.sort(sortWaypointByDate);
+    }else{
+      return this.#humanizedWaypoints;
+    }
+  }
+
+  #createHumanizedWaypoint(point){
+    const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
+    const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
+    const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
+    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames, this.#offers);
   }
 
   #adaptToClient(waypoint) {

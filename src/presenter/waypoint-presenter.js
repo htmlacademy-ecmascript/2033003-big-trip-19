@@ -7,11 +7,11 @@ export default class WaypointPresenter{
   #contentContainer = null;
   #pointComponent = null;
   #editPointComponent = null;
+  #newWaypointPresenter = null;
   #waypoint = null;
   #mode = ViewMode.DEFAULT;
   #handleModeChange = null;
   #handleDataChange = null;
-  #newWaypointPresenter = null;
 
   constructor({newWaypointPresenter, waypointContainer, onModeChange, onDataChange}){
     this.#newWaypointPresenter = newWaypointPresenter;
