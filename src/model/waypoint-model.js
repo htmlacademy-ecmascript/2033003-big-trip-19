@@ -1,5 +1,5 @@
 import { POINT_TYPES, UpdateType } from '../const.js';
-import { humanizeWaypointDate, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
+import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 import Observable from '../framework/observable.js';
 
 function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames, allOffers){
@@ -48,29 +48,6 @@ export default class WaypointModel extends Observable {
 
   get humanizedWaypoints(){
     return this.#humanizedWaypoints;
-  }
-
-  getTripInfo(waypoints){
-    const trip = {};
-    if(waypoints.length !== 0){
-      const firstWaypoint = waypoints[0];
-      const lastWaypoint = waypoints.slice(-1)[0];
-
-      if (waypoints.length > 3) {
-        trip.template = `${firstWaypoint.destination.name} — ... — ${lastWaypoint.destination.name}`;
-      } else {
-        const mappedWaypoints = waypoints.slice(1).map((waypoint) => waypoint.destination.name);
-        if (waypoints.length > 1) {
-          trip.template = mappedWaypoints.join(' — ');
-          trip.template = `${firstWaypoint.destination.name} — ${trip.template}`;
-        } else {
-          trip.template = firstWaypoint.destination.name;
-        }
-      }
-      trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
-      trip.cost = waypoints.reduce((sum, elem) => sum + elem.basePrice, 0);
-    }
-    return trip;
   }
 
   #getHumanizedWaypoints(waypoints) {

@@ -8,7 +8,7 @@ import TripInfoView from '../view/trip-info-view.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
 import LoadingView from '../view/loading-view.js';
-import { newWaypoint } from '../utils/util-waypoint.js';
+import { humanizeWaypointDate, newWaypoint } from '../utils/util-waypoint.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { sortTypes } from '../utils/util-sort.js';
 
@@ -113,9 +113,33 @@ export default class ContentPresenter {
   #renderTrip(){
     const trip = this.waypoints.length === 0
       ? {cost: 0, dates: '', template: ''}
-      : this.#waypointModel.getTripInfo(this.waypoints);
+      : this.#returnTripInfo();
     this.#tripComponent = new TripInfoView({trip: trip});
     render(this.#tripComponent, this.#tripContainer, 'AFTERBEGIN');
+  }
+
+  #returnTripInfo(){
+    const filteredWaypoints = filter[this.#filterType](this.#waypointModel.humanizedWaypoints);
+    const trip = {};
+
+    if (filteredWaypoints.length === 0) {
+      return trip;
+    }
+
+    const [firstWaypoint, ...otherWaypoints] = filteredWaypoints;
+    const lastWaypoint = filteredWaypoints[filteredWaypoints.length - 1];
+
+    if (filteredWaypoints.length > 3) {
+      trip.template = `${firstWaypoint.destination.name} — ... — ${lastWaypoint.destination.name}`;
+    } else {
+      const destinationNames = otherWaypoints.map(({ destination }) => destination.name);
+      trip.template = [firstWaypoint.destination.name, ...destinationNames].join(' — ');
+    }
+
+    trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
+    trip.cost = filteredWaypoints.reduce((sum, { basePrice }) => sum + basePrice, 0);
+
+    return trip;
   }
 
   #renderLoading(){

@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
+import { isEmptyObject } from '../utils/util-waypoint.js';
 import { lowwerCaseFirst, upperCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -255,19 +255,16 @@ export default class AddPointView extends AbstractStatefulView {
     let isValid = true;
     if (!this.#startDatePickerElement.value) {
       isValid = false;
-    } else {
-      this.#startDatePickerElement.setCustomValidity('');
     }
-    
+
     if (!this.#endDatePickerElement.value) {
       isValid = false;
-    } else {
-      this.#endDatePickerElement.setCustomValidity('');
     }
 
     if (this._state.basePrice <= 0) {
       isValid = false;
     }
+
     evt.preventDefault();
     if (isValid) {
       this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
