@@ -217,11 +217,11 @@ export default class EditPointView extends AbstractStatefulView {
     if (this.#datepickerStartWaypoint.selectedDates[0] > this.#datepickerEndWaypoint.selectedDates[0]) {
       this.#datepickerEndWaypoint.clear();
     }
-    this.updateElement({dateFrom: userDate[0]});
+    this._setState({dateFrom: userDate[0]});
   };
 
   #dateEndChangeHandler = (userDate) => {
-    this.updateElement({dateTo: userDate[0]});
+    this._setState({dateTo: userDate[0]});
   };
 
   #editClickHandler = (evt) => {
