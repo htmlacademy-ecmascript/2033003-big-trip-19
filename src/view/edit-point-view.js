@@ -190,7 +190,7 @@ export default class EditPointView extends AbstractStatefulView {
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
         disable: [
-          (date) => date < this.#datepickerStartWaypoint.selectedDates[0]
+          (date) => date < this._state.dateFrom
         ],
       },
     );
@@ -218,6 +218,7 @@ export default class EditPointView extends AbstractStatefulView {
     if (state.dateFrom.getTime() > state.dateTo.getTime()) {
       this.updateElement({dateTo: userDate[0]});
     }
+    this.updateElement({dateFrom: userDate[0]});
   }
 
   #dateStartChangeHandler = (userDate) => {
