@@ -1,5 +1,5 @@
 import { POINT_TYPES, UpdateType } from '../const.js';
-import { newWaypoint, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
+import { newWaypointTemplate, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 import Observable from '../framework/observable.js';
 
 export default class WaypointModel extends Observable {
@@ -34,7 +34,7 @@ export default class WaypointModel extends Observable {
       const offers = await this.#waypointApiService.offers;
       this.#offers = offers;
       this.#humanizedWaypoints = this.#getHumanizedWaypoints(this.#waypoints);
-      this.#newHumanizedWaypoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypoint, updateType: UpdateType.INIT});
+      this.#newHumanizedWaypoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypointTemplate, updateType: UpdateType.INIT});
     }
     catch(err){
       this.#waypoints = [];
@@ -153,13 +153,13 @@ export default class WaypointModel extends Observable {
     return this.#createPoint(
       updateType,
       isNewPoint,
-      point, 
-      availableOffers, 
-      destinationdById, 
-      allAvailableOffers.offers, 
-      this.#destinations, 
-      POINT_TYPES, 
-      this.#destinationNames, 
+      point,
+      availableOffers,
+      destinationdById,
+      allAvailableOffers.offers,
+      this.#destinations,
+      POINT_TYPES,
+      this.#destinationNames,
       this.#offers
     );
   }

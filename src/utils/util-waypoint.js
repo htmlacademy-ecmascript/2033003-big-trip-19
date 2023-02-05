@@ -1,7 +1,7 @@
 import { DateFormat, FilterType, POINT_TYPES} from '../const.js';
 import dayjs from 'dayjs';
 
-const newWaypoint = {
+const newWaypointTemplate = {
   basePrice: '',
   dateFrom: new Date(),
   dateTo: new Date(),
@@ -73,7 +73,7 @@ const isCheckedOffer = (offer, pointOffers) => pointOffers.some((pointOffer) => 
 
 export {
   NoWaypointsTextType,
-  newWaypoint,
+  newWaypointTemplate,
   getTimeFromDate,
   getFullFormatDate,
   getDateDifference,

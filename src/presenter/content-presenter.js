@@ -8,7 +8,7 @@ import TripInfoView from '../view/trip-info-view.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
-import { humanizeWaypointDate, newWaypoint } from '../utils/util-waypoint.js';
+import { humanizeWaypointDate} from '../utils/util-waypoint.js';
 import { sortTypes } from '../utils/util-sort.js';
 import { FilterType, SortType, TimeLimit, UpdateType, UserAction } from '../const.js';
 
