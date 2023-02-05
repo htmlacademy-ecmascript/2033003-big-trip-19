@@ -46,6 +46,7 @@ function handleNewWaypointFormClose() {
 
 function handleNewWaypointButtonClick() {
   contentPresenter.createNewWaypoint();
+  contentPresenter.destroyMessage();
   newWaypointButtonComponent.addButton.disabled = true;
 }
 

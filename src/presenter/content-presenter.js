@@ -82,6 +82,12 @@ export default class ContentPresenter {
     this.#newWaypointPresenter.init(this.#newWaypoint);
   }
 
+  destroyMessage(){
+    if(this.#messageComponent){
+      remove(this.#messageComponent);
+    }
+  }
+
   #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
     this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
     this.#waypointPresentersList.clear();
@@ -93,7 +99,7 @@ export default class ContentPresenter {
     this.#filterType = resetFilterType ? FilterType.EVERYTHING : this.#filterType;
 
     if(this.#messageComponent){
-      remove(this.#messageComponent);
+      this.destroyMessage();
     }
   }
 
