@@ -166,6 +166,7 @@ export default class AddPointView extends AbstractStatefulView {
         enableTime: true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateStartChangeHandler,
+        onClose: (userDate) => this.#dateStartCloseHandler(userDate, this._state)
       },
     );
     this.#datepickerEndWaypoint = flatpickr(
@@ -212,10 +213,13 @@ export default class AddPointView extends AbstractStatefulView {
     this.updateElement({offers: this._state.offers});
   };
 
-  #dateStartChangeHandler = (userDate) => {
-    if (this.#datepickerStartWaypoint.selectedDates[0] > this.#datepickerEndWaypoint.selectedDates[0]) {
-      this.#datepickerEndWaypoint.clear();
+  #dateStartCloseHandler(userDate, state){
+    if (state.dateFrom.getTime() > state.dateTo.getTime()) {
+      this.updateElement({dateTo: userDate[0]});
     }
+  }
+
+  #dateStartChangeHandler = (userDate) => {
     this._setState({dateFrom: userDate[0]});
   };
 
