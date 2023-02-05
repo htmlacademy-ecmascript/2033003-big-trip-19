@@ -76,8 +76,10 @@ export default class ContentPresenter {
   }
 
   renderMessage(){
-    this.#messageComponent = new MessageView({filterType: this.#filterType});
-    render(this.#messageComponent, this.#contentContainer);
+    if(this.waypoints.length === 0){
+      this.#messageComponent = new MessageView({filterType: this.#filterType});
+      render(this.#messageComponent, this.#contentContainer);
+    }
   }
 
   #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
@@ -111,9 +113,7 @@ export default class ContentPresenter {
 
     this.#renderTripInfo();
 
-    if(waypoints.length === 0){
-      this.renderMessage();
-    }
+    this.renderMessage();
   }
 
   #renderLoading(){
