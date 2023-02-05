@@ -41,6 +41,7 @@ const newWaypointButtonComponent = new NewWaypointButtonView({
 newWaypointButtonComponent.addButton.disabled = true;
 
 function handleNewWaypointFormClose() {
+  contentPresenter.renderMessage();
   newWaypointButtonComponent.addButton.disabled = false;
 }
 

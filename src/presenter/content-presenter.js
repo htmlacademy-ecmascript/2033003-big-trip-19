@@ -75,6 +75,11 @@ export default class ContentPresenter {
     }
   }
 
+  renderMessage(){
+    this.#messageComponent = new MessageView({filterType: this.#filterType});
+    render(this.#messageComponent, this.#contentContainer);
+  }
+
   #clearContentContainer({resetSortType = false, resetFilterType = false} = {}) {
     this.#waypointPresentersList.forEach((presenter) => presenter.destroy());
     this.#waypointPresentersList.clear();
@@ -107,7 +112,7 @@ export default class ContentPresenter {
     this.#renderTripInfo();
 
     if(waypoints.length === 0){
-      this.#renderMessage();
+      this.renderMessage();
     }
   }
 
@@ -170,11 +175,6 @@ export default class ContentPresenter {
     trip.cost = offersCost + baseCost;
 
     return trip;
-  }
-
-  #renderMessage(){
-    this.#messageComponent = new MessageView({filterType: this.#filterType});
-    render(this.#messageComponent, this.#contentContainer);
   }
 
   #handleSortTypeChange = (sortType) => {
