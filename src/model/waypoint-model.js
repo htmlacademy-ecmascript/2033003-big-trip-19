@@ -1,24 +1,6 @@
 import { POINT_TYPES, UpdateType } from '../const.js';
-import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
+import { newWaypoint, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 import Observable from '../framework/observable.js';
-
-function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames, allOffers){
-  return {
-    id:point.id,
-    basePrice: point.basePrice,
-    dateFrom: point.dateFrom,
-    dateTo: point.dateTo,
-    destination: destination,
-    isFavorite: point.isFavorite,
-    offers: offers,
-    type: point.type,
-    offersByType: allAvailableOffers,
-    allTypes: allTypes,
-    allDestinationNames: destinationNames,
-    allDestinations: alldestinations,
-    allOffers: allOffers
-  };
-}
 
 export default class WaypointModel extends Observable {
   #offers = null;
@@ -26,28 +8,20 @@ export default class WaypointModel extends Observable {
   #destinations = null;
   #waypoints = null;
   #humanizedWaypoints = null;
-  #allTypes = POINT_TYPES;
   #waypointApiService = null;
+  #newHumanizedWaypoint = null;
 
   constructor({waypointApiService}){
     super();
     this.#waypointApiService = waypointApiService;
   }
 
-  get cities() {
-    return this.#destinationNames;
-  }
-
-  get destinations() {
-    return this.#destinations;
-  }
-
-  get offers(){
-    return this.#offers;
-  }
-
   get humanizedWaypoints(){
     return this.#humanizedWaypoints;
+  }
+
+  get newHumanizedWaypoint(){
+    return this.#newHumanizedWaypoint;
   }
 
   async init(){
@@ -60,7 +34,9 @@ export default class WaypointModel extends Observable {
       const offers = await this.#waypointApiService.offers;
       this.#offers = offers;
       this.#humanizedWaypoints = this.#getHumanizedWaypoints(this.#waypoints);
-    }catch(err){
+      this.#newHumanizedWaypoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypoint, updateType: UpdateType.INIT});
+    }
+    catch(err){
       this.#waypoints = [];
       this.#humanizedWaypoints = [];
       this.#destinations = [];
@@ -79,7 +55,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.updateWaypoint(update);
       const updatedWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizedWaypoint(updatedWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint({point: updatedWaypoint, updateType: updateType});
       this.#humanizedWaypoints = [
         ...this.#humanizedWaypoints.slice(0, index),
         humanizedPoint,
@@ -95,7 +71,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.addWaypoint(update);
       const newWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizedWaypoint(newWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypoint, updateType: updateType});
       this.#humanizedWaypoints = [
         humanizedPoint,
         ...this.#humanizedWaypoints,
@@ -125,6 +101,22 @@ export default class WaypointModel extends Observable {
     }
   }
 
+  #adaptToClient(waypoint) {
+    const adaptedWaypoint = {...waypoint,
+      basePrice: waypoint['base_price'],
+      dateFrom: waypoint['date_from'] !== null ? new Date(waypoint['date_from']) : waypoint['date_from'],
+      dateTo: waypoint['date_to'] !== null ? new Date(waypoint['date_to']) : waypoint['date_to'],
+      isFavorite: waypoint['is_favorite'],
+    };
+
+    delete adaptedWaypoint['base_price'];
+    delete adaptedWaypoint['date_from'];
+    delete adaptedWaypoint['date_to'];
+    delete adaptedWaypoint['is_favorite'];
+
+    return adaptedWaypoint;
+  }
+
   sortWaypoints(waypoints, sortType){
     switch(sortType){
       case sortType = 'day':
@@ -145,7 +137,7 @@ export default class WaypointModel extends Observable {
   #getHumanizedWaypoints(waypoints) {
     if(this.#humanizedWaypoints === null){
       this.#humanizedWaypoints = [];
-      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint(waypoint));
+      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint({point: waypoint, updateType: UpdateType.INIT}));
       this.#waypoints = this.#humanizedWaypoints;
       return this.#humanizedWaypoints.sort(sortWaypointByDate);
     }else{
@@ -153,26 +145,42 @@ export default class WaypointModel extends Observable {
     }
   }
 
-  #createHumanizedWaypoint(point){
+  #createHumanizedWaypoint({isNewPoint = false, point, updateType} = {}){
     const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
     const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
     const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames, this.#offers);
+
+    return this.#createPoint(
+      updateType,
+      isNewPoint,
+      point, 
+      availableOffers, 
+      destinationdById, 
+      allAvailableOffers.offers, 
+      this.#destinations, 
+      POINT_TYPES, 
+      this.#destinationNames, 
+      this.#offers
+    );
   }
 
-  #adaptToClient(waypoint) {
-    const adaptedWaypoint = {...waypoint,
-      basePrice: waypoint['base_price'],
-      dateFrom: waypoint['date_from'] !== null ? new Date(waypoint['date_from']) : waypoint['date_from'],
-      dateTo: waypoint['date_to'] !== null ? new Date(waypoint['date_to']) : waypoint['date_to'],
-      isFavorite: waypoint['is_favorite'],
+  #createPoint(updateType, isNewPoint, point, offers, destination, allAvailableOffers, allDestinations, allTypes, destinationNames, allOffers){
+    const result = {
+      id: updateType === UpdateType.INIT && isNewPoint ? undefined : point.id,
+      basePrice: point.basePrice,
+      dateFrom: point.dateFrom,
+      dateTo: point.dateTo,
+      destination: isNewPoint ? allDestinations[0] : destination,
+      isFavorite: point.isFavorite,
+      offers: offers,
+      type: point.type,
+      offersByType: allAvailableOffers,
+      allTypes: allTypes,
+      allDestinationNames: destinationNames,
+      allDestinations: allDestinations,
+      allOffers: allOffers
     };
 
-    delete adaptedWaypoint['base_price'];
-    delete adaptedWaypoint['date_from'];
-    delete adaptedWaypoint['date_to'];
-    delete adaptedWaypoint['is_favorite'];
-
-    return adaptedWaypoint;
+    return result;
   }
 }

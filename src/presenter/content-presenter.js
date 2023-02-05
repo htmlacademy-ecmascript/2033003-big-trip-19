@@ -63,20 +63,7 @@ export default class ContentPresenter {
   }
 
   createNewWaypoint() {
-    const offersByType = newWaypoint.offersByType([...this.#waypointModel.offers]);
-
-    const destinations = this.#waypointModel.destinations;
-    this.#newWaypoint = {
-      ...newWaypoint,
-      allDestinations: destinations,
-      allOffers: [...this.#waypointModel.offers],
-      destination: destinations[0],
-      offersByType: offersByType.offers,
-      dateFrom: new Date(),
-      dateTo: new Date(),
-      isFavorite: false,
-      allDestinationNames: this.#waypointModel.cities,
-    };
+    this.#newWaypoint = {...this.#waypointModel.newHumanizedWaypoint, dateFrom: new Date(), dateTo: new Date()};
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newWaypointPresenter.init(this.#newWaypoint);
