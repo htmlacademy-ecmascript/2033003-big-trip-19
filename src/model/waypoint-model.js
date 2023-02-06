@@ -1,23 +1,6 @@
 import { POINT_TYPES, UpdateType } from '../const.js';
-import { sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
+import { newWaypointTemplate, sortWaypointByDate, sortWaypointByDuration, sortWaypointByPrice } from '../utils/util-waypoint.js';
 import Observable from '../framework/observable.js';
-
-function createPoint(point, offers, destination, allAvailableOffers, alldestinations, allTypes, destinationNames){
-  return {
-    id:point.id,
-    basePrice: point.basePrice,
-    dateFrom: point.dateFrom,
-    dateTo: point.dateTo,
-    destination: destination,
-    isFavorite: point.isFavorite,
-    offers: offers,
-    type: point.type,
-    offersByType: allAvailableOffers,
-    allTypes: allTypes,
-    allDestinationNames: destinationNames,
-    allDestinations: alldestinations
-  };
-}
 
 export default class WaypointModel extends Observable {
   #offers = null;
@@ -25,50 +8,20 @@ export default class WaypointModel extends Observable {
   #destinations = null;
   #waypoints = null;
   #humanizedWaypoints = null;
-  #allTypes = POINT_TYPES;
   #waypointApiService = null;
+  #newHumanizedWaypoint = null;
 
   constructor({waypointApiService}){
     super();
     this.#waypointApiService = waypointApiService;
   }
 
-  get cities() {
-    return this.#destinationNames;
-  }
-
-  get allTypes() {
-    return this.#allTypes;
-  }
-
-  get destinations() {
-    return this.#destinations;
-  }
-
-  get offers(){
-    return this.#offers;
-  }
-
   get humanizedWaypoints(){
     return this.#humanizedWaypoints;
   }
 
-  #getHumanizedWaypoints(waypoints) {
-    if(this.#humanizedWaypoints === null){
-      this.#humanizedWaypoints = [];
-      this.#humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint(waypoint));
-      this.#waypoints = this.#humanizedWaypoints;
-      return this.#humanizedWaypoints.sort(sortWaypointByDate);
-    }else{
-      return this.#humanizedWaypoints;
-    }
-  }
-
-  #createHumanizedWaypoint(point){
-    const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
-    const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
-    const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-    return createPoint(point, availableOffers, destinationdById, allAvailableOffers.offers, this.#destinations, this.#allTypes, this.#destinationNames);
+  get newHumanizedWaypoint(){
+    return this.#newHumanizedWaypoint;
   }
 
   async init(){
@@ -81,8 +34,11 @@ export default class WaypointModel extends Observable {
       const offers = await this.#waypointApiService.offers;
       this.#offers = offers;
       this.#humanizedWaypoints = this.#getHumanizedWaypoints(this.#waypoints);
-    }catch(err){
+      this.#newHumanizedWaypoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypointTemplate, updateType: UpdateType.INIT});
+    }
+    catch(err){
       this.#waypoints = [];
+      this.#humanizedWaypoints = [];
       this.#destinations = [];
       this.#offers = [];
     }
@@ -99,7 +55,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.updateWaypoint(update);
       const updatedWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizedWaypoint(updatedWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint({point: updatedWaypoint, updateType: updateType});
       this.#humanizedWaypoints = [
         ...this.#humanizedWaypoints.slice(0, index),
         humanizedPoint,
@@ -115,7 +71,7 @@ export default class WaypointModel extends Observable {
     try {
       const response = await this.#waypointApiService.addWaypoint(update);
       const newWaypoint = this.#adaptToClient(response);
-      const humanizedPoint = this.#createHumanizedWaypoint(newWaypoint);
+      const humanizedPoint = this.#createHumanizedWaypoint({isNewPoint: true, point: newWaypoint, updateType: updateType});
       this.#humanizedWaypoints = [
         humanizedPoint,
         ...this.#humanizedWaypoints,
@@ -162,6 +118,17 @@ export default class WaypointModel extends Observable {
     return waypoints;
   }
 
+  #getHumanizedWaypoints(waypoints) {
+    let humanizedWaypoints = this.#humanizedWaypoints;
+    if (humanizedWaypoints === null) {
+      humanizedWaypoints = waypoints.map((waypoint) => this.#createHumanizedWaypoint({point: waypoint, updateType: UpdateType.INIT}));
+      humanizedWaypoints = humanizedWaypoints.sort(sortWaypointByDate);
+      this.#humanizedWaypoints = humanizedWaypoints;
+      this.#waypoints = humanizedWaypoints;
+    }
+    return humanizedWaypoints;
+  }
+
   #adaptToClient(waypoint) {
     const adaptedWaypoint = {...waypoint,
       basePrice: waypoint['base_price'],
@@ -176,5 +143,44 @@ export default class WaypointModel extends Observable {
     delete adaptedWaypoint['is_favorite'];
 
     return adaptedWaypoint;
+  }
+
+  #createHumanizedWaypoint({isNewPoint = false, point, updateType} = {}){
+    const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
+    const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
+    const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
+
+    const data = {
+      updateType,
+      isNewPoint,
+      point,
+      availableOffers,
+      destination: destinationdById,
+      allAvailableOffers: allAvailableOffers.offers,
+      allDestinations: this.#destinations,
+      allTypes: POINT_TYPES,
+      destinationNames: this.#destinationNames,
+      allOffers: this.#offers
+    };
+    return this.#createPoint(data);
+  }
+
+  #createPoint(data){
+    const { updateType, isNewPoint, point, availableOffers, destination, allAvailableOffers, allDestinations, allTypes, destinationNames, allOffers } = data;
+    return {
+      id: updateType === UpdateType.INIT && isNewPoint ? undefined : point.id,
+      basePrice: point.basePrice,
+      dateFrom: point.dateFrom,
+      dateTo: point.dateTo,
+      destination: isNewPoint ? allDestinations[0] : destination,
+      isFavorite: point.isFavorite,
+      offers: availableOffers,
+      type: point.type,
+      offersByType: allAvailableOffers,
+      allTypes: allTypes,
+      allDestinationNames: destinationNames,
+      allDestinations: allDestinations,
+      allOffers: allOffers
+    };
   }
 }

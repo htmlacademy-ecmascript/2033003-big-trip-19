@@ -7,11 +7,11 @@ export default class WaypointPresenter{
   #contentContainer = null;
   #pointComponent = null;
   #editPointComponent = null;
+  #newWaypointPresenter = null;
   #waypoint = null;
   #mode = ViewMode.DEFAULT;
   #handleModeChange = null;
   #handleDataChange = null;
-  #newWaypointPresenter = null;
 
   constructor({newWaypointPresenter, waypointContainer, onModeChange, onDataChange}){
     this.#newWaypointPresenter = newWaypointPresenter;
@@ -64,6 +64,41 @@ export default class WaypointPresenter{
     }
   }
 
+  setSaving() {
+    if (this.#mode === ViewMode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === ViewMode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === ViewMode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editPointComponent.shake(resetFormState);
+  }
+
   #replacePointToEdit () {
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -107,7 +142,6 @@ export default class WaypointPresenter{
       UpdateType.MINOR,
       waypoint
     );
-    this.#replaceEditToPoint();
   };
 
   #handleFavoriteClick = () => {

@@ -40,6 +40,11 @@ const FilterType = {
   PAST: 'PAST'
 };
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export {
   DateFormat,
   POINT_TYPES,
@@ -47,4 +52,5 @@ export {
   UserAction,
   UpdateType,
   FilterType,
-  ViewMode};
+  ViewMode,
+  TimeLimit};

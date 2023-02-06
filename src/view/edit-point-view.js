@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { getFullFormatDate, isEmptyObject } from '../utils/util-waypoint.js';
+import { isEmptyObject } from '../utils/util-waypoint.js';
 import { upperCaseFirst, lowwerCaseFirst } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -35,7 +35,7 @@ const createOffersViewTemplate = (point, allOffers) => `<section class="event__s
   </section>`;
 
 function createEditViewTemplate(waypoint) {
-  const { type, destination, dateFrom, dateTo, basePrice, id, offersByType, allTypes, allDestinationNames } = waypoint;
+  const { type, destination, basePrice, id, offersByType, allTypes, allDestinationNames, isDisabled, isSaving, isDeleting } = waypoint;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -69,10 +69,10 @@ function createEditViewTemplate(waypoint) {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-${id}">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFullFormatDate(dateFrom)}">
+        <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="" required>
         &mdash;
         <label class="visually-hidden" for="event-end-time-${id}">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${getFullFormatDate(dateTo)}">
+        <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="" required>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -83,8 +83,12 @@ function createEditViewTemplate(waypoint) {
         <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" pattern="[0-9]+" value="${basePrice}" required>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+      ${isSaving ? 'Saving...' : 'Save'}
+      </button>
+      <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+      ${isDeleting ? 'Deleting...' : 'Delete'}
+      </button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
@@ -104,6 +108,8 @@ export default class EditPointView extends AbstractStatefulView {
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
   #destinationNames = null;
+  #startDatePickerElement = null;
+  #endDatePickerElement = null;
 
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
@@ -152,6 +158,9 @@ export default class EditPointView extends AbstractStatefulView {
     destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.#setOfferClickHandler();
+
+    this.#startDatePickerElement = this.element.querySelector('input[name="event-start-time"]');
+    this.#endDatePickerElement = this.element.querySelector('input[name="event-end-time"]');
     this.#setDatepickers();
   }
 
@@ -170,6 +179,7 @@ export default class EditPointView extends AbstractStatefulView {
         enableTime: true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateStartChangeHandler,
+        onClose: (userDate) => this.#dateStartCloseHandler(userDate, this._state)
       },
     );
     this.#datepickerEndWaypoint = flatpickr(
@@ -179,6 +189,9 @@ export default class EditPointView extends AbstractStatefulView {
         enableTime: true,
         defaultDate: this._state.dateTo,
         onChange: this.#dateEndChangeHandler,
+        disable: [
+          (date) => date < this._state.dateFrom
+        ],
       },
     );
   }
@@ -201,12 +214,19 @@ export default class EditPointView extends AbstractStatefulView {
     this.updateElement({offers: this._state.offers});
   };
 
-  #dateStartChangeHandler = (userDate) => {
+  #dateStartCloseHandler(userDate, state){
+    if (state.dateFrom.getTime() > state.dateTo.getTime()) {
+      this.updateElement({dateTo: userDate[0]});
+    }
     this.updateElement({dateFrom: userDate[0]});
+  }
+
+  #dateStartChangeHandler = (userDate) => {
+    this._setState({dateFrom: userDate[0]});
   };
 
   #dateEndChangeHandler = (userDate) => {
-    this.updateElement({dateTo: userDate[0]});
+    this._setState({dateTo: userDate[0]});
   };
 
   #editClickHandler = (evt) => {
@@ -220,8 +240,23 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #saveClickHandler = (evt) =>{
+    let isValid = true;
+    if (!this.#startDatePickerElement.value) {
+      isValid = false;
+    }
+
+    if (!this.#endDatePickerElement.value) {
+      isValid = false;
+    }
+
+    if (this._state.basePrice <= 0) {
+      isValid = false;
+    }
+
     evt.preventDefault();
-    this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
+    if (isValid) {
+      this.#handleSaveClick(EditPointView.parseStateToWaypoint(this._state));
+    }
   };
 
   #typeChangeHandler = (evt) => {
@@ -259,11 +294,20 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   static parseWaypointToState(waypoint) {
-    return {...waypoint};
+    return {
+      ...waypoint,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    };
   }
 
   static parseStateToWaypoint(state) {
     const waypoint = {...state};
+
+    delete waypoint.isDisabled;
+    delete waypoint.isSaving;
+    delete waypoint.isDeleting;
 
     return waypoint;
   }
