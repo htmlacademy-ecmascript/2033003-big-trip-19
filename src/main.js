@@ -2,11 +2,10 @@ import FilterModel from './model/filter-model.js';
 import WaypointModel from './model/waypoint-model.js';
 import ContentPresenter from './presenter/content-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-import { returnRandomString } from './utils/common.js';
 import NewWaypointButtonView from './view/new-waypoint-button-view.js';
 import WaypointsApiService from './waypoints-api-service.js';
 
-const AUTHORIZATION = `Basic ${returnRandomString()}`;
+const AUTHORIZATION = 'Basic 9tBHaimE3KGICpDEH6Id';
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
 
 const siteTripMain = document.querySelector('.trip-main');
