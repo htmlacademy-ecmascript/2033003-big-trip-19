@@ -8,7 +8,7 @@ import WaypointsApiService from './waypoints-api-service.js';
 const AUTHORIZATION = 'Basic 9tBHaimE3KGICpDEH6Id';
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
 
-const siteTripMain = document.querySelector('.trip-main');
+const siteTripMainElement = document.querySelector('.trip-main');
 const siteFilterEventsElement = document.querySelector('.trip-controls__filters');
 const siteSortEventsElement = document.querySelector('.trip-events');
 
@@ -27,7 +27,7 @@ const contentPresenter = new ContentPresenter(
   {
     contentContainer: siteSortEventsElement,
     sortingsContainer: siteSortEventsElement,
-    tripContainer: siteTripMain,
+    tripContainer: siteTripMainElement,
     waypointModel,
     filterModel,
     onNewWaypointDestroy: handleNewWaypointFormClose

@@ -1,6 +1,6 @@
-import { UpdateType, UserAction} from '../const.js';
+import { UpdateType, UserAction, ViewMode} from '../const.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-import AddPointView from '../view/add-point-view.js';
+import EditPointView from '../view/edit-point-view.js';
 
 export default class NewPointPresenter{
   #contentContainer = null;
@@ -22,10 +22,11 @@ export default class NewPointPresenter{
 
     this.#newWaypoint = newWaypoint;
 
-    this.#newPointComponent = new AddPointView({
+    this.#newPointComponent = new EditPointView({
       waypoint: this.#newWaypoint,
-      onCancelAddPointClick: this.#cancelAddPointClick,
-      onSaveNewPointClick: this.#saveNewPointClick
+      onCancelClick: this.#cancelAddPointClick,
+      onSaveClick: this.#saveNewPointClick,
+      mode: ViewMode.ADDING
     });
 
     render(this.#newPointComponent, this.#contentContainer, RenderPosition.AFTERBEGIN);

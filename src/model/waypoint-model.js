@@ -148,8 +148,8 @@ export default class WaypointModel extends Observable {
   #createHumanizedWaypoint({isNewPoint = false, point, updateType} = {}){
     const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
     const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
-    const destination = this.#destinations.find((destinationElement) => destinationElement.id ===  point.destination);
-  
+    const destination = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
+
     return {
       id: updateType === UpdateType.INIT && isNewPoint ? undefined : point.id,
       basePrice: point.basePrice,

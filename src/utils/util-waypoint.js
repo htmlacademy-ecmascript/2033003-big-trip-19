@@ -60,8 +60,6 @@ const sortWaypointByPrice = (waypointA, waypointB) => waypointB.basePrice - wayp
 
 const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DAY) : date;
 
-const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
-
 const NoWaypointsTextType = {
   [FilterType.EVERYTHING]: 'Click New Event to create your first point',
   [FilterType.PAST]: 'There are no past events now',
@@ -79,7 +77,6 @@ export {
   getDateDifference,
   isEmptyObject,
   humanizeWaypointDate,
-  getRandomArrayElement,
   sortWaypointByDate,
   sortWaypointByDuration,
   sortWaypointByPrice,

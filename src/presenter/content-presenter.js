@@ -151,11 +151,6 @@ export default class ContentPresenter {
     render(this.#tripComponent, this.#tripContainer, 'AFTERBEGIN');
   }
 
-  #getMonthName(month) {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    return monthNames[month];
-  }
-
   #returnTripInfo(){
     const filteredWaypoints = filter[this.#filterType](this.#waypointModel.humanizedWaypoints);
     const trip = {};
@@ -175,7 +170,7 @@ export default class ContentPresenter {
     }
 
     trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
-    
+
     if (dayjs(firstWaypoint.dateFrom).isSame(dayjs(lastWaypoint.dateTo), 'month')) {
       const startDate = dayjs(firstWaypoint.dateFrom).format(DateFormat.MONTH_AND_DAY);
       const endDate = dayjs(lastWaypoint.dateTo).format(DateFormat.DAY);

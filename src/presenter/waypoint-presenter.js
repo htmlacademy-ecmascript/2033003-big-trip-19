@@ -31,9 +31,10 @@ export default class WaypointPresenter{
     });
     this.#editPointComponent = new EditPointView({
       waypoint: this.#waypoint,
-      onCloseEditClick: this.#handleCloseEditClick,
+      onCancelClick: this.#handleCloseEditClick,
       onDeleteClick: this.#handleDeleteClick,
       onSaveClick: this.#handleFormSubmit,
+      mode: ViewMode.EDITING
     });
 
     if(prevPointComponent === null || prevEditPointComponent === null){
