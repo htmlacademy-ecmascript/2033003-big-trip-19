@@ -148,39 +148,22 @@ export default class WaypointModel extends Observable {
   #createHumanizedWaypoint({isNewPoint = false, point, updateType} = {}){
     const allAvailableOffers = this.#offers.find((offer) => offer.type === point.type);
     const availableOffers = allAvailableOffers.offers.filter((availableOffer) => point.offers.includes(availableOffer.id));
-    const destinationdById = this.#destinations.find((destinationElement) => destinationElement.id === point.destination);
-
-    const data = {
-      updateType,
-      isNewPoint,
-      point,
-      availableOffers,
-      destination: destinationdById,
-      allAvailableOffers: allAvailableOffers.offers,
-      allDestinations: this.#destinations,
-      allTypes: POINT_TYPES,
-      destinationNames: this.#destinationNames,
-      allOffers: this.#offers
-    };
-    return this.#createPoint(data);
-  }
-
-  #createPoint(data){
-    const { updateType, isNewPoint, point, availableOffers, destination, allAvailableOffers, allDestinations, allTypes, destinationNames, allOffers } = data;
+    const destination = this.#destinations.find((destinationElement) => destinationElement.id ===  point.destination);
+  
     return {
       id: updateType === UpdateType.INIT && isNewPoint ? undefined : point.id,
       basePrice: point.basePrice,
       dateFrom: point.dateFrom,
       dateTo: point.dateTo,
-      destination: isNewPoint ? allDestinations[0] : destination,
+      destination: updateType === UpdateType.INIT && isNewPoint ? 0 : destination,
       isFavorite: point.isFavorite,
       offers: availableOffers,
       type: point.type,
-      offersByType: allAvailableOffers,
-      allTypes: allTypes,
-      allDestinationNames: destinationNames,
-      allDestinations: allDestinations,
-      allOffers: allOffers
+      offersByType: allAvailableOffers.offers,
+      allTypes: POINT_TYPES,
+      allDestinationNames: this.#destinationNames,
+      allDestinations: this.#destinations,
+      allOffers: this.#offers
     };
   }
 }

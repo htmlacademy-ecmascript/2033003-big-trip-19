@@ -18,17 +18,20 @@ const createDestinationViewTemplate = (destinationPoint) => {
   </section>`;
 };
 
-const showDestinationTitle = (destination) => `<input class="event__input  event__input--destination" id="event-destination-${destination.id}" type="text" name="event-destination" value="${destination.name}" list="destination-list-${destination.id}">`;
+const showDestinationTitle = (destinationId, destinationName) => `<input class="event__input  event__input--destination" id="event-destination-${destinationId}" type="text" name="event-destination" value="${destinationName}" list="destination-list-${destinationId}">`;
 
-const showDestinationsList = (destination, type, allDestinationNames) => `<div class="event__field-group  event__field-group--destination">
-<label class="event__label  event__type-output" for="event-destination-${destination.id}">
-${upperCaseFirst(type)}
-</label>
-${showDestinationTitle(destination)}
-<datalist id="destination-list-${destination.id}">
-  ${allDestinationNames.map((name) => `<option value="${name}" ${name === destination.name ? 'selected' : ''}></option>`).join('')}
-</datalist>
-</div>`;
+const showDestinationsList = (destination, type, allDestinationNames) => {
+  const destinationId = destination === 0 ? 0 : destination.id;
+  const destinationName = destination === 0 ? '' : destination.name;
+  return `<div class="event__field-group  event__field-group--destination">
+    <label class="event__label  event__type-output" for="event-destination-${destinationId}">
+    ${upperCaseFirst(type)}
+    </label>
+    ${showDestinationTitle(destinationId, destinationName)}
+    <datalist id="destination-list-${destinationId}">
+      ${allDestinationNames.map((name) => `<option value="${name}" ${name === destinationName ? 'selected' : ''}></option>`).join('')}
+    </datalist>
+    </div>`};
 
 const createOffersViewTemplate = (waypoint, offers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -66,7 +69,7 @@ const createAddPointViewTemplate = (waypoint) => {
           </fieldset>
         </div>
       </div>
-    ${!isEmptyObject(destination) ? showDestinationsList(destination, type, allDestinationNames) : ''}
+    ${showDestinationsList(destination, type, allDestinationNames)}
   <div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-1">From</label>
     <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="">
@@ -128,9 +131,9 @@ export default class AddPointView extends AbstractStatefulView {
       type.addEventListener('click', this.#typeChangeHandler);
     }
 
-    const destination = this.element.querySelector('.event__input--destination');
-    const destinationName = destination.value;
-    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
+      const destination = this.element.querySelector('.event__input--destination');
+      const destinationName = this._state.destination === 0 ? '' : destination.value;
+      destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.#setOfferClickHandler();
 
@@ -239,6 +242,7 @@ export default class AddPointView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt, prevDestinationName) => {
+    prevDestinationName = prevDestinationName === '' ? this._state.allDestinations[0].name : prevDestinationName;
     let destination = null;
     if(this.#destinationNames.includes(evt.target.value)) {
       destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
