@@ -110,6 +110,7 @@ export default class EditPointView extends AbstractStatefulView {
   #destinationNames = null;
   #startDatePickerElement = null;
   #endDatePickerElement = null;
+  #priceChangeTimeout = null;
 
   constructor({ waypoint, onCloseEditClick, onDeleteClick, onSaveClick }) {
     super();
@@ -147,7 +148,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('form').addEventListener('reset', this.#deleteClickHandler);
     this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChange);
     const types = this.element.querySelectorAll('.event__type-input');
     for (const type of types){
       type.addEventListener('click', this.#typeChangeHandler);
@@ -173,7 +174,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #setDatepickers() {
     this.#datepickerStartWaypoint = flatpickr(
-      this.element.querySelector('input[name="event-start-time"]'),
+      this.#startDatePickerElement,
       {
         dateFormat: 'd/m/Y H:i',
         enableTime: true,
@@ -183,7 +184,7 @@ export default class EditPointView extends AbstractStatefulView {
       },
     );
     this.#datepickerEndWaypoint = flatpickr(
-      this.element.querySelector('input[name="event-end-time"]'),
+      this.#endDatePickerElement,
       {
         dateFormat: 'd/m/Y H:i',
         enableTime: true,
@@ -229,16 +230,6 @@ export default class EditPointView extends AbstractStatefulView {
     this._setState({dateTo: userDate[0]});
   };
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleCloseEditClick();
-  };
-
-  #deleteClickHandler = (evt) =>{
-    evt.preventDefault();
-    this.#handleDeleteClick(EditPointView.parseStateToWaypoint(this._state));
-  };
-
   #saveClickHandler = (evt) =>{
     let isValid = true;
     if (!this.#startDatePickerElement.value) {
@@ -269,28 +260,44 @@ export default class EditPointView extends AbstractStatefulView {
     });
   };
 
-  #destinationChangeHandler = (evt, prevDestinationName) => {
+  #destinationChangeHandler = (evt) => {
+    evt.target.setCustomValidity('');
     let destination = null;
     if(this.#destinationNames.includes(evt.target.value)) {
       destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+      this.updateElement({
+        destination: destination[0],
+        offers: []
+      });
     }else{
-      destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
+      evt.target.setCustomValidity('Такого города нет в списке');
     }
-    this.updateElement({
-      destination: destination[0],
-      offers: []
-    });
   };
 
   #priceChange = (evt) => {
+    evt.target.setCustomValidity('');
     const price = Number(evt.target.value);
     if(!isNaN(price) && price > 0){
-      this.updateElement({
+      this._setState({
         basePrice: Number(evt.target.value)
       });
+      clearTimeout(this.#priceChangeTimeout);
+      this.#priceChangeTimeout = setTimeout(() => {
+        evt.target.blur();
+      }, 650);
     }else{
       evt.target.setCustomValidity('Значение должно быть больше 0');
     }
+  };
+
+  #deleteClickHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handleDeleteClick(EditPointView.parseStateToWaypoint(this._state));
+  };
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseEditClick();
   };
 
   static parseWaypointToState(waypoint) {

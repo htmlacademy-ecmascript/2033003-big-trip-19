@@ -31,7 +31,8 @@ const showDestinationsList = (destination, type, allDestinationNames) => {
     <datalist id="destination-list-${destinationId}">
       ${allDestinationNames.map((name) => `<option value="${name}" ${name === destinationName ? 'selected' : ''}></option>`).join('')}
     </datalist>
-    </div>`};
+    </div>`;
+};
 
 const createOffersViewTemplate = (waypoint, offers) => `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -100,18 +101,19 @@ const createAddPointViewTemplate = (waypoint) => {
 
 export default class AddPointView extends AbstractStatefulView {
   #handleCancelAddPointClick = null;
-  #handleSaveNewPointClick = null;
+  #handleSavePointClick = null;
   #datepickerStartWaypoint = null;
   #datepickerEndWaypoint = null;
   #destinationNames = null;
   #startDatePickerElement = null;
   #endDatePickerElement = null;
+  #priceChangeTimeout = null;
 
   constructor({ waypoint, onCancelAddPointClick, onSaveNewPointClick}) {
     super();
     this._setState(AddPointView.parseWaypointToState(waypoint));
     this.#handleCancelAddPointClick = onCancelAddPointClick;
-    this.#handleSaveNewPointClick = onSaveNewPointClick;
+    this.#handleSavePointClick = onSaveNewPointClick;
     this.#destinationNames = waypoint.allDestinationNames;
 
     this._restoreHandlers();
@@ -123,17 +125,17 @@ export default class AddPointView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.querySelector('form').addEventListener('reset', this.#closeClickHandler);
-    this.element.querySelector('form').addEventListener('submit', this.#saveNewPointClickHandler);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChange);
+    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChange);
 
     const types = this.element.querySelectorAll('.event__type-input');
     for (const type of types){
       type.addEventListener('click', this.#typeChangeHandler);
     }
 
-      const destination = this.element.querySelector('.event__input--destination');
-      const destinationName = this._state.destination === 0 ? '' : destination.value;
-      destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
+    const destination = this.element.querySelector('.event__input--destination');
+    const destinationName = this._state.destination === 0 ? '' : destination.value;
+    destination.addEventListener('change', (evt) => this.#destinationChangeHandler(evt, destinationName));
 
     this.#setOfferClickHandler();
 
@@ -186,21 +188,9 @@ export default class AddPointView extends AbstractStatefulView {
     );
   }
 
-  #priceChange = (evt) => {
-    const price = Number(evt.target.value);
-    if(!isNaN(price) && price > 0){
-      this.updateElement({
-        basePrice: Number(evt.target.value)
-      });
-    }else{
-      evt.target.setCustomValidity('Значение должно быть больше 0');
-    }
-  };
-
   #offerClickHandler = (evt) => {
     evt.preventDefault();
     const datasetOffer = Number(evt.currentTarget.dataset.offer);
-
     let offer;
     const offersByType = this._state.allOffers.find((element) => element.type === this._state.type);
     if (offersByType) {
@@ -231,36 +221,7 @@ export default class AddPointView extends AbstractStatefulView {
     this._setState({dateTo: userDate[0]});
   };
 
-  #typeChangeHandler = (evt) => {
-    evt.preventDefault();
-    const offersByType = this._state.allOffers.find((offer) => offer.type === evt.target.value);
-    this.updateElement({
-      type: evt.target.value,
-      offersByType: offersByType.offers,
-      offers: []
-    });
-  };
-
-  #destinationChangeHandler = (evt, prevDestinationName) => {
-    prevDestinationName = prevDestinationName === '' ? this._state.allDestinations[0].name : prevDestinationName;
-    let destination = null;
-    if(this.#destinationNames.includes(evt.target.value)) {
-      destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
-    }else{
-      destination = this._state.allDestinations.filter((element) => element.name === prevDestinationName);
-    }
-    this.updateElement({
-      destination: destination[0],
-      offers: []
-    });
-  };
-
-  #closeClickHandler = (evt) =>{
-    evt.preventDefault();
-    this.#handleCancelAddPointClick();
-  };
-
-  #saveNewPointClickHandler = (evt) =>{
+  #saveClickHandler = (evt) =>{
     let isValid = true;
     if (!this.#startDatePickerElement.value) {
       isValid = false;
@@ -276,8 +237,53 @@ export default class AddPointView extends AbstractStatefulView {
 
     evt.preventDefault();
     if (isValid) {
-      this.#handleSaveNewPointClick(AddPointView.parseStateToWaypoint(this._state));
+      this.#handleSavePointClick(AddPointView.parseStateToWaypoint(this._state));
     }
+  };
+
+  #typeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const offersByType = this._state.allOffers.find((offer) => offer.type === evt.target.value);
+    this.updateElement({
+      type: evt.target.value,
+      offersByType: offersByType.offers,
+      offers: []
+    });
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.target.setCustomValidity('');
+    let destination = null;
+    if(this.#destinationNames.includes(evt.target.value)) {
+      destination = this._state.allDestinations.filter((element) => element.name === evt.target.value);
+      this.updateElement({
+        destination: destination[0],
+        offers: []
+      });
+    }else{
+      evt.target.setCustomValidity('Такого города нет в списке');
+    }
+  };
+
+  #priceChange = (evt) => {
+    evt.target.setCustomValidity('');
+    const price = Number(evt.target.value);
+    if(!isNaN(price) && price > 0){
+      this._setState({
+        basePrice: Number(evt.target.value)
+      });
+      clearTimeout(this.#priceChangeTimeout);
+      this.#priceChangeTimeout = setTimeout(() => {
+        evt.target.blur();
+      }, 650);
+    }else{
+      evt.target.setCustomValidity('Значение должно быть больше 0');
+    }
+  };
+
+  #closeClickHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handleCancelAddPointClick();
   };
 
   static parseWaypointToState(waypoint) {
