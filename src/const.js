@@ -1,5 +1,6 @@
 const DateFormat = {
-  MONTH_AND_DATE: 'MMM DD',
+  DAY: 'DD',
+  MONTH_AND_DAY: 'MMM DD',
   HOURS_AND_MINUTES: 'HH:mm',
   FULL_DATE_AND_TIME: 'DD/MM/YY HH:mm'
 };

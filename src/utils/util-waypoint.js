@@ -58,7 +58,7 @@ const sortWaypointByDuration = (waypointA, waypointB) => {
 
 const sortWaypointByPrice = (waypointA, waypointB) => waypointB.basePrice - waypointA.basePrice;
 
-const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DATE) : date;
+const humanizeWaypointDate = (date) => date ? dayjs(date).format(DateFormat.MONTH_AND_DAY) : date;
 
 const getRandomArrayElement = (elements) => elements[Math.floor(Math.random() * elements.length)];
 

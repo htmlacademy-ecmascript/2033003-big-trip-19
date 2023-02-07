@@ -10,7 +10,8 @@ import NewPointPresenter from './new-point-presenter.js';
 import { filter } from '../utils/util-filter.js';
 import { humanizeWaypointDate} from '../utils/util-waypoint.js';
 import { sortTypes } from '../utils/util-sort.js';
-import { FilterType, SortType, TimeLimit, UpdateType, UserAction } from '../const.js';
+import { DateFormat, FilterType, SortType, TimeLimit, UpdateType, UserAction } from '../const.js';
+import dayjs from 'dayjs';
 
 export default class ContentPresenter {
   #boardComponent = new ContentView();
@@ -150,6 +151,11 @@ export default class ContentPresenter {
     render(this.#tripComponent, this.#tripContainer, 'AFTERBEGIN');
   }
 
+  #getMonthName(month) {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return monthNames[month];
+  }
+
   #returnTripInfo(){
     const filteredWaypoints = filter[this.#filterType](this.#waypointModel.humanizedWaypoints);
     const trip = {};
@@ -169,6 +175,12 @@ export default class ContentPresenter {
     }
 
     trip.dates = `${humanizeWaypointDate(firstWaypoint.dateFrom)} - ${humanizeWaypointDate(lastWaypoint.dateTo)}`;
+    
+    if (dayjs(firstWaypoint.dateFrom).isSame(dayjs(lastWaypoint.dateTo), 'month')) {
+      const startDate = dayjs(firstWaypoint.dateFrom).format(DateFormat.MONTH_AND_DAY);
+      const endDate = dayjs(lastWaypoint.dateTo).format(DateFormat.DAY);
+      trip.dates = `${startDate} - ${endDate}`;
+    }
 
     const offersCost = filteredWaypoints.map(({ offers }) => offers.reduce((sum, { price }) => sum + price, 0)).reduce((sum, price) => sum + price, 0);
     const baseCost = filteredWaypoints.map(({ basePrice }) => basePrice).reduce((sum, price) => sum + price, 0);
